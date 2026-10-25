@@ -1,0 +1,131 @@
+{
+  "sourceRepository": "svanistelrooy901-art/advisorlink",
+  "sourceCommit": "761a17834db27b32e7724fd8324d5817faf3fb8c",
+  "sourceBranch": "review/basic-v1-production-cutover-20261025",
+  "refreshed": "2026-10-25",
+  "files": [
+    {
+      "sourcePath": "app/package.json",
+      "sourceBlobSha": "834992e663c342d16c7a73d5e66ff772df1f7fca",
+      "targetPath": "app/package.json",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/package-lock.json",
+      "sourceBlobSha": "61b8938c58c9f528de723c43c09f55c5c8899e41",
+      "targetPath": "app/package-lock.json",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/tsconfig.json",
+      "sourceBlobSha": "5e1feb437651831f728f7188d3b8ce2c0e3eb8f7",
+      "targetPath": "app/tsconfig.json",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/tsconfig.node.json",
+      "sourceBlobSha": "59e73c85157e0c1c798e8cfae1e02848f57c8bfa",
+      "targetPath": "app/tsconfig.node.json",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/vite.config.ts",
+      "sourceBlobSha": "fcd678c6eb613de9c7c635297ada1e2d41b48d97",
+      "targetPath": "app/vite.config.ts",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/src/hooks/useAuth.tsx",
+      "sourceBlobSha": "aa4499222204db864e84d806a267f54f1ce83c6f",
+      "targetPath": "app/src/hooks/useAuth.tsx",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/src/lib/authCallback.ts",
+      "sourceBlobSha": "48616b65bbc4f0bf890da673a135532ae9594900",
+      "targetPath": "app/src/lib/authCallback.ts",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/src/lib/recoveryGrant.ts",
+      "sourceBlobSha": "0ca52b6cc845e70d4036ea7cffe4f63e3140e4aa",
+      "targetPath": "app/src/lib/recoveryGrant.ts",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/src/lib/safeReturnTo.ts",
+      "sourceBlobSha": "bcb811d4337d3c2f249d603562a9c6922f5b5c56",
+      "targetPath": "app/src/lib/safeReturnTo.ts",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/src/lib/passwordSetup.ts",
+      "sourceBlobSha": "7b948b4d6cce4a444f1572807ca12dbc6e8f0d1c",
+      "targetPath": "app/src/lib/passwordSetup.ts",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/src/lib/whatsappNumber.ts",
+      "sourceBlobSha": "4a9b80420e1d66a8846eabcc9ce95e430b2bbb4b",
+      "targetPath": "app/src/lib/whatsappNumber.ts",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/src/lib/utils.ts",
+      "sourceBlobSha": "ba49bab1f404f93e613172f1ba5e340ff0265a91",
+      "targetPath": "app/src/lib/utils.ts",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/src/pages/LoginPage.tsx",
+      "sourceBlobSha": "e04ac42e964cf30ecf435e80792b3cf2cf822f8e",
+      "targetPath": "app/src/pages/LoginPage.tsx",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/src/pages/AuthCallbackPage.tsx",
+      "sourceBlobSha": "c0dfbfdb4904bf75d053e3f02fa1ee85732ddb8e",
+      "targetPath": "app/src/pages/AuthCallbackPage.tsx",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/src/pages/ForgotPasswordPage.tsx",
+      "sourceBlobSha": "1df98e20b946a22c67c6fa92f998af8785b2b4da",
+      "targetPath": "app/src/pages/ForgotPasswordPage.tsx",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/src/pages/RecoveryPage.tsx",
+      "sourceBlobSha": "5d321c8c927cc00a9300a0866d85b2c2d0ee54a9",
+      "targetPath": "app/src/pages/RecoveryPage.tsx",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/src/pages/ResetPasswordPage.tsx",
+      "sourceBlobSha": "0c1dd35e8dd6970a4f3f2c1bf52ba1bc784d836e",
+      "targetPath": "app/src/pages/ResetPasswordPage.tsx",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    },
+    {
+      "sourcePath": "app/src/pages/SetPasswordPage.tsx",
+      "sourceBlobSha": "1d88397bb627758ed1f9c3a076918a4e81107d57",
+      "targetPath": "app/src/pages/SetPasswordPage.tsx",
+      "notes": "Reviewed and adapted; see SOURCE_ASSESSMENT.md"
+    }
+  ],
+  "architecturalAdaptations": [
+    "app/src/hooks/useAppStore.tsx",
+    "app/src/components/ProfilePresentation.tsx",
+    "app/src/lib/repository.ts",
+    "app/src/lib/supabase.ts"
+  ],
+  "geography": {
+    "source": "https://github.com/dosm-malaysia/data-open/blob/main/datasets/census/census_district.csv",
+    "sourceBlobSha": "616115279d0ce24f74bb35f7e1ac88d391199aca",
+    "version": "dosm-census-2020-v1",
+    "transform": "Unique state/code_state and district/code_district pairs; SL IDs prefixed my-, zero-padded.",
+    "countStates": 16,
+    "countSubdivisions": 160
+  },
+  "targetBrandBaseline": "d3d35a14c38fcfd9eb6e0242c33ee95b47d6ec47"
+}

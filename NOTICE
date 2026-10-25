@@ -1,0 +1,7 @@
+Service Link — Digital Sambal
+
+Selected application code is reused and adapted from AdvisorLink under the explicit authorization of the owner of both repositories, svanistelrooy901-art. Source commit: 761a17834db27b32e7724fd8324d5817faf3fb8c. See docs/source-manifest.json and docs/SOURCE_ASSESSMENT.md.
+
+No source LICENSE or NOTICE was present in the reviewed AdvisorLink tree. This reuse record does not grant a broader license or relicense third-party dependencies. The source repository remains private and unmodified.
+
+Third-party dependency licenses and notices are retained in docs/THIRD_PARTY_NOTICES.md. Geography attribution and transformation details are in docs/GEOGRAPHY.md.

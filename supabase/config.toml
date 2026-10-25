@@ -1,0 +1,20 @@
+# Independent local SL stack; never link this checkout to AdvisorLink.
+project_id = "servicelink-local"
+[api]
+port = 55321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 100
+[db]
+port = 55322
+shadow_port = 55320
+major_version = 17
+[studio]
+port = 55323
+[auth]
+site_url = "http://localhost:5178"
+additional_redirect_urls = ["http://localhost:5178/auth/callback", "http://localhost:5178/auth/recovery"]
+enable_signup = true
+[auth.email]
+enable_signup = true
+enable_confirmations = true
