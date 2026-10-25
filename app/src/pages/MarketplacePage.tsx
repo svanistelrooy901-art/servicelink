@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, ArrowUpRight, Briefcase, X } from 'lucide-react';
+import { Search, MapPin, ArrowUpRight, HeartHandshake, BookOpen, Sparkles, X } from 'lucide-react';
+import { CategoryIcon } from '../components/CategoryIcon';
 import { ServiceLinkBrand } from '../components/ServiceLinkBrand';
 import { repository } from '../lib/repository';
 import { categories, type PublicListing } from '../lib/types';
@@ -72,7 +73,13 @@ export function MarketplacePage() {
             Across Malaysia. Around your corner.
           </p>
           <span className="market-hero-mark" aria-hidden="true">
-            <Briefcase size={60} />
+            <HeartHandshake size={52} />
+            <span className="market-mini-stamp stamp-book">
+              <BookOpen size={23} />
+            </span>
+            <span className="market-mini-stamp stamp-spark">
+              <Sparkles size={23} />
+            </span>
           </span>
         </section>
         <section className="market-filters" aria-label="Search providers">
@@ -163,7 +170,10 @@ export function MarketplacePage() {
           {results.map(({ profile: p }) => (
             <article className={`listing-card theme-${p.accent}`} key={p.slug}>
               <div className="listing-cover">
-                <span className="category-badge">{categories[p.category]}</span>
+                <span className="category-badge">
+                  <CategoryIcon category={p.category} size={13} />
+                  {categories[p.category]}
+                </span>
                 <div className="listing-avatar">
                   {p.photo ? <img src={p.photo} alt="" /> : p.name[0]}
                 </div>

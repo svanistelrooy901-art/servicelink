@@ -28,7 +28,7 @@ Open `http://127.0.0.1:5178/login` and choose **Explore the demo**. No credentia
 
 ## What this milestone includes
 
-- SL branding, responsive workspace navigation, checklist and locked pricing copy.
+- SL branding, warm ivory/pastel surfaces, service-category icons, responsive workspace navigation, checklist and locked pricing copy.
 - AL-derived account login, callback, recovery and password setup; SL signup entry point.
 - Editable provider profile and service catalogue for the five initial categories.
 - Shared geography: 16 states/territories and 160 DOSM district/territory entries; whole-state, selected-district and multi-state coverage.
