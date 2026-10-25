@@ -10,7 +10,8 @@
     "lint": "tsc --noEmit",
     "test": "node --test --experimental-strip-types tests/*.test.ts",
     "test:browser": "node tests/browser.mjs",
-    "test:booking-browser": "node tests/booking-browser.mjs"
+    "test:booking-browser": "node tests/booking-browser.mjs",
+    "test:banner-browser": "node tests/banner-browser.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.116.0",

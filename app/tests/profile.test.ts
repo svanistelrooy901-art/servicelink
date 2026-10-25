@@ -155,3 +155,60 @@ test('concurrent local writes accept only one revision', async () => {
   ]);
   assert.equal(results.filter((r) => r.status === 'fulfilled').length, 1);
 });
+
+test('legacy profiles receive banner defaults without losing their saved or published content', async () => {
+  const s = storage();
+  const { banner, bannerPosition, ...legacy } = demoProfile();
+  s.setItem(
+    LOCAL_WORKSPACE_KEY,
+    JSON.stringify({
+      draft: legacy,
+      published: legacy,
+      revision: 4,
+      savedAt: 'saved',
+      publishedAt: 'published',
+    }),
+  );
+  const r = createLocalRepository(s),
+    w = await r.load();
+  assert.equal(w.draft.banner, '');
+  assert.equal(w.draft.bannerPosition, 50);
+  assert.equal(w.published?.name, legacy.name);
+  assert.equal(w.revision, 4);
+  assert.equal((await r.getPublic(legacy.slug))?.profile.banner, '');
+});
+
+test('banner drafts and positions persist separately from publication; removal is published explicitly', async () => {
+  const s = storage(),
+    r = createLocalRepository(s);
+  const p = { ...demoProfile(), banner: 'data:image/webp;base64,UklGRg==', bannerPosition: 20 };
+  let w = await r.publish(p, 0);
+  assert.equal(w.published?.banner, p.banner);
+  w = await r.save({ ...p, banner: '', bannerPosition: 50 }, w.revision);
+  assert.equal((await createLocalRepository(s).load()).draft.banner, '');
+  assert.equal((await r.getPublic(p.slug))?.profile.bannerPosition, 20);
+  assert.equal((await r.listPublic())[0].profile.banner, p.banner);
+  w = await r.publish(w.draft, w.revision);
+  assert.equal(w.published?.banner, '');
+  await r.unpublish(w.revision);
+  assert.equal(await r.getPublic(p.slug), null);
+});
+
+test('publication rejects external/oversized banner data and invalid focus positions', () => {
+  const p = demoProfile();
+  for (const banner of [
+    'https://example.invalid/banner.png',
+    'data:image/svg+xml;base64,AAAA',
+    'data:image/webp;base64,' + 'A'.repeat(220000),
+  ])
+    assert.ok(validateForPublish({ ...p, banner }).some((e) => e.includes('banner')));
+  for (const bannerPosition of [-1, 101, 0.5, NaN])
+    assert.ok(validateForPublish({ ...p, bannerPosition }).some((e) => e.includes('position')));
+  for (const bannerPosition of [0, 50, 100])
+    assert.deepEqual(validateForPublish({ ...p, bannerPosition }), []);
+  assert.equal(
+    publicSnapshot({ ...p, banner: 'data:image/webp;base64,UklGRg==', bannerPosition: 80 })
+      .bannerPosition,
+    80,
+  );
+});

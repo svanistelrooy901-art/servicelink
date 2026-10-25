@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useAppStore } from '../hooks/useAppStore';
 import { ProfilePresentation } from '../components/ProfilePresentation';
 import { CoverageSelector } from '../components/CoverageSelector';
+import { BannerEditor } from '../components/BannerEditor';
 import { categories, type Service } from '../lib/types';
 import { normalizeSlug } from '../lib/profile';
 import { compressProfilePhoto } from '../lib/media';
@@ -221,6 +222,7 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                   Only enable this if you want customers to contact you at this number.
                 </p>
               </section>
+              <BannerEditor profile={p} onChange={update} />
               <section className="panel">
                 <h2>Your colour, your character</h2>
                 <div className="theme-options">

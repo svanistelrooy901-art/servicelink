@@ -19,6 +19,12 @@ test('SQL foundation: ownership, private drafts, atomic publication, stale write
       'utf8',
     );
     await db.exec(migration);
+    await db.exec(
+      await readFile(
+        new URL('../../supabase/migrations/20261025095911_sl_profile_banner.sql', import.meta.url),
+        'utf8',
+      ),
+    );
     const { rows: geo } = await db.query(
       'select id,name,subdivisions from sl_geography order by id',
     );
@@ -41,6 +47,41 @@ test('SQL foundation: ownership, private drafts, atomic publication, stale write
     }
     await role('authenticated', a);
     const p = demoProfile();
+    const { banner, bannerPosition, ...legacy } = publicSnapshot(p);
+    const valid = async (profile: unknown) =>
+      (
+        await db.query<{ valid: boolean }>('select sl_valid_profile($1::jsonb) as valid', [
+          JSON.stringify(profile),
+        ])
+      ).rows[0].valid;
+    assert.equal(await valid(legacy), true);
+    const large = {
+      ...publicSnapshot(p),
+      photo: 'data:image/webp;base64,' + 'A'.repeat(160000),
+      banner: 'data:image/webp;base64,' + 'B'.repeat(210000),
+      bannerPosition: 0,
+    };
+    assert.equal(await valid(large), true);
+    await db.query('insert into sl_workspaces(user_id,draft) values($1,$2)', [
+      a,
+      JSON.stringify(large),
+    ]);
+    await assert.rejects(
+      db.query('update sl_workspaces set draft=$1', [
+        JSON.stringify({ ...large, extra: 'x'.repeat(500000) }),
+      ]),
+      /check constraint/,
+    );
+    for (const bad of [
+      { banner: 'https://example.invalid/secret.png' },
+      { banner: null },
+      { banner: 'data:image/webp;base64,' + 'A'.repeat(220000) },
+      { bannerPosition: 101 },
+      { bannerPosition: 0.5 },
+      { bannerPosition: '50' },
+      { privateBannerSource: 'private' },
+    ])
+      assert.equal(await valid({ ...publicSnapshot(p), ...bad }), false);
     await write(p, null, 0, 'save');
     const { rows: privateRows } = await db.query('select * from sl_workspaces');
     assert.equal(privateRows.length, 1);
@@ -80,6 +121,10 @@ test('SQL foundation: ownership, private drafts, atomic publication, stale write
     await assert.rejects(write(p, null, 1, 'save'), /another tab/);
     const bad = { ...publicSnapshot(p), privateEmail: 'should-not-leak' };
     await assert.rejects(write(p, bad, 3, 'publish'), /required public profile/);
+    await assert.rejects(
+      write({ ...p, banner: 'data:image/webp;base64,AAAA' }, publicSnapshot(p), 3, 'publish'),
+      /match your draft/,
+    );
     const badCoverage = {
       ...publicSnapshot(p),
       coverage: [{ stateId: 'my-07', wholeState: false, subdivisionIds: ['my-01-01'] }],

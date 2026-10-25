@@ -1,5 +1,10 @@
 import { emptyWorkspace } from '../data/demo.ts';
-import { cloneProfile, publicSnapshot, validateForPublish } from './profile.ts';
+import {
+  cloneProfile,
+  publicSnapshot,
+  validateForPublish,
+  withProfileDefaults,
+} from './profile.ts';
 import type { ProfileRepository, ProviderProfile, Workspace } from './types.ts';
 export const LOCAL_WORKSPACE_KEY = 'servicelink:workspace:v1';
 export interface StorageLike {
@@ -13,7 +18,11 @@ export function createLocalRepository(storage: StorageLike): ProfileRepository {
     try {
       const w = JSON.parse(raw);
       if (!w.draft || !Number.isInteger(w.revision)) throw new Error();
-      return w;
+      return {
+        ...w,
+        draft: withProfileDefaults(w.draft),
+        published: w.published ? withProfileDefaults(w.published) : null,
+      };
     } catch {
       throw new Error(
         'The saved demo could not be read. Export or clear this site’s data to start again.',

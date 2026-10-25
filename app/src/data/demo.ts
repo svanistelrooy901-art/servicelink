@@ -12,6 +12,8 @@ export function emptyProfile(): ProviderProfile {
     whatsapp: '',
     showWhatsapp: false,
     photo: '',
+    banner: '',
+    bannerPosition: 50,
     accent: 'ocean',
     coverage: [],
     services: [],

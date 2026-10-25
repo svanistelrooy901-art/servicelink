@@ -7,9 +7,10 @@ Validated on 25 October 2026 with Node 24.22.1. No hosted system, real account, 
 | `npm ci` | Clean dependency install succeeds |
 | `npm run lint` | TypeScript passes |
 | `npm run build` | TypeScript + Vite production build pass |
-| `npm test` | 24 passing domain/database tests |
+| `npm test` | 27 passing domain/database tests |
 | `npm run test:browser` | 52 assertions pass across 390px, 420px and 1440px |
 | `npm run test:booking-browser` | 54 assertions pass across the same viewports |
+| `npm run test:banner-browser` | 111 banner assertions pass across the same viewports |
 | Browser exceptions | None |
 | External browser requests | None; test intercepts and rejects them |
 | Page horizontal overflow | None on tested workspace/public flows |
@@ -51,3 +52,18 @@ The environment's normal Playwright browser download returned truncated archives
 ## Honest limits
 
 A new SL Supabase project, Auth email settings/redirects and R2 integration are not available/configured. Cloud repository methods are type-checked; migration behavior is tested in embedded Postgres. Hosted signup/recovery, actual cloud data persistence, Supabase advisors and R2 authorization/upload require staging verification. Static Cloudflare configuration is prepared but undeployed. Pricing copy is present; no billing/trial enforcement or real payments are active. Availability, booking and manual-payment status are a local demonstration only; cloud booking explicitly remains unavailable until its independent backend is integrated. Refer Me and actual review rules remain future milestones. This visual refresh adds no hosted configuration or new backend capability.
+
+## Optional banners
+
+The banner increment adds three domain tests for legacy defaults, draft/public image and focus separation, removal and format/position validation. Embedded Postgres verifies legacy snapshots, the combined payload ceiling, invalid image URLs/types/sizes/positions, unknown-key rejection, and draft/snapshot mismatch denial with the additive banner migration installed. Existing ownership/privacy/atomicity and booking SQL tests continue to pass.
+
+The dedicated browser flow checks all five category icons, unsupported MIME, corrupt and oversized uploads, real PNG-to-WebP re-encoding/resizing/size cap, the 8:3 display ratio, position changes, save/reload, preview/public parity, marketplace images, explicit publication/removal, repeated upload of the same file, unpublish and mobile overflow. All 217 browser assertions (52 profile + 54 booking + 111 banner) pass at 390px, 420px and 1440px. Screenshots use a generated fictional banner, with no external assets or personal data.
+
+- [390px banner editor](qa/banners/banner-editor-390.png)
+- [Desktop banner editor](qa/banners/banner-editor-1440.png)
+- [390px custom public banner](qa/banners/public-banner-390.png)
+- [Desktop custom public banner](qa/banners/public-banner-1440.png)
+- [Tutor service template](qa/banners/tutor-template-420.png)
+- [Marketplace banner](qa/banners/marketplace-banner.png)
+
+Hosted banner storage, staging migration and hosted advisors remain pending the independent Service Link integration; the local demonstration is the verified runtime.

@@ -170,6 +170,15 @@ export function MarketplacePage() {
           {results.map(({ profile: p }) => (
             <article className={`listing-card theme-${p.accent}`} key={p.slug}>
               <div className="listing-cover">
+                {p.banner && (
+                  <img
+                    className="listing-banner"
+                    src={p.banner}
+                    alt=""
+                    loading="lazy"
+                    style={{ objectPosition: `50% ${p.bannerPosition ?? 50}%` }}
+                  />
+                )}
                 <span className="category-badge">
                   <CategoryIcon category={p.category} size={13} />
                   {categories[p.category]}

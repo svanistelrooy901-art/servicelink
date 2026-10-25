@@ -32,6 +32,8 @@ export interface ProviderProfile {
   whatsapp: string;
   showWhatsapp: boolean;
   photo: string;
+  banner: string;
+  bannerPosition: number;
   accent: 'forest' | 'plum' | 'ocean';
   coverage: Coverage[];
   services: Service[];

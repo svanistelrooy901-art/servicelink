@@ -16,7 +16,7 @@ npm run dev -- --host 127.0.0.1 --port 5178
 
 Open `http://127.0.0.1:5178/login` and choose **Explore the demo**. No credentials are required. The default is local mode; there are no real account, billing or message requests.
 
-1. Edit **My profile**, including category, optional public WhatsApp, theme and photo.
+1. Edit **My profile**, including category, optional public WhatsApp, theme, photo and banner.
 2. Add/edit/delete **Services** and choose **Coverage** in one or more states.
 3. **Save draft**, then reload to check persistence.
 4. **Preview & publish** shows the same profile renderer used at `/p/:slug`. Publication validates required fields.
@@ -63,3 +63,15 @@ Billing, gateway payments, Refer Me and customer reviews are not activated. Book
 The local demonstration now includes **Availability** and **Bookings**, service-level appointment/date-range requests, shared capacity, private customer booking links, provider acceptance with amount/deadline, QR/bank instructions, customer payment reporting and explicit provider verification. Phone/WhatsApp bookings and blocked time share the same calendar. See [the full milestone-2 walkthrough and backend limits](docs/MILESTONE_2.md).
 
 Booking records are local-demo data until the independent booking backend is integrated. Cloud mode intentionally keeps booking unavailable. The new booking migration is prepared and tested, not hosted/applied. No real payment or external message is sent.
+
+## Profile banners
+
+**My profile → Your profile banner** offers an automatic service template or your own image. The template icon follows the selected category: baby (nanny), heart/handshake (confinement), book (tutor), brush (makeup), sparkles (cleaning).
+
+Recommended upload: **1600 × 600 px (8:3)**, JPG/PNG/WebP up to 8 MB and up to 40 megapixels. Images are re-encoded as WebP, resized to a maximum 1600px longest edge, and capped at 220,000 data-URL characters (about 165KB binary). Other proportions are cropped to fit; the vertical-position slider adjusts the visible area. Keep important details near the centre. Marketplace thumbnails may crop further.
+
+Use **Save draft**, then **Publish updates** to change the public banner. Replace/Remove or **Use service template** works the same way. Old profiles retain their content and receive empty-banner/centred defaults. Editor, full preview and public profile share the same cover component; marketplace cards use the published image/position.
+
+Uploads work in local demonstration mode. Hosted uploads remain disabled pending the independent SL R2 integration. The additive `20261025095911_sl_profile_banner.sql` migration is prepared for review only; it accepts bounded optional banner fields and preserves existing RLS/ownership.
+
+Run `npm run test:banner-browser` in `app/` for compression, category, persistence, publication and viewport checks. [Mobile banner editor](docs/qa/banners/banner-editor-390.png) · [custom public banner](docs/qa/banners/public-banner-390.png).

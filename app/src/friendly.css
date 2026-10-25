@@ -935,3 +935,74 @@ td {
       border-color 0.15s ease;
   }
 }
+
+/* A shared banner surface keeps the editor and published profile in step. */
+.provider-profile .profile-cover.profile-cover-image {
+  height: auto;
+  aspect-ratio: 8 / 3;
+  padding: 0;
+  border: 0;
+}
+.profile-banner-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+.banner-preview {
+  border: 1px solid var(--sl-edge);
+  border-radius: 14px;
+}
+.banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.banner-actions button[aria-pressed='true'] {
+  color: #315bb9;
+  border-color: #bdccf4;
+  background: #edf1ff;
+}
+.banner-template-note {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.banner-position input[type='range'] {
+  width: 100%;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: var(--sl-blue);
+  box-shadow: none;
+}
+.banner-position > div {
+  display: flex;
+  justify-content: space-between;
+}
+.banner-position .text-btn {
+  margin-top: 15px;
+}
+.listing-banner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.listing-cover .category-badge {
+  position: relative;
+}
+.banner-editor {
+  display: grid;
+  gap: 16px;
+}
+.banner-editor > div:first-child .hint {
+  margin-top: 6px;
+}
+.banner-editor .banner-position label {
+  margin-top: 0;
+}

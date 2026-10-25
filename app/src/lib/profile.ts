@@ -11,6 +11,10 @@ export function normalizeSlug(value: string) {
     .replace(/^-|-$/g, '');
 }
 export const cloneProfile = (p: ProviderProfile): ProviderProfile => structuredClone(p);
+// Existing local/cloud profiles predate optional banners; keep their drafts and publications.
+export function withProfileDefaults(p: ProviderProfile): ProviderProfile {
+  return { ...p, banner: p.banner ?? '', bannerPosition: p.bannerPosition ?? 50 };
+}
 export function publicSnapshot(p: ProviderProfile): ProviderProfile {
   // Explicit allowlist: future private draft fields cannot leak through publication.
   return {
@@ -25,6 +29,8 @@ export function publicSnapshot(p: ProviderProfile): ProviderProfile {
     whatsapp: p.showWhatsapp ? (normalizeMalaysiaWhatsapp(p.whatsapp) ?? '') : '',
     showWhatsapp: p.showWhatsapp,
     photo: p.photo,
+    banner: p.banner ?? '',
+    bannerPosition: p.bannerPosition ?? 50,
     accent: p.accent,
     coverage: p.coverage.map((c) => ({
       stateId: c.stateId,
@@ -88,6 +94,18 @@ export function validateForPublish(p: ProviderProfile): string[] {
     errors.push('Use a compressed WebP profile photo under 130 KB.');
   if (!['forest', 'plum', 'ocean'].includes(p.accent))
     errors.push('Choose an available colour theme.');
+  if (
+    p.banner !== undefined &&
+    (typeof p.banner !== 'string' ||
+      (p.banner !== '' &&
+        (!/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(p.banner) || p.banner.length > 220000)))
+  )
+    errors.push('Use a compressed WebP banner under 165 KB.');
+  if (
+    p.bannerPosition !== undefined &&
+    (!Number.isInteger(p.bannerPosition) || p.bannerPosition < 0 || p.bannerPosition > 100)
+  )
+    errors.push('Choose a banner position between 0 and 100.');
   if (p.base.length > 100 || p.languages.length > 120)
     errors.push('Keep your base and languages short.');
   return [...new Set(errors)];

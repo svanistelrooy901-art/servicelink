@@ -1,6 +1,7 @@
 // AL's shared ProfilePresentation architecture, adapted to SL's provider/service domain.
-import { MapPin, Globe, Briefcase, MessageCircle, ArrowUpRight, Star, Link2 } from 'lucide-react';
+import { MapPin, Globe, Briefcase, MessageCircle, ArrowUpRight, Star } from 'lucide-react';
 import { CategoryIcon } from './CategoryIcon';
+import { ProfileCover } from './ProfileCover';
 import { Link } from 'react-router-dom';
 import { coverageLabels } from '../lib/geography';
 import { categories, type ProviderProfile } from '../lib/types';
@@ -24,20 +25,7 @@ export function ProfilePresentation({
       .toUpperCase() || 'YOU';
   return (
     <article className={`provider-profile theme-${p.accent}`} data-testid="profile-presentation">
-      <div className="profile-cover">
-        <span className="cover-caption">
-          <Link2 size={15} /> YOUR NEXT CONNECTION
-        </span>
-        <span className="cover-orbit" />
-        <span className="profile-cover-stamp" aria-hidden="true">
-          <CategoryIcon category={p.category} size={35} />
-        </span>
-        <div className="cover-label">
-          Good people.
-          <br />
-          Great services.
-        </div>
-      </div>
+      <ProfileCover profile={p} />
       <div className="profile-body">
         <div className="profile-top">
           <div className="avatar">
