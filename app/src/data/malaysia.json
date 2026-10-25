@@ -1,0 +1,738 @@
+[
+  {
+    "id": "my-01",
+    "name": "Johor",
+    "subdivisions": [
+      {
+        "id": "my-01-01",
+        "name": "Batu Pahat"
+      },
+      {
+        "id": "my-01-02",
+        "name": "Johor Bahru"
+      },
+      {
+        "id": "my-01-03",
+        "name": "Kluang"
+      },
+      {
+        "id": "my-01-04",
+        "name": "Kota Tinggi"
+      },
+      {
+        "id": "my-01-05",
+        "name": "Mersing"
+      },
+      {
+        "id": "my-01-06",
+        "name": "Muar"
+      },
+      {
+        "id": "my-01-07",
+        "name": "Pontian"
+      },
+      {
+        "id": "my-01-08",
+        "name": "Segamat"
+      },
+      {
+        "id": "my-01-09",
+        "name": "Kulai"
+      },
+      {
+        "id": "my-01-10",
+        "name": "Tangkak"
+      }
+    ]
+  },
+  {
+    "id": "my-02",
+    "name": "Kedah",
+    "subdivisions": [
+      {
+        "id": "my-02-01",
+        "name": "Baling"
+      },
+      {
+        "id": "my-02-02",
+        "name": "Bandar Baharu"
+      },
+      {
+        "id": "my-02-03",
+        "name": "Kota Setar"
+      },
+      {
+        "id": "my-02-04",
+        "name": "Kuala Muda"
+      },
+      {
+        "id": "my-02-05",
+        "name": "Kubang Pasu"
+      },
+      {
+        "id": "my-02-06",
+        "name": "Kulim"
+      },
+      {
+        "id": "my-02-07",
+        "name": "Langkawi"
+      },
+      {
+        "id": "my-02-08",
+        "name": "Padang Terap"
+      },
+      {
+        "id": "my-02-09",
+        "name": "Sik"
+      },
+      {
+        "id": "my-02-10",
+        "name": "Yan"
+      },
+      {
+        "id": "my-02-11",
+        "name": "Pendang"
+      },
+      {
+        "id": "my-02-12",
+        "name": "Pokok Sena"
+      }
+    ]
+  },
+  {
+    "id": "my-03",
+    "name": "Kelantan",
+    "subdivisions": [
+      {
+        "id": "my-03-01",
+        "name": "Bachok"
+      },
+      {
+        "id": "my-03-02",
+        "name": "Kota Bharu"
+      },
+      {
+        "id": "my-03-03",
+        "name": "Machang"
+      },
+      {
+        "id": "my-03-04",
+        "name": "Pasir Mas"
+      },
+      {
+        "id": "my-03-05",
+        "name": "Pasir Puteh"
+      },
+      {
+        "id": "my-03-06",
+        "name": "Tanah Merah"
+      },
+      {
+        "id": "my-03-07",
+        "name": "Tumpat"
+      },
+      {
+        "id": "my-03-08",
+        "name": "Gua Musang"
+      },
+      {
+        "id": "my-03-09",
+        "name": "Kuala Krai"
+      },
+      {
+        "id": "my-03-10",
+        "name": "Jeli"
+      },
+      {
+        "id": "my-03-11",
+        "name": "Kecil Lojing"
+      }
+    ]
+  },
+  {
+    "id": "my-04",
+    "name": "Melaka",
+    "subdivisions": [
+      {
+        "id": "my-04-01",
+        "name": "Alor Gajah"
+      },
+      {
+        "id": "my-04-02",
+        "name": "Jasin"
+      },
+      {
+        "id": "my-04-03",
+        "name": "Melaka Tengah"
+      }
+    ]
+  },
+  {
+    "id": "my-05",
+    "name": "Negeri Sembilan",
+    "subdivisions": [
+      {
+        "id": "my-05-01",
+        "name": "Jelebu"
+      },
+      {
+        "id": "my-05-02",
+        "name": "Kuala Pilah"
+      },
+      {
+        "id": "my-05-03",
+        "name": "Port Dickson"
+      },
+      {
+        "id": "my-05-04",
+        "name": "Rembau"
+      },
+      {
+        "id": "my-05-05",
+        "name": "Seremban"
+      },
+      {
+        "id": "my-05-06",
+        "name": "Tampin"
+      },
+      {
+        "id": "my-05-07",
+        "name": "Jempol"
+      }
+    ]
+  },
+  {
+    "id": "my-06",
+    "name": "Pahang",
+    "subdivisions": [
+      {
+        "id": "my-06-01",
+        "name": "Bentong"
+      },
+      {
+        "id": "my-06-02",
+        "name": "Cameron Highlands"
+      },
+      {
+        "id": "my-06-03",
+        "name": "Jerantut"
+      },
+      {
+        "id": "my-06-04",
+        "name": "Kuantan"
+      },
+      {
+        "id": "my-06-05",
+        "name": "Lipis"
+      },
+      {
+        "id": "my-06-06",
+        "name": "Pekan"
+      },
+      {
+        "id": "my-06-07",
+        "name": "Raub"
+      },
+      {
+        "id": "my-06-08",
+        "name": "Temerloh"
+      },
+      {
+        "id": "my-06-09",
+        "name": "Rompin"
+      },
+      {
+        "id": "my-06-10",
+        "name": "Maran"
+      },
+      {
+        "id": "my-06-11",
+        "name": "Bera"
+      }
+    ]
+  },
+  {
+    "id": "my-07",
+    "name": "Pulau Pinang",
+    "subdivisions": [
+      {
+        "id": "my-07-01",
+        "name": "Seberang Perai Tengah"
+      },
+      {
+        "id": "my-07-02",
+        "name": "Seberang Perai Utara"
+      },
+      {
+        "id": "my-07-03",
+        "name": "Seberang Perai Selatan"
+      },
+      {
+        "id": "my-07-04",
+        "name": "Timur Laut"
+      },
+      {
+        "id": "my-07-05",
+        "name": "Barat Daya"
+      }
+    ]
+  },
+  {
+    "id": "my-08",
+    "name": "Perak",
+    "subdivisions": [
+      {
+        "id": "my-08-01",
+        "name": "Batang Padang"
+      },
+      {
+        "id": "my-08-02",
+        "name": "Manjung"
+      },
+      {
+        "id": "my-08-03",
+        "name": "Kinta"
+      },
+      {
+        "id": "my-08-04",
+        "name": "Kerian"
+      },
+      {
+        "id": "my-08-05",
+        "name": "Kuala Kangsar"
+      },
+      {
+        "id": "my-08-06",
+        "name": "Larut dan Matang"
+      },
+      {
+        "id": "my-08-07",
+        "name": "Hilir Perak"
+      },
+      {
+        "id": "my-08-08",
+        "name": "Hulu Perak"
+      },
+      {
+        "id": "my-08-09",
+        "name": "Perak Tengah"
+      },
+      {
+        "id": "my-08-10",
+        "name": "Kampar"
+      },
+      {
+        "id": "my-08-11",
+        "name": "Muallim"
+      },
+      {
+        "id": "my-08-12",
+        "name": "Bagan Datuk"
+      },
+      {
+        "id": "my-08-13",
+        "name": "Selama"
+      }
+    ]
+  },
+  {
+    "id": "my-09",
+    "name": "Perlis",
+    "subdivisions": [
+      {
+        "id": "my-09-01",
+        "name": "Perlis"
+      }
+    ]
+  },
+  {
+    "id": "my-10",
+    "name": "Selangor",
+    "subdivisions": [
+      {
+        "id": "my-10-01",
+        "name": "Gombak"
+      },
+      {
+        "id": "my-10-02",
+        "name": "Klang"
+      },
+      {
+        "id": "my-10-03",
+        "name": "Kuala Langat"
+      },
+      {
+        "id": "my-10-04",
+        "name": "Kuala Selangor"
+      },
+      {
+        "id": "my-10-05",
+        "name": "Petaling"
+      },
+      {
+        "id": "my-10-06",
+        "name": "Sabak Bernam"
+      },
+      {
+        "id": "my-10-07",
+        "name": "Sepang"
+      },
+      {
+        "id": "my-10-08",
+        "name": "Ulu Langat"
+      },
+      {
+        "id": "my-10-09",
+        "name": "Ulu Selangor"
+      }
+    ]
+  },
+  {
+    "id": "my-11",
+    "name": "Terengganu",
+    "subdivisions": [
+      {
+        "id": "my-11-01",
+        "name": "Besut"
+      },
+      {
+        "id": "my-11-02",
+        "name": "Dungun"
+      },
+      {
+        "id": "my-11-03",
+        "name": "Kemaman"
+      },
+      {
+        "id": "my-11-04",
+        "name": "Kuala Terengganu"
+      },
+      {
+        "id": "my-11-05",
+        "name": "Marang"
+      },
+      {
+        "id": "my-11-06",
+        "name": "Hulu Terengganu"
+      },
+      {
+        "id": "my-11-07",
+        "name": "Setiu"
+      },
+      {
+        "id": "my-11-08",
+        "name": "Kuala Nerus"
+      }
+    ]
+  },
+  {
+    "id": "my-12",
+    "name": "Sabah",
+    "subdivisions": [
+      {
+        "id": "my-12-01",
+        "name": "Tawau"
+      },
+      {
+        "id": "my-12-02",
+        "name": "Lahad Datu"
+      },
+      {
+        "id": "my-12-03",
+        "name": "Semporna"
+      },
+      {
+        "id": "my-12-04",
+        "name": "Sandakan"
+      },
+      {
+        "id": "my-12-05",
+        "name": "Kinabatangan"
+      },
+      {
+        "id": "my-12-06",
+        "name": "Beluran"
+      },
+      {
+        "id": "my-12-07",
+        "name": "Kota Kinabalu"
+      },
+      {
+        "id": "my-12-08",
+        "name": "Ranau"
+      },
+      {
+        "id": "my-12-09",
+        "name": "Kota Belud"
+      },
+      {
+        "id": "my-12-10",
+        "name": "Tuaran"
+      },
+      {
+        "id": "my-12-11",
+        "name": "Penampang"
+      },
+      {
+        "id": "my-12-12",
+        "name": "Papar"
+      },
+      {
+        "id": "my-12-13",
+        "name": "Kudat"
+      },
+      {
+        "id": "my-12-14",
+        "name": "Kota Marudu"
+      },
+      {
+        "id": "my-12-15",
+        "name": "Pitas"
+      },
+      {
+        "id": "my-12-16",
+        "name": "Beaufort"
+      },
+      {
+        "id": "my-12-17",
+        "name": "Kuala Penyu"
+      },
+      {
+        "id": "my-12-18",
+        "name": "Sipitang"
+      },
+      {
+        "id": "my-12-19",
+        "name": "Tenom"
+      },
+      {
+        "id": "my-12-20",
+        "name": "Nabawan"
+      },
+      {
+        "id": "my-12-21",
+        "name": "Keningau"
+      },
+      {
+        "id": "my-12-22",
+        "name": "Tambunan"
+      },
+      {
+        "id": "my-12-23",
+        "name": "Kunak"
+      },
+      {
+        "id": "my-12-24",
+        "name": "Tongod"
+      },
+      {
+        "id": "my-12-25",
+        "name": "Putatan"
+      },
+      {
+        "id": "my-12-26",
+        "name": "Telupid"
+      },
+      {
+        "id": "my-12-27",
+        "name": "Kalabakan"
+      }
+    ]
+  },
+  {
+    "id": "my-13",
+    "name": "Sarawak",
+    "subdivisions": [
+      {
+        "id": "my-13-01",
+        "name": "Kuching"
+      },
+      {
+        "id": "my-13-02",
+        "name": "Bau"
+      },
+      {
+        "id": "my-13-03",
+        "name": "Lundu"
+      },
+      {
+        "id": "my-13-04",
+        "name": "Samarahan"
+      },
+      {
+        "id": "my-13-05",
+        "name": "Serian"
+      },
+      {
+        "id": "my-13-06",
+        "name": "Simunjan"
+      },
+      {
+        "id": "my-13-07",
+        "name": "Sri Aman"
+      },
+      {
+        "id": "my-13-08",
+        "name": "Lubok Antu"
+      },
+      {
+        "id": "my-13-09",
+        "name": "Betong"
+      },
+      {
+        "id": "my-13-10",
+        "name": "Saratok"
+      },
+      {
+        "id": "my-13-11",
+        "name": "Sarikei"
+      },
+      {
+        "id": "my-13-12",
+        "name": "Maradong"
+      },
+      {
+        "id": "my-13-13",
+        "name": "Daro"
+      },
+      {
+        "id": "my-13-14",
+        "name": "Julau"
+      },
+      {
+        "id": "my-13-15",
+        "name": "Sibu"
+      },
+      {
+        "id": "my-13-16",
+        "name": "Dalat"
+      },
+      {
+        "id": "my-13-17",
+        "name": "Mukah"
+      },
+      {
+        "id": "my-13-18",
+        "name": "Kanowit"
+      },
+      {
+        "id": "my-13-19",
+        "name": "Bintulu"
+      },
+      {
+        "id": "my-13-20",
+        "name": "Tatau"
+      },
+      {
+        "id": "my-13-21",
+        "name": "Kapit"
+      },
+      {
+        "id": "my-13-22",
+        "name": "Song"
+      },
+      {
+        "id": "my-13-23",
+        "name": "Belaga"
+      },
+      {
+        "id": "my-13-24",
+        "name": "Miri"
+      },
+      {
+        "id": "my-13-25",
+        "name": "Marudi"
+      },
+      {
+        "id": "my-13-26",
+        "name": "Limbang"
+      },
+      {
+        "id": "my-13-27",
+        "name": "Lawas"
+      },
+      {
+        "id": "my-13-28",
+        "name": "Matu"
+      },
+      {
+        "id": "my-13-29",
+        "name": "Asajaya"
+      },
+      {
+        "id": "my-13-30",
+        "name": "Pakan"
+      },
+      {
+        "id": "my-13-31",
+        "name": "Selangau"
+      },
+      {
+        "id": "my-13-32",
+        "name": "Tebedu"
+      },
+      {
+        "id": "my-13-33",
+        "name": "Pusa"
+      },
+      {
+        "id": "my-13-34",
+        "name": "Kabong"
+      },
+      {
+        "id": "my-13-35",
+        "name": "Tanjung Manis"
+      },
+      {
+        "id": "my-13-36",
+        "name": "Sebauh"
+      },
+      {
+        "id": "my-13-37",
+        "name": "Bukit Mabong"
+      },
+      {
+        "id": "my-13-38",
+        "name": "Subis"
+      },
+      {
+        "id": "my-13-39",
+        "name": "Beluru"
+      },
+      {
+        "id": "my-13-40",
+        "name": "Telang Usan"
+      }
+    ]
+  },
+  {
+    "id": "my-14",
+    "name": "W.P. Kuala Lumpur",
+    "subdivisions": [
+      {
+        "id": "my-14-01",
+        "name": "W.P. Kuala Lumpur"
+      }
+    ]
+  },
+  {
+    "id": "my-15",
+    "name": "W.P. Labuan",
+    "subdivisions": [
+      {
+        "id": "my-15-01",
+        "name": "W.P. Labuan"
+      }
+    ]
+  },
+  {
+    "id": "my-16",
+    "name": "W.P. Putrajaya",
+    "subdivisions": [
+      {
+        "id": "my-16-01",
+        "name": "W.P. Putrajaya"
+      }
+    ]
+  }
+]
