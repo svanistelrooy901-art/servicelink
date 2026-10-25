@@ -2,6 +2,8 @@
 import { MapPin, Globe, Briefcase, MessageCircle, ArrowUpRight, Star } from 'lucide-react';
 import { CategoryIcon } from './CategoryIcon';
 import { ProfileCover } from './ProfileCover';
+import { SocialLinks } from './SocialLinks';
+import { ProfileGallery } from './ProfileGallery';
 import { Link } from 'react-router-dom';
 import { coverageLabels } from '../lib/geography';
 import { categories, type ProviderProfile } from '../lib/types';
@@ -62,6 +64,7 @@ export function ProfilePresentation({
             </span>
           )}
         </div>
+        <SocialLinks links={p.social} preview={preview} />
         <div className="profile-contact">
           {contact ? (
             preview ? (
@@ -134,6 +137,7 @@ export function ProfilePresentation({
             )}
           </div>
         </section>
+        <ProfileGallery pictures={p.gallery} name={p.name} />
         <section className="public-section">
           <h2>Service coverage</h2>
           <div className="coverage-tags">

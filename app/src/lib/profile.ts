@@ -1,6 +1,8 @@
 import { categories, type ProviderProfile } from './types.ts';
 import { coverageErrors } from './geography.ts';
 import { normalizeMalaysiaWhatsapp } from './whatsappNumber.ts';
+import { emptySocialLinks, socialPlatforms, validSocialLink } from './social.ts';
+import { galleryErrors } from './gallery.ts';
 export function normalizeSlug(value: string) {
   return value
     .trim()
@@ -13,7 +15,13 @@ export function normalizeSlug(value: string) {
 export const cloneProfile = (p: ProviderProfile): ProviderProfile => structuredClone(p);
 // Existing local/cloud profiles predate optional banners; keep their drafts and publications.
 export function withProfileDefaults(p: ProviderProfile): ProviderProfile {
-  return { ...p, banner: p.banner ?? '', bannerPosition: p.bannerPosition ?? 50 };
+  return {
+    ...p,
+    banner: p.banner ?? '',
+    bannerPosition: p.bannerPosition ?? 50,
+    social: { ...emptySocialLinks(), ...p.social },
+    gallery: p.gallery ?? [],
+  };
 }
 export function publicSnapshot(p: ProviderProfile): ProviderProfile {
   // Explicit allowlist: future private draft fields cannot leak through publication.
@@ -31,6 +39,12 @@ export function publicSnapshot(p: ProviderProfile): ProviderProfile {
     photo: p.photo,
     banner: p.banner ?? '',
     bannerPosition: p.bannerPosition ?? 50,
+    social: {
+      facebook: p.social?.facebook ?? '',
+      instagram: p.social?.instagram ?? '',
+      threads: p.social?.threads ?? '',
+    },
+    gallery: (p.gallery ?? []).map(({ id, src, caption }) => ({ id, src, caption })),
     accent: p.accent,
     coverage: p.coverage.map((c) => ({
       stateId: c.stateId,
@@ -108,6 +122,17 @@ export function validateForPublish(p: ProviderProfile): string[] {
     errors.push('Choose a banner position between 0 and 100.');
   if (p.base.length > 100 || p.languages.length > 120)
     errors.push('Keep your base and languages short.');
+  if (p.social !== undefined) {
+    if (!p.social || typeof p.social !== 'object' || Array.isArray(p.social))
+      errors.push('Check your social media links.');
+    else
+      for (const platform of Object.keys(socialPlatforms) as (keyof typeof socialPlatforms)[])
+        if (!validSocialLink(platform, p.social[platform]))
+          errors.push(
+            `Use a full https:// ${socialPlatforms[platform].label} link, or leave it empty.`,
+          );
+  }
+  if (p.gallery !== undefined) errors.push(...galleryErrors(p.gallery));
   return [...new Set(errors)];
 }
 export function priceLabel(service: ProviderProfile['services'][number]) {

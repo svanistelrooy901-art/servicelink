@@ -30,3 +30,4 @@ async function compressImage(file: File, maxDimension: number, maxLength: number
 }
 export const compressProfilePhoto = (file: File) => compressImage(file, 480, 180000);
 export const compressProfileBanner = (file: File) => compressImage(file, 1600, 220000);
+export const compressGalleryPicture = (file: File) => compressImage(file, 1200, 120000);

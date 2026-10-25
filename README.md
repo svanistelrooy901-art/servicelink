@@ -16,7 +16,7 @@ npm run dev -- --host 127.0.0.1 --port 5178
 
 Open `http://127.0.0.1:5178/login` and choose **Explore the demo**. No credentials are required. The default is local mode; there are no real account, billing or message requests.
 
-1. Edit **My profile**, including category, optional public WhatsApp, theme, photo and banner.
+1. Edit **My profile**, including category, optional public WhatsApp, theme, photo, banner, social links and work gallery.
 2. Add/edit/delete **Services** and choose **Coverage** in one or more states.
 3. **Save draft**, then reload to check persistence.
 4. **Preview & publish** shows the same profile renderer used at `/p/:slug`. Publication validates required fields.
@@ -75,3 +75,15 @@ Use **Save draft**, then **Publish updates** to change the public banner. Replac
 Uploads work in local demonstration mode. Hosted uploads remain disabled pending the independent SL R2 integration. The additive `20261025095911_sl_profile_banner.sql` migration is prepared for review only; it accepts bounded optional banner fields and preserves existing RLS/ownership.
 
 Run `npm run test:banner-browser` in `app/` for compression, category, persistence, publication and viewport checks. [Mobile banner editor](docs/qa/banners/banner-editor-390.png) · [custom public banner](docs/qa/banners/public-banner-390.png).
+
+## Social links and work gallery
+
+In **My profile**, add optional Facebook, Instagram and Threads profile/page URLs. Use full `https://` links for the matching platform; blank links stay hidden. Public icons open a new tab with opener isolation. Live-preview social actions are disabled. Threads `.com` and legacy `.net` links are accepted.
+
+**Your work, in pictures** accepts at most **8 pictures**, individually or in a batch. JPG/PNG/WebP inputs up to 8MB each are re-encoded as WebP, resized to a maximum 1200px longest edge and capped at 120,000 data-URL characters each (about 90KB binary). A failed batch leaves the previous gallery unchanged. Save/publish/discard controls wait while images are being prepared.
+
+Use the arrows to choose the order; the first **2 pictures** appear as profile thumbnails. Optional captions also provide image descriptions. With more than two pictures, **More** opens a responsive popup containing the complete gallery. Pictures have no individual-view, zoom or image-navigation action. The popup can close through its button, Escape or backdrop; background scrolling is locked while open and focus returns on close. A gallery with one/two pictures needs no More button; an empty gallery is hidden.
+
+**Save draft → Publish updates** applies to links, captions, picture order, additions and removals. Existing public snapshots remain unchanged until publication. Legacy profiles get empty social links and an empty gallery. Hosted uploads are still disabled until the independent SL media integration is ready.
+
+Run `npm run test:social-gallery-browser` for the complete flow at 390px, 420px and 1440px. [Mobile profile](docs/qa/social-gallery/public-390.png) · [mobile popup](docs/qa/social-gallery/gallery-modal-390.png) · [desktop popup](docs/qa/social-gallery/gallery-modal-1440.png).

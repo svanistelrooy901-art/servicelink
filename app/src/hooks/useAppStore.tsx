@@ -6,6 +6,8 @@ interface Store {
   workspace: Workspace | null;
   profile: ProviderProfile | null;
   busy: boolean;
+  mediaBusy: boolean;
+  setMediaBusy: (busy: boolean) => void;
   error: string;
   feedback: string;
   dirty: boolean;
@@ -21,6 +23,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [profile, setProfile] = useState<ProviderProfile | null>(null);
   const [busy, setBusy] = useState(false);
+  const [mediaBusy, setMediaBusy] = useState(false);
   const [error, setError] = useState('');
   const [feedback, setFeedback] = useState('');
   useEffect(() => {
@@ -46,16 +49,16 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     workspace?.published && JSON.stringify(profile) !== JSON.stringify(workspace.published),
   );
   useEffect(() => {
-    if (!dirty) return;
+    if (!dirty && !mediaBusy) return;
     const warn = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = '';
     };
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
-  }, [dirty]);
+  }, [dirty, mediaBusy]);
   async function run(action: 'save' | 'publish' | 'unpublish') {
-    if (!workspace || !profile || busy) return;
+    if (!workspace || !profile || busy || mediaBusy) return;
     setBusy(true);
     setError('');
     setFeedback('');
@@ -85,6 +88,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         workspace,
         profile,
         busy,
+        mediaBusy,
+        setMediaBusy,
         error,
         feedback,
         dirty,
@@ -98,7 +103,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         publish: () => run('publish'),
         unpublish: () => run('unpublish'),
         reset: () => {
-          if (workspace) setProfile(structuredClone(workspace.draft));
+          if (workspace && !mediaBusy) setProfile(structuredClone(workspace.draft));
         },
       }}
     >

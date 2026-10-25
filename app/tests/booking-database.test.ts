@@ -37,6 +37,12 @@ test('booking SQL: private records, owner checks, server-only guest access, capa
         'utf8',
       ),
     );
+    await db.exec(
+      await readFile(
+        new URL('../../supabase/migrations/20261025102409_sl_social_gallery.sql', import.meta.url),
+        'utf8',
+      ),
+    );
     await db.query('insert into auth.users values($1),($2)', [owner, other]);
     const p = publicSnapshot(demoProfile());
     await db.query('insert into sl_public_profiles(user_id,slug,profile) values($1,$2,$3)', [

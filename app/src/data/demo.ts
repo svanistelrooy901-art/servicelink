@@ -14,6 +14,8 @@ export function emptyProfile(): ProviderProfile {
     photo: '',
     banner: '',
     bannerPosition: 50,
+    social: { facebook: '', instagram: '', threads: '' },
+    gallery: [],
     accent: 'ocean',
     coverage: [],
     services: [],

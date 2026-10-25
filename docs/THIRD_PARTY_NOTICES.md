@@ -1231,3 +1231,13 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
 ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 ```
+
+## Simple Icons — Threads mark
+
+`app/src/assets/threads.svg` is copied from Simple Icons, retrieved 25 October 2026:
+https://github.com/simple-icons/simple-icons/blob/develop/icons/threads.svg
+
+CC0 1.0 Universal; complete text in `app/licenses/simple-icons-CC0.txt`.
+https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md
+
+The logo identifies the user's Threads link; no affiliation is implied. Facebook/Instagram icons continue to use the existing Lucide dependency and its retained license.

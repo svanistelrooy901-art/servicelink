@@ -131,21 +131,31 @@ export function DashboardLayout() {
           <footer className="save-bar">
             <span>
               <span className={`status-dot ${store.dirty ? 'unsaved' : ''}`} />
-              {store.busy
-                ? 'Saving…'
-                : store.dirty
-                  ? 'Unsaved changes'
-                  : store.workspace?.savedAt
-                    ? 'All changes saved'
-                    : 'Ready to make it yours'}
+              {store.mediaBusy
+                ? 'Preparing images…'
+                : store.busy
+                  ? 'Saving…'
+                  : store.dirty
+                    ? 'Unsaved changes'
+                    : store.workspace?.savedAt
+                      ? 'All changes saved'
+                      : 'Ready to make it yours'}
             </span>
             <div>
               {store.dirty && (
-                <button className="text-btn" disabled={store.busy} onClick={store.reset}>
+                <button
+                  className="text-btn"
+                  disabled={store.busy || store.mediaBusy}
+                  onClick={store.reset}
+                >
                   Discard edits
                 </button>
               )}
-              <button className="btn-primary" disabled={store.busy} onClick={store.save}>
+              <button
+                className="btn-primary"
+                disabled={store.busy || store.mediaBusy}
+                onClick={store.save}
+              >
                 <Save size={16} />
                 Save draft
               </button>

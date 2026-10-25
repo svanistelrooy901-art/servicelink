@@ -7,10 +7,11 @@ Validated on 25 October 2026 with Node 24.22.1. No hosted system, real account, 
 | `npm ci` | Clean dependency install succeeds |
 | `npm run lint` | TypeScript passes |
 | `npm run build` | TypeScript + Vite production build pass |
-| `npm test` | 27 passing domain/database tests |
+| `npm test` | 31 passing domain/database tests |
 | `npm run test:browser` | 52 assertions pass across 390px, 420px and 1440px |
 | `npm run test:booking-browser` | 54 assertions pass across the same viewports |
 | `npm run test:banner-browser` | 111 banner assertions pass across the same viewports |
+| `npm run test:social-gallery-browser` | 158 social/gallery assertions pass across the same viewports |
 | Browser exceptions | None |
 | External browser requests | None; test intercepts and rejects them |
 | Page horizontal overflow | None on tested workspace/public flows |
@@ -67,3 +68,20 @@ The dedicated browser flow checks all five category icons, unsupported MIME, cor
 - [Marketplace banner](qa/banners/marketplace-banner.png)
 
 Hosted banner storage, staging migration and hosted advisors remain pending the independent Service Link integration; the local demonstration is the verified runtime.
+
+## Social links and eight-picture gallery
+
+Four new domain tests cover matching-platform HTTPS URLs, hostile schemes/hosts/credentials, zero/eight/nine-picture and caption/media limits, ordering, legacy defaults, public metadata allowlisting, persistence, snapshot isolation and removal. Embedded Postgres also rejects invalid social URLs, unknown/private object keys, duplicate IDs, a ninth picture, oversized/non-WebP media and long captions while accepting a complete bounded portrait/banner/eight-picture payload. All **31 domain/database tests** pass.
+
+**158 new browser assertions** verify social link validation/attributes and persistence, disabled preview links, rejected ninth-file/SVG/corrupt batches, real resize/compression of eight PNG uploads, unfinished-upload save protection, captions and first-two ordering, reload, public publication, two thumbnails, eight-picture popup, noninteractive images with no individual views/tabs, Escape/button/backdrop closing, scroll restoration, focus return, removals, hidden empty sections and unpublish. No real social link was visited and no external request was permitted.
+
+Together with the profile (52), booking (54) and banner (111) suites, **375 browser assertions** pass at 390px, 420px and 1440px. The main flow and popup were visually reviewed on mobile and desktop. All images and account links in evidence are fictional test fixtures. Native modal behavior is tested in Chromium; physical phones and Safari remain outside this local validation.
+
+- [Mobile social icons and gallery preview](qa/social-gallery/public-390.png)
+- [390px gallery popup](qa/social-gallery/gallery-modal-390.png)
+- [420px gallery popup](qa/social-gallery/gallery-modal-420.png)
+- [Desktop popup](qa/social-gallery/gallery-modal-1440.png)
+- [Mobile gallery editor](qa/social-gallery/editor-390.png)
+- [Desktop gallery editor](qa/social-gallery/editor-1440.png)
+
+The migration and hosted-media limits are detailed in [INTEGRATION.md](INTEGRATION.md). Hosted storage remains unconfigured and no external infrastructure was changed.

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Upload, Check } from 'lucide-react';
 import { CategoryIcon } from './CategoryIcon';
 import { ProfileCover } from './ProfileCover';
@@ -9,13 +9,19 @@ import { usingLocal } from '../lib/config';
 export function BannerEditor({
   profile: p,
   onChange,
+  onProcessingChange,
 }: {
   profile: ProviderProfile;
   onChange: (patch: Partial<ProviderProfile>) => void;
+  onProcessingChange: (busy: boolean) => void;
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [preparing, setPreparing] = useState(false);
   const [error, setError] = useState('');
+  useEffect(() => {
+    onProcessingChange(preparing);
+    return () => onProcessingChange(false);
+  }, [preparing, onProcessingChange]);
   return (
     <section className="panel banner-editor">
       <div>

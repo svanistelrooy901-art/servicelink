@@ -73,3 +73,11 @@ See [MILESTONE_2.md](MILESTONE_2.md) for the booking schema, roles/constraints, 
 `20261025095911_sl_profile_banner.sql` is generated with Supabase CLI 2.122.0 and tested locally in embedded Postgres. It keeps banner/image-position fields optional for legacy public snapshots, rejects external/SVG/oversized image data and invalid positions, and increases the combined draft/public JSON ceiling to 500,000 bytes for bounded portrait plus banner payloads. Owner checks, function invoker mode, unknown-key rejection, grants and RLS remain in force. Apply the migrations in filename order when independent SL staging is authorized.
 
 No hosted migration or advisor run was performed because no SL project is configured. Supabase's current function-security documentation and changelog were checked; the new validator uses `SECURITY INVOKER`, an empty search path and the existing explicit grants. Hosted R2 work must cover banners as well as portraits, replacing temporary inline data with SL-owned media references before pilot scale.
+
+## Social/gallery schema delta
+
+`20261025102409_sl_social_gallery.sql` is an additive review-only migration, created with Supabase CLI 2.122.0. It accepts optional `social` and `gallery` fields so earlier public snapshots remain valid. Social keys are restricted to Facebook/Instagram/Threads, with bounded HTTPS platform-domain URLs. Gallery records allow only `id`, compressed WebP `src` and bounded `caption`; identifiers are unique and the server enforces the eight-picture maximum.
+
+The combined JSON ceiling rises to **1,500,000 bytes**, enough for the bounded portrait, banner, eight gallery images and profile text in the demonstration. Ownership, explicit grants, invoker mode, snapshot matching and RLS remain unchanged and are re-tested in embedded Postgres. No hosted migration, project, bucket, paid service or real external action was performed.
+
+R2 integration must also implement gallery upload ownership, server-side re-encoding, maximum count/size quotas and replacement/deletion cleanup. Before a cloud pilot, replace all temporary inline-media fields with SL-owned object/version references. The verified gallery runtime is the local demonstration; hosted-media advisors and real cross-device persistence remain staging work.
