@@ -1,5 +1,6 @@
 // AL's shared ProfilePresentation architecture, adapted to SL's provider/service domain.
 import { MapPin, Globe, Briefcase, MessageCircle, ArrowUpRight, Star, Link2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { coverageLabels } from '../lib/geography';
 import { categories, type ProviderProfile } from '../lib/types';
 import { priceLabel } from '../lib/profile';
@@ -122,6 +123,18 @@ export function ProfilePresentation({
                     </span>
                   </div>
                   <strong>{priceLabel(s)}</strong>
+                  {preview ? (
+                    <button className="btn-secondary service-book-btn" disabled>
+                      Request booking
+                    </button>
+                  ) : (
+                    <Link
+                      className="btn-secondary service-book-btn"
+                      to={`/p/${p.slug}/book?service=${encodeURIComponent(s.id)}`}
+                    >
+                      Request booking
+                    </Link>
+                  )}
                 </div>
               ))
             ) : (
@@ -149,7 +162,9 @@ export function ProfilePresentation({
           </div>
         </section>
         <p className="profile-footnote">
-          {preview ? 'Live preview · contact actions are disabled' : 'Connected by Service Link'}
+          {preview
+            ? 'Live preview · contact and booking actions are disabled'
+            : 'Connected by Service Link'}
           <span>Digital Sambal</span>
         </p>
       </div>

@@ -63,3 +63,7 @@ Membership billing and customer-to-freelancer payment require separate tables, r
 - https://supabase.com/changelog/cbc-tls-ciphers-deprecated
 - https://developers.cloudflare.com/workers/static-assets/routing/advanced/html-handling/
 - Pricing/capacity sources: see the complete handover.
+
+## Milestone 2 delta
+
+See [MILESTONE_2.md](MILESTONE_2.md) for the booking schema, roles/constraints, complete demo flow and exact hosted API work remaining. `20261025085204_sl_booking_foundation.sql` is review-only and requires `btree_gist`. Private booking rows are not exposed to anonymous users; guest operations are reserved for a future validated server endpoint. Project inventory was read without changes; no Service Link project was found. Availability/Bookings stay unavailable in cloud mode until that backend is integrated.

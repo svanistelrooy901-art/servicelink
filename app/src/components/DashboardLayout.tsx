@@ -1,6 +1,8 @@
-import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
+  CalendarDays,
+  Inbox,
   UserRound,
   Briefcase,
   MapPin,
@@ -20,10 +22,16 @@ const nav = [
   ['profile', 'My profile', UserRound],
   ['services', 'Services', Briefcase],
   ['coverage', 'Coverage', MapPin],
+  ['availability', 'Availability', CalendarDays],
+  ['bookings', 'Bookings', Inbox],
   ['preview', 'Preview & publish', Eye],
 ] as const;
 export function DashboardLayout() {
   const store = useAppStore();
+  const location = useLocation();
+  const usesProfileDraft = !['/dashboard/availability', '/dashboard/bookings'].includes(
+    location.pathname,
+  );
   const { signOut } = useAuth();
   const navigate = useNavigate();
   async function leave() {
@@ -103,7 +111,7 @@ export function DashboardLayout() {
               {store.error}
             </div>
           )}
-          {store.feedback && (
+          {store.feedback && usesProfileDraft && (
             <div className="success-box" role="status">
               <Check size={17} />
               {store.feedback}
@@ -119,7 +127,7 @@ export function DashboardLayout() {
             </button>
           )}
         </main>
-        {store.profile && (
+        {store.profile && usesProfileDraft && (
           <footer className="save-bar">
             <span>
               <span className={`status-dot ${store.dirty ? 'unsaved' : ''}`} />

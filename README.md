@@ -2,7 +2,7 @@
 
 A Digital Sambal product for independent service providers across Malaysia.
 
-**Milestone 1 is a working local demonstration**, with a separate Supabase adapter and SQL migration prepared for review. No Service Link cloud project, Worker, R2 bucket, production deployment or payment connection has been created.
+**Milestones 1 and 2 provide a working local demonstration**, with a separate Supabase adapter and SQL migration prepared for review. No Service Link cloud project, Worker, R2 bucket, production deployment or payment connection has been created.
 
 ## Run and review
 
@@ -56,4 +56,10 @@ See [validation evidence](docs/VALIDATION.md), [source assessment](docs/SOURCE_A
 
 For a new SL Supabase project, use `app/.env.example` and the reviewed migration under `supabase/migrations/`. Set `VITE_DATA_BACKEND=supabase`, its own HTTPS project URL, publishable key and matching `VITE_SL_PROJECT_REF`. Cloud misconfiguration fails visibly and never silently switches to demo storage. The cloud adapter is type-checked and the SQL is exercised in embedded Postgres; hosted Auth and end-to-end cloud persistence still require the new project and verification.
 
-Billing, bookings, gateway payments, Refer Me and customer reviews are not activated in this milestone. The displayed 14-day trial is the agreed offer; no trial is claimed to have started. No production, paid service, real payment or external message is authorized by this code.
+Billing, gateway payments, Refer Me and customer reviews are not activated. Booking/manual-payment simulation is available in local demo mode only. The displayed 14-day trial is the agreed offer; no trial is claimed to have started. No production, paid service, real payment or external message is authorized by this code.
+
+## Milestone 2 update
+
+The local demonstration now includes **Availability** and **Bookings**, service-level appointment/date-range requests, shared capacity, private customer booking links, provider acceptance with amount/deadline, QR/bank instructions, customer payment reporting and explicit provider verification. Phone/WhatsApp bookings and blocked time share the same calendar. See [the full milestone-2 walkthrough and backend limits](docs/MILESTONE_2.md).
+
+Booking records are local-demo data until the independent booking backend is integrated. Cloud mode intentionally keeps booking unavailable. The new booking migration is prepared and tested, not hosted/applied. No real payment or external message is sent.

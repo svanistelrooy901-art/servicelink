@@ -146,7 +146,7 @@ export function DashboardOverview() {
           <section className="next-card">
             <CalendarDays size={22} />
             <div>
-              <strong>Up next: bookings</strong>
+              <strong>Your booking workspace</strong>
               <p>
                 Availability, booking requests and manual payment verification are the next
                 milestone.
