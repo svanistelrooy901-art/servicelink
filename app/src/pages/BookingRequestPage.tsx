@@ -5,7 +5,7 @@ import { bookingRepository } from '../lib/bookingRepository';
 import type { ProviderProfile } from '../lib/types';
 import { BookingForm, bookingAccessPath } from '../components/BookingForm';
 import { ServiceLinkBrand } from '../components/ServiceLinkBrand';
-import { usingLocal } from '../lib/config';
+import { usingLocal, bookingsEnabled } from '../lib/config';
 export function BookingRequestPage() {
   const { slug = '' } = useParams();
   const [search] = useSearchParams();
@@ -46,7 +46,7 @@ export function BookingRequestPage() {
         <span className="eyebrow">LET’S MAKE A CONNECTION</span>
         <h1>Request a booking</h1>
         {p && <p className="hint">With {p.name}</p>}
-        {!usingLocal ? (
+        {!bookingsEnabled ? (
           <p className="booking-notice">
             Booking requests are not enabled in this environment yet.
           </p>

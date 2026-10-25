@@ -3,3 +3,8 @@ if (!['local', 'supabase'].includes(backend))
   throw new Error('Choose local or supabase for VITE_DATA_BACKEND.');
 export const usingLocal = backend === 'local';
 export const DEMO_ACCESS_KEY = 'servicelink:demo-access:v1';
+
+export const bookingsEnabled = usingLocal || import.meta.env.VITE_SL_BOOKINGS_ENABLED === 'true';
+export const mediaEnabled = usingLocal || import.meta.env.VITE_SL_MEDIA_ENABLED === 'true';
+
+export const isStaging = !usingLocal;

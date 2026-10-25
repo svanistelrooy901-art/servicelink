@@ -1,3 +1,4 @@
+import { MediaImage } from './MediaImage';
 // AL's shared ProfilePresentation architecture, adapted to SL's provider/service domain.
 import { MapPin, Globe, Briefcase, MessageCircle, ArrowUpRight, Star } from 'lucide-react';
 import { CategoryIcon } from './CategoryIcon';
@@ -32,7 +33,7 @@ export function ProfilePresentation({
         <div className="profile-top">
           <div className="avatar">
             {p.photo ? (
-              <img
+              <MediaImage
                 src={p.photo}
                 alt={p.name ? `${p.name} profile portrait` : 'Your profile portrait'}
               />

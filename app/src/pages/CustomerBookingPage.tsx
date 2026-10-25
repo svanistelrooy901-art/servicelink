@@ -1,3 +1,4 @@
+import { MediaImage } from '../components/MediaImage';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { bookingRepository } from '../lib/bookingRepository';
@@ -122,9 +123,10 @@ export function CustomerBookingPage() {
                   Payment deadline: <strong>{formatMY(b.paymentDeadline!)}</strong>
                 </p>
                 {b.paymentDetails.qrPhoto && (
-                  <img
+                  <MediaImage
                     className="customer-payment-qr"
                     src={b.paymentDetails.qrPhoto}
+                    access={{ id, token }}
                     alt="Provider payment QR"
                   />
                 )}

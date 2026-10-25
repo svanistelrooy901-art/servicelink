@@ -1,5 +1,7 @@
 # Milestone 2: availability, booking requests and manual payments
 
+Historical M2 record. M3 now implements the cloud transport behind disabled flags; see [MILESTONE_3.md](MILESTONE_3.md) and [STAGING_SETUP.md](STAGING_SETUP.md) for current status. Live staging remains unavailable.
+
 Implemented on top of milestone 1, commit `17974e7`, in `feat/sl-m2-booking-manual-payments`. The PR is stacked on the milestone-1 branch so its booking changes can be reviewed separately. Neither PR is merged by this work.
 
 ## Confirmed direction and supporting choices

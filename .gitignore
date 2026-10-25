@@ -9,3 +9,7 @@ qa-output/
 
 supabase/.temp/
 supabase/.branches/
+
+.dev.vars
+.dev.vars.*
+!.dev.vars.example

@@ -1,3 +1,4 @@
+import { isMediaReference } from './mediaReference.ts';
 import { categories, type ProviderProfile } from './types.ts';
 import { coverageErrors } from './geography.ts';
 import { normalizeMalaysiaWhatsapp } from './whatsappNumber.ts';
@@ -103,6 +104,7 @@ export function validateForPublish(p: ProviderProfile): string[] {
   }
   if (
     p.photo &&
+    !isMediaReference(p.photo) &&
     (!/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(p.photo) || p.photo.length > 180000)
   )
     errors.push('Use a compressed WebP profile photo under 130 KB.');
@@ -112,6 +114,7 @@ export function validateForPublish(p: ProviderProfile): string[] {
     p.banner !== undefined &&
     (typeof p.banner !== 'string' ||
       (p.banner !== '' &&
+        !isMediaReference(p.banner) &&
         (!/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(p.banner) || p.banner.length > 220000)))
   )
     errors.push('Use a compressed WebP banner under 165 KB.');

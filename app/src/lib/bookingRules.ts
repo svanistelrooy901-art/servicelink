@@ -1,3 +1,4 @@
+import { isMediaReference } from './mediaReference.ts';
 import type { BookingSettings, BookingRecord, BookingStatus, BookingMode } from './bookingTypes.ts';
 import type { Service } from './types.ts';
 export const DAY_NAMES = [
@@ -84,7 +85,8 @@ export function settingsErrors(s: BookingSettings): string[] {
     e.push('Keep payment instructions short.');
   if (
     s.payment.qrPhoto &&
-    (!/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(s.payment.qrPhoto) ||
+    ((!isMediaReference(s.payment.qrPhoto) &&
+      !/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(s.payment.qrPhoto)) ||
       s.payment.qrPhoto.length > 180000)
   )
     e.push('Use a compressed QR image.');

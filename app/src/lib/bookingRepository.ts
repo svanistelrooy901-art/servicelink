@@ -1,6 +1,8 @@
-import { usingLocal } from './config';
+import { usingLocal, bookingsEnabled } from './config';
 import { repository as profiles } from './repository';
 import { createLocalBookingRepository } from './localBookingRepository';
+import { createHttpBookingRepository } from './httpBookingRepository';
+import { getSupabaseClient } from './supabase';
 import type { BookingRepository } from './bookingTypes';
 const unavailable = async (): Promise<never> => {
   throw new Error(
@@ -9,15 +11,20 @@ const unavailable = async (): Promise<never> => {
 };
 export const bookingRepository: BookingRepository = usingLocal
   ? createLocalBookingRepository(window.localStorage, profiles)
-  : {
-      load: unavailable,
-      saveSettings: unavailable,
-      addBlock: unavailable,
-      removeBlock: unavailable,
-      availability: unavailable,
-      request: unavailable,
-      manual: unavailable,
-      ownerAction: unavailable,
-      customerRead: unavailable,
-      customerAction: unavailable,
-    };
+  : bookingsEnabled
+    ? createHttpBookingRepository(async () => {
+        const { data } = await getSupabaseClient().auth.getSession();
+        return data.session?.access_token ?? null;
+      })
+    : {
+        load: unavailable,
+        saveSettings: unavailable,
+        addBlock: unavailable,
+        removeBlock: unavailable,
+        availability: unavailable,
+        request: unavailable,
+        manual: unavailable,
+        ownerAction: unavailable,
+        customerRead: unavailable,
+        customerAction: unavailable,
+      };

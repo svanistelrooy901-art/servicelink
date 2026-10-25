@@ -17,7 +17,7 @@ import {
   addDays,
   effectiveStatus,
 } from '../lib/bookingRules';
-import { usingLocal } from '../lib/config';
+import { bookingsEnabled } from '../lib/config';
 export function BookingsPage() {
   const { data, busy, error, feedback, refresh, run } = useBookings();
   const { workspace } = useAppStore();
@@ -26,7 +26,7 @@ export function BookingsPage() {
   const [manualOpen, setManualOpen] = useState(false);
   const [manualAmount, setManualAmount] = useState('');
   const [manualDeadline, setManualDeadline] = useState(`${addDays(myDate(), 1)}T08:00`);
-  if (!usingLocal)
+  if (!bookingsEnabled)
     return (
       <section className="panel">
         <h1>Bookings</h1>
@@ -300,10 +300,12 @@ function OwnerBookingCard({
             {b.mode === 'date-range' ? 'Full date-range request' : 'Appointment request'}
           </p>
           {b.note && <p className="customer-note">{b.note}</p>}
-          <Link className="private-booking-link" to={bookingAccessPath(b)} target="_blank">
-            View private customer page
-            <ExternalLink size={13} />
-          </Link>
+          {b.accessToken && (
+            <Link className="private-booking-link" to={bookingAccessPath(b)} target="_blank">
+              View private customer page
+              <ExternalLink size={13} />
+            </Link>
+          )}
         </section>
         <section>
           <p className="payment-state">{paymentLabel(b.paymentStatus)}</p>

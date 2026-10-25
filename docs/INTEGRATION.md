@@ -1,49 +1,41 @@
-# Integration preparation
+# Integration status and architecture
 
-No external resource has been created, linked, purchased, migrated or deployed for this milestone. Configurations are review templates. AdvisorLink was read-only throughout.
+The M3 booking/media transport is ready for review behind disabled flags. **Live staging has not been deployed or verified.** Independent SL project creation hit the account free-project quota; Cloudflare CLI has no authenticated target. No existing project was paused, deleted or upgraded. No hosted resource, migration, payment or message was created. AdvisorLink stayed read-only.
 
-## Hosting: Cloudflare
+Use [STAGING_SETUP.md](STAGING_SETUP.md) for the current configuration sequence and [MILESTONE_3.md](MILESTONE_3.md) for exact behavior, tests and limitations. Earlier milestone documents describe their historical state.
 
-The handover's recommended static assets + Workers architecture is suitable for this Vite application. `app/wrangler.jsonc` uses the independent name `servicelink-review`, SPA routing, no custom domains/account ID, and disables workers.dev/preview URLs until an explicit deployment instruction. No deploy workflow or deploy command runs on commit/PR.
+## Cloudflare
 
-A future SL-only staging deployment needs a Cloudflare account/target, explicit origin, build-time Supabase variables and Auth redirect allowlist. Review direct profile and password callback deep links. Configure HTML and profile-data cache behavior so Unpublish cannot leave a cached private publication visible. Public API data must not be cached indefinitely. The current SPA fetches publication on navigation/focus; already displayed content cannot be recalled from a visitor's browser.
+`app/wrangler.jsonc` defines the independent `servicelink-staging` Worker with static Vite assets. API/private-booking paths run the Worker first; workers.dev, preview URLs, observability and booking/media flags are off. No deploy-on-commit workflow exists. `npm run worker:check` only bundles a deployment dry-run.
 
-## Authentication and database: Supabase
+APIs use same-origin requests, verified provider sessions, fixed RPC routes and safe error projections. Private booking HTML and all API/media responses use no-store/no-referrer headers. Anonymous media reads check the current publication on every request. Already downloaded or displayed content cannot be recalled after Unpublish. A supported-host/staging runtime smoke test is still required: this container could not start Wrangler local runtime because `uv_interface_addresses` is unavailable.
 
-Create or identify a **new Service Link project**. Do not reuse any AL project. `supabase/config.toml` is an independent local-stack template with a separate project ID and ports. No hosted project link file is present.
+## Supabase
 
-Migration: `supabase/migrations/20261025081126_sl_provider_foundation.sql`, created using Supabase CLI 2.122.0 `migration new`, then authored and verified with embedded Postgres (PGlite). It has not been applied to hosted Supabase.
+Use only an independent Service Link project. `supabase/config.toml` is an independent local-stack template, with no hosted link file. Apply all migrations in filename order after review:
 
-- `sl_workspaces`: owner-only drafts and optimistic revision number.
-- `sl_public_profiles`: validated allowlisted snapshots; public SELECT exposes profile, slug and publication timestamp. Anonymous users cannot select owner UUIDs or drafts.
-- `sl_geography`: read-only canonical state/territory data and subdivisions seeded from the shared JSON.
-- `sl_write_workspace`: SECURITY INVOKER function; RLS applies; transaction + row lock + revision check prevent stale saves and partial publication. Slug uniqueness is global; replacing it retires the previous row/link.
-- RLS is enabled on every exposed table. Policies use `auth.uid()`, never editable user metadata. Grants and invoker functions are explicit. No privileged server key is needed in the browser.
+| Migration | Purpose |
+| --- | --- |
+| `20261025081126_sl_provider_foundation.sql` | Owner drafts, allowlisted public snapshots, canonical geography, atomic publication and revisions |
+| `20261025085204_sl_booking_foundation.sql` | Private booking/settings/capacity, provider/server routines and `btree_gist` exclusion constraint |
+| `20261025095911_sl_profile_banner.sql` | Optional banner/focus and legacy defaults |
+| `20261025102409_sl_social_gallery.sql` | Optional platform links and eight-picture gallery |
+| `20261025114351_sl_cloud_booking_api.sql` | Versioned owner APIs, sanitized availability, snapshots, safe DTOs and private rate limiting |
+| `20261025114907_sl_r2_media.sql` | Private asset registry, ownership/purpose checks, reference-based hosted media and cleanup |
 
-Before staging integration, review/apply the migration to the SL project, run Supabase advisors there, generate precise TypeScript database types, and verify actual signup/confirmation/sign-in/recovery/sign-out plus ownership using two test accounts and anonymous browsing. PGlite substitutes `auth.uid()`/`auth.users` for SQL tests; it does not test Supabase Auth, PostgREST, SMTP, rate limits or hosted project settings.
+The final media migration rejects inline images for hosted writes and limits profile JSON to 64KB; earlier larger inline ceilings remain only historical/local-demo design. Upload pictures through the owner media API instead. Existing demo data is not automatically imported.
 
-Set these in `app/.env.local` (never commit actual values):
-
-```dotenv
-VITE_DATA_BACKEND=supabase
-VITE_SUPABASE_URL=https://YOUR_NEW_SL_REF.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_YOUR_SL_KEY
-VITE_SL_PROJECT_REF=YOUR_NEW_SL_REF
-```
+RLS and explicit grants protect exposed tables. Owner RPCs use `auth.uid()` from a verified JWT, never editable metadata; guest/media wrappers require the server role. Security-definer functions have empty search paths and explicit ownership checks. Old unversioned owner-write grants are revoked. Server keys never reach the browser. Run hosted advisors and real concurrent/two-account checks before a pilot. Embedded SQL tests substitute Auth and serialize one connection; they are not hosted certification.
 
 The client requires a publishable key and verifies URL/ref agreement. It uses `servicelink:auth:v1` and PKCE. Add the exact SL frontend origin as Site URL, and `/auth/callback` and `/auth/recovery` as allowed redirects. Keep email confirmations enabled. Prefer a confirmation email link to `/auth/callback?token_hash={{ .TokenHash }}&type=signup` so a GET/prefetch does not consume a signup token; the retained callback requires a user confirmation click for this route. Verify templates and PKCE flows on staging, including same-browser recovery and invalid/expired links.
 
-No auth emails have been sent by this work. No account/trial/membership payment is activated by opening the demonstration. The signup flow is implemented but needs the new project and email configuration before end-to-end verification.
+Supabase documentation/changelog were checked during M3. No change required a different Auth protocol; the Worker verifies provider identity through `/auth/v1/user` with the provider bearer token and publishable API key. Hosted email templates, SMTP and redirects still need SL-only configuration. No auth emails were sent by this work.
 
-Supabase documentation and changelog were checked during implementation. The relevant 12 October TLS cipher deprecation affects unsupported legacy clients; this app targets current browsers and needs no special cipher implementation. Password/PKCE and RLS references were checked against current docs.
+## R2 and Images
 
-## Media: R2
+`wrangler.media.example.jsonc` is a review-only binding example. The default config activates neither a bucket nor image transformations. R2 remains private; profiles carry canonical opaque API references instead of bucket URLs or owner IDs. Server-side decoding/re-encoding uses the optional Cloudflare Images binding, whose transformations have separate usage billing. Confirm account availability/cost before enabling it; leave uploads disabled otherwise.
 
-R2 remains the preferred home for public profile/portfolio images, following the handover's transfer model. Local portraits are decoded, resized to at most 480px, re-encoded as WebP (metadata stripped), and capped at 180,000 data-URL characters (about 130KB binary). Optional banners use a maximum 1600px longest edge, an 8:3 display crop with a vertical focus point, and a separate 220,000-character cap (about 165KB binary). Both accept JPG/PNG/WebP inputs up to 8MB and up to 40 megapixels. They are stored only in local browser data in demo mode.
-
-**Hosted uploads are deliberately unavailable until R2 integration is ready.** No AL image endpoint/bucket was reused. The current schema accepts compressed inline demo-format images; before a cloud pilot, replace that temporary field with an SL-owned object/version reference and a validated CDN URL projection. Do not run inline media at scale in Supabase JSON.
-
-Required R2 integration: new SL-only bucket, authenticated upload authorization, ownership-bound object keys, server-side image validation/re-encoding, public CDN routing, file quotas, replacement cleanup, cache versions, and deletion/unpublish behavior. Keep signing secrets on the server; browser compression alone is not server validation. Receipts remain outside storage in the agreed WhatsApp handoff unless the owner changes that decision.
+Portrait/QR, banner and gallery processing retains the documented frontend size guidance. Server byte limits, purpose/ownership-bound references, publication-aware reads and seven-day unreferenced cleanup are detailed in [MILESTONE_3.md](MILESTONE_3.md). Receipts remain outside storage in the WhatsApp handoff; no receipt-upload feature was added.
 
 ## Costs and measurement
 
@@ -51,33 +43,18 @@ The handover's 25 October findings support starting with static hosting, keeping
 
 Planning baseline from the handover: Workers Paid + one Supabase Pro Micro ≈ USD30/month (≈RM135 using its assumed USD1=RM4.50), before email/domain/tax/gateway/extra projects. No paid tier is needed to run this local milestone. No subscription has been started. Recheck prices, account-level quotas, free-project availability and measured payloads before any purchase/deployment. Track requests, egress, DB size, R2 storage/operations and emails; plan upgrades near 70–80% of relevant allowances.
 
-## Payment boundaries
+## Payment and release boundaries
 
-Membership billing and customer-to-freelancer payment require separate tables, references, permissions and integration decisions. No legacy lifetime, gateway add-on, merchant secret, checkout or callback is included. Manual QR/transfer must remain a complete route for providers without gateway accounts. No real checkout, message send or gateway test is part of this milestone.
+Membership billing and customer-to-freelancer payment remain separate domains. Locked pricing is unchanged: 14-day trial, RM9.90 monthly, RM49 first annual year, RM99 annual renewal. Optional gateway access is included; transaction charges are separate. No lifetime/add-on offer, gateway merchant or real checkout is implemented. Manual QR/bank transfer remains the complete MVP payment route for providers without gateway accounts.
+
+Refer Me, reviews, membership enforcement and optional gateway integration remain later milestones. Production deployment, paid subscriptions, real payment tests and external messaging require separate instructions.
 
 ## References
 
 - https://supabase.com/docs/guides/auth/passwords
-- https://supabase.com/docs/reference/javascript/auth-exchangecodeforsession
+- https://supabase.com/docs/guides/auth/jwts
 - https://supabase.com/docs/guides/database/postgres/row-level-security
-- https://supabase.com/changelog/cbc-tls-ciphers-deprecated
-- https://developers.cloudflare.com/workers/static-assets/routing/advanced/html-handling/
-- Pricing/capacity sources: see the complete handover.
-
-## Milestone 2 delta
-
-See [MILESTONE_2.md](MILESTONE_2.md) for the booking schema, roles/constraints, complete demo flow and exact hosted API work remaining. `20261025085204_sl_booking_foundation.sql` is review-only and requires `btree_gist`. Private booking rows are not exposed to anonymous users; guest operations are reserved for a future validated server endpoint. Project inventory was read without changes; no Service Link project was found. Availability/Bookings stay unavailable in cloud mode until that backend is integrated.
-
-## Banner schema delta
-
-`20261025095911_sl_profile_banner.sql` is generated with Supabase CLI 2.122.0 and tested locally in embedded Postgres. It keeps banner/image-position fields optional for legacy public snapshots, rejects external/SVG/oversized image data and invalid positions, and increases the combined draft/public JSON ceiling to 500,000 bytes for bounded portrait plus banner payloads. Owner checks, function invoker mode, unknown-key rejection, grants and RLS remain in force. Apply the migrations in filename order when independent SL staging is authorized.
-
-No hosted migration or advisor run was performed because no SL project is configured. Supabase's current function-security documentation and changelog were checked; the new validator uses `SECURITY INVOKER`, an empty search path and the existing explicit grants. Hosted R2 work must cover banners as well as portraits, replacing temporary inline data with SL-owned media references before pilot scale.
-
-## Social/gallery schema delta
-
-`20261025102409_sl_social_gallery.sql` is an additive review-only migration, created with Supabase CLI 2.122.0. It accepts optional `social` and `gallery` fields so earlier public snapshots remain valid. Social keys are restricted to Facebook/Instagram/Threads, with bounded HTTPS platform-domain URLs. Gallery records allow only `id`, compressed WebP `src` and bounded `caption`; identifiers are unique and the server enforces the eight-picture maximum.
-
-The combined JSON ceiling rises to **1,500,000 bytes**, enough for the bounded portrait, banner, eight gallery images and profile text in the demonstration. Ownership, explicit grants, invoker mode, snapshot matching and RLS remain unchanged and are re-tested in embedded Postgres. No hosted migration, project, bucket, paid service or real external action was performed.
-
-R2 integration must also implement gallery upload ownership, server-side re-encoding, maximum count/size quotas and replacement/deletion cleanup. Before a cloud pilot, replace all temporary inline-media fields with SL-owned object/version references. The verified gallery runtime is the local demonstration; hosted-media advisors and real cross-device persistence remain staging work.
+- https://supabase.com/changelog
+- https://developers.cloudflare.com/workers/static-assets/routing/advanced/serving-spa/
+- https://developers.cloudflare.com/images/transform-images/bindings/
+- Pricing/capacity assumptions: see the complete product handover.

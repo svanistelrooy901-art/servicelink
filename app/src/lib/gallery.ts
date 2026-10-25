@@ -1,3 +1,4 @@
+import { isMediaReference } from './mediaReference.ts';
 import type { GalleryPicture } from './types.ts';
 export const MAX_GALLERY_PICTURES = 8;
 export const GALLERY_IMAGE_LIMIT = 120000;
@@ -13,7 +14,7 @@ export function galleryErrors(value: unknown): string[] {
       !p.id ||
       p.id.length > 80 ||
       typeof p.src !== 'string' ||
-      !/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(p.src) ||
+      (!isMediaReference(p.src) && !/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(p.src)) ||
       p.src.length > GALLERY_IMAGE_LIMIT ||
       typeof p.caption !== 'string' ||
       p.caption.length > 140

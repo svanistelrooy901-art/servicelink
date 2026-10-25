@@ -1,0 +1,23 @@
+// REVIEW EXAMPLE ONLY. Copy bindings into wrangler.jsonc after account/cost approval.
+// Do not bind any AdvisorLink bucket or Worker. Images transformations have separate usage billing.
+{
+  "name": "servicelink-staging",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-25",
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": false },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/booking/*"],
+  },
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "servicelink-staging-media" }],
+  "images": { "binding": "IMAGES" },
+  "vars": {
+    "SL_ENVIRONMENT": "staging",
+    "SL_BOOKINGS_ENABLED": "false",
+    "SL_MEDIA_ENABLED": "false",
+  },
+}
