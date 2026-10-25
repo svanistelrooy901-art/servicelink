@@ -12,7 +12,7 @@ export function emptyProfile(): ProviderProfile {
     whatsapp: '',
     showWhatsapp: false,
     photo: '',
-    accent: 'forest',
+    accent: 'ocean',
     coverage: [],
     services: [],
   };

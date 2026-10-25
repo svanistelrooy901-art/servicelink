@@ -56,3 +56,7 @@ Neither reviewed repository tree supplied a source LICENSE/NOTICE. Owner-authori
 5. Persist drafts separately and implement publish, slug replacement and unpublish.
 6. Exercise SQL ownership/atomicity and mobile/desktop browser flows.
 7. Push a review branch and draft PR, with external setup left explicit.
+
+## Target update incorporated during review
+
+After the first implementation push, target main advanced to `d3d35a14c38fcfd9eb6e0242c33ee95b47d6ec47` with Mamu’s approved SL brand artwork and a handover update. That main commit was incorporated without overwriting it. The app imports `assets/brand/servicelink-logo.svg` unchanged; its canonical SL icon is copied unchanged through Vite’s public pipeline for the favicon. Workspace accents follow the cyan/blue/navy family; provider colour choices remain editable. No tagline is added to the approved lockup.

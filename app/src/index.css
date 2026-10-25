@@ -10,13 +10,13 @@
     BlinkMacSystemFont,
     'Segoe UI',
     sans-serif;
-  color: #263b36;
-  background: #f6f7f4;
+  color: #263449;
+  background: #f5f7fb;
   font-synthesis: none;
   font-weight: 400;
   font-size: 14px;
   line-height: 1.55;
-  --green: #155d50;
+  --green: #245edb;
   --line: #e3e8e2;
   --muted: #66756e;
 }
@@ -163,7 +163,7 @@ select {
   color: white;
 }
 .btn-primary:hover:not(:disabled) {
-  background: #104c41;
+  background: #1d4ab0;
 }
 .btn-secondary {
   background: #fff;
@@ -174,8 +174,8 @@ select {
   background: #f3f7f2;
 }
 .btn-cream {
-  background: #f1e6c9;
-  color: #23493d;
+  background: #e0eafd;
+  color: #24467a;
 }
 .text-btn {
   padding: 8px 10px;
@@ -291,8 +291,8 @@ select {
   min-height: 46px;
 }
 .sidebar nav a.active {
-  background: #edf3e8;
-  color: #275941;
+  background: #eaf0fd;
+  color: #2856a6;
   font-weight: 650;
 }
 .sidebar nav a:hover {
@@ -439,20 +439,20 @@ select {
 }
 .welcome-card {
   min-height: 278px;
-  background: #155d50;
+  background: #245edb;
   border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 33px 40px;
-  color: #f9fff2;
+  color: #f7faff;
   overflow: hidden;
   position: relative;
   margin-bottom: 26px;
 }
 .welcome-card .eyebrow {
   font-size: 8px;
-  color: #b5cdb5;
+  color: #b2c7ec;
   letter-spacing: 1.7px;
 }
 .welcome-card h2 {
@@ -462,7 +462,7 @@ select {
 }
 .welcome-card p {
   font-size: 11px;
-  color: #afc8b5;
+  color: #b6c9e9;
   max-width: 290px;
   margin-top: 14px;
   line-height: 1.8;
@@ -656,8 +656,8 @@ select {
   gap: 20px;
 }
 .membership-card {
-  background: #f0f2e6;
-  border-color: #e2e6d4;
+  background: #edf1fb;
+  border-color: #dce4f4;
 }
 .membership-card h2 {
   font-size: 25px;
@@ -854,7 +854,7 @@ select {
   background: #fff;
   overflow: auto;
   max-height: calc(100vh - 145px);
-  box-shadow: 0 8px 25px #263b3610;
+  box-shadow: 0 8px 25px #26344910;
   scrollbar-width: thin;
 }
 .phone-address {
@@ -924,9 +924,9 @@ select {
   --light: #dcc1ce;
 }
 .theme-ocean {
-  --accent: #3b627a;
-  --tint: #edf3f7;
-  --light: #bdcfdc;
+  --accent: #245edb;
+  --tint: #eef3fe;
+  --light: #c4d5f6;
 }
 .check-row {
   display: flex;
@@ -2768,5 +2768,29 @@ textarea {
   }
   .workspace-header {
     gap: 7px;
+  }
+}
+
+/* Canonical logo artwork is imported unchanged from assets/brand. */
+.brand img {
+  display: block;
+  width: 180px;
+  height: auto;
+  max-width: 100%;
+}
+.sidebar .brand img {
+  width: 180px;
+}
+@media (max-width: 950px) {
+  .sidebar .brand img {
+    width: 145px;
+  }
+}
+@media (max-width: 680px) {
+  .sidebar .brand img {
+    width: 170px;
+  }
+  .public-header .brand img {
+    width: 155px;
   }
 }

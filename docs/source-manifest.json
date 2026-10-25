@@ -126,5 +126,6 @@
     "transform": "Unique state/code_state and district/code_district pairs; SL IDs prefixed my-, zero-padded.",
     "countStates": 16,
     "countSubdivisions": 160
-  }
+  },
+  "targetBrandBaseline": "d3d35a14c38fcfd9eb6e0242c33ee95b47d6ec47"
 }

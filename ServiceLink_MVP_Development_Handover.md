@@ -106,6 +106,17 @@ Use judgment to implement necessary supporting mechanics for agreed features, bu
 
 Not approved as initial requirements: multi-staff, recurring-booking engines, session-credit packages, waitlists, loyalty, referral cash rewards, native mobile apps, Google Calendar sync, group classes or automatic refunds.
 
+### Approved Service Link logo
+
+Mamu approved the Service Link logo on 25 October 2026 and authorized its addition to this repository. Use the canonical artwork in `assets/brand/`:
+
+- `servicelink-logo.svg` / `servicelink-logo.png`: horizontal ServiceLink lockup.
+- `servicelink-icon.svg` / `servicelink-icon.png`: SL monogram.
+- `servicelink-logo-preview.png`: white-background preview.
+- `README.md`: colors and usage.
+
+The logo uses a connected SL monogram with the cyan–blue–violet family of AdvisorLink, plus a dark navy wordmark. No tagline was added. Reuse the approved files when implementing SL branding.
+
 ## 5. Geographic coverage — confirmed
 
 Use **one canonical geography list** for both provider coverage and customer marketplace filters.
