@@ -39,7 +39,7 @@ Supabase documentation and changelog were checked during implementation. The rel
 
 ## Media: R2
 
-R2 remains the preferred home for public profile/portfolio images, following the handover's transfer model. Local photos are decoded, resized to at most 480px, re-encoded as WebP (metadata stripped), and capped at 180,000 data-URL characters (about 130KB binary). They are stored only in local browser data in demo mode.
+R2 remains the preferred home for public profile/portfolio images, following the handover's transfer model. Local portraits are decoded, resized to at most 480px, re-encoded as WebP (metadata stripped), and capped at 180,000 data-URL characters (about 130KB binary). Optional banners use a maximum 1600px longest edge, an 8:3 display crop with a vertical focus point, and a separate 220,000-character cap (about 165KB binary). Both accept JPG/PNG/WebP inputs up to 8MB and up to 40 megapixels. They are stored only in local browser data in demo mode.
 
 **Hosted uploads are deliberately unavailable until R2 integration is ready.** No AL image endpoint/bucket was reused. The current schema accepts compressed inline demo-format images; before a cloud pilot, replace that temporary field with an SL-owned object/version reference and a validated CDN URL projection. Do not run inline media at scale in Supabase JSON.
 
@@ -63,3 +63,21 @@ Membership billing and customer-to-freelancer payment require separate tables, r
 - https://supabase.com/changelog/cbc-tls-ciphers-deprecated
 - https://developers.cloudflare.com/workers/static-assets/routing/advanced/html-handling/
 - Pricing/capacity sources: see the complete handover.
+
+## Milestone 2 delta
+
+See [MILESTONE_2.md](MILESTONE_2.md) for the booking schema, roles/constraints, complete demo flow and exact hosted API work remaining. `20261025085204_sl_booking_foundation.sql` is review-only and requires `btree_gist`. Private booking rows are not exposed to anonymous users; guest operations are reserved for a future validated server endpoint. Project inventory was read without changes; no Service Link project was found. Availability/Bookings stay unavailable in cloud mode until that backend is integrated.
+
+## Banner schema delta
+
+`20261025095911_sl_profile_banner.sql` is generated with Supabase CLI 2.122.0 and tested locally in embedded Postgres. It keeps banner/image-position fields optional for legacy public snapshots, rejects external/SVG/oversized image data and invalid positions, and increases the combined draft/public JSON ceiling to 500,000 bytes for bounded portrait plus banner payloads. Owner checks, function invoker mode, unknown-key rejection, grants and RLS remain in force. Apply the migrations in filename order when independent SL staging is authorized.
+
+No hosted migration or advisor run was performed because no SL project is configured. Supabase's current function-security documentation and changelog were checked; the new validator uses `SECURITY INVOKER`, an empty search path and the existing explicit grants. Hosted R2 work must cover banners as well as portraits, replacing temporary inline data with SL-owned media references before pilot scale.
+
+## Social/gallery schema delta
+
+`20261025102409_sl_social_gallery.sql` is an additive review-only migration, created with Supabase CLI 2.122.0. It accepts optional `social` and `gallery` fields so earlier public snapshots remain valid. Social keys are restricted to Facebook/Instagram/Threads, with bounded HTTPS platform-domain URLs. Gallery records allow only `id`, compressed WebP `src` and bounded `caption`; identifiers are unique and the server enforces the eight-picture maximum.
+
+The combined JSON ceiling rises to **1,500,000 bytes**, enough for the bounded portrait, banner, eight gallery images and profile text in the demonstration. Ownership, explicit grants, invoker mode, snapshot matching and RLS remain unchanged and are re-tested in embedded Postgres. No hosted migration, project, bucket, paid service or real external action was performed.
+
+R2 integration must also implement gallery upload ownership, server-side re-encoding, maximum count/size quotas and replacement/deletion cleanup. Before a cloud pilot, replace all temporary inline-media fields with SL-owned object/version references. The verified gallery runtime is the local demonstration; hosted-media advisors and real cross-device persistence remain staging work.

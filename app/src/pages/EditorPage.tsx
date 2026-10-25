@@ -4,13 +4,15 @@ import { Link } from 'react-router-dom';
 import { useAppStore } from '../hooks/useAppStore';
 import { ProfilePresentation } from '../components/ProfilePresentation';
 import { CoverageSelector } from '../components/CoverageSelector';
+import { BannerEditor } from '../components/BannerEditor';
+import { GalleryEditor } from '../components/GalleryEditor';
+import { SocialLinksEditor } from '../components/SocialLinksEditor';
 import { categories, type Service } from '../lib/types';
 import { normalizeSlug } from '../lib/profile';
 import { compressProfilePhoto } from '../lib/media';
 import { usingLocal } from '../lib/config';
 export function EditorPage({ section }: { section: 'profile' | 'services' | 'coverage' }) {
-  const { profile: p, update, busy } = useAppStore();
-  const [mediaBusy, setMediaBusy] = useState(false);
+  const { profile: p, update, busy, mediaBusy, setMediaBusy } = useAppStore();
   const [mediaError, setMediaError] = useState('');
   if (!p) return null;
   const titles = {
@@ -221,6 +223,13 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                   Only enable this if you want customers to contact you at this number.
                 </p>
               </section>
+              <SocialLinksEditor value={p.social} onChange={(social) => update({ social })} />
+              <BannerEditor profile={p} onChange={update} onProcessingChange={setMediaBusy} />
+              <GalleryEditor
+                pictures={p.gallery}
+                onChange={(gallery) => update({ gallery })}
+                onProcessingChange={setMediaBusy}
+              />
               <section className="panel">
                 <h2>Your colour, your character</h2>
                 <div className="theme-options">

@@ -6,7 +6,15 @@ import { ProfilePresentation } from '../components/ProfilePresentation';
 import { validateForPublish } from '../lib/profile';
 import { usingLocal } from '../lib/config';
 export function PreviewPage() {
-  const { profile: p, workspace, busy, publish, unpublish, unpublishedChanges } = useAppStore();
+  const {
+    profile: p,
+    workspace,
+    busy,
+    mediaBusy,
+    publish,
+    unpublish,
+    unpublishedChanges,
+  } = useAppStore();
   const [width, setWidth] = useState<'mobile' | 'desktop'>('mobile');
   const [copied, setCopied] = useState(false);
   if (!p) return null;
@@ -58,12 +66,12 @@ export function PreviewPage() {
           )}
         </div>
         <div className="publish-actions">
-          <button disabled={busy} className="btn-primary" onClick={publish}>
+          <button disabled={busy || mediaBusy} className="btn-primary" onClick={publish}>
             <Globe size={17} />
             {live ? 'Publish updates' : 'Publish profile'}
           </button>
           {live && (
-            <button disabled={busy} className="text-btn" onClick={unpublish}>
+            <button disabled={busy || mediaBusy} className="text-btn" onClick={unpublish}>
               Unpublish profile
             </button>
           )}

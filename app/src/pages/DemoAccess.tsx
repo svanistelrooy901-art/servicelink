@@ -1,13 +1,16 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ServiceLinkBrand } from '../components/ServiceLinkBrand';
 import { DEMO_ACCESS_KEY } from '../lib/config';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, Sparkles } from 'lucide-react';
 export function DemoAccess() {
   const navigate = useNavigate();
   return (
     <main className="access-page">
       <section className="access-card">
         <ServiceLinkBrand />
+        <span className="access-spark" aria-hidden="true">
+          <Sparkles size={28} />
+        </span>
         <span className="eyebrow">LOCAL DEMONSTRATION</span>
         <h1>
           Your skills.

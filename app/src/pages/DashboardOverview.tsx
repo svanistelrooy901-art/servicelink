@@ -8,7 +8,10 @@ import {
   MapPin,
   Eye,
   CalendarDays,
+  Sparkles,
+  HeartHandshake,
 } from 'lucide-react';
+import { CategoryIcon } from '../components/CategoryIcon';
 import { useAppStore } from '../hooks/useAppStore';
 export function DashboardOverview() {
   const { profile: p, workspace } = useAppStore();
@@ -62,11 +65,11 @@ export function DashboardOverview() {
       </div>
       <section className="welcome-card">
         <div>
-          <span className="eyebrow">YOUR BUSINESS, BEAUTIFULLY CONNECTED</span>
+          <span className="eyebrow">GOOD WORK. HAPPY CONNECTIONS.</span>
           <h2>
-            Small business.
+            Do what you love.
             <br />
-            Big possibilities.
+            Let people find you.
           </h2>
           <p>Bring your story, services and service areas together in one link.</p>
           <Link className="btn-cream" to="/dashboard/profile">
@@ -76,18 +79,30 @@ export function DashboardOverview() {
         </div>
         <div className="welcome-art" aria-hidden="true">
           <div className="art-orbit" />
+          <span className="art-spark art-spark-one">
+            <Sparkles size={24} />
+          </span>
+          <span className="art-spark art-spark-two">
+            <HeartHandshake size={24} />
+          </span>
           <div className="mini-profile">
-            <span className="mini-avatar">{p.name[0] || 'Y'}</span>
+            <span className="mini-avatar">
+              <CategoryIcon category={p.category} size={27} />
+            </span>
             <span className="mini-line long" />
             <span className="mini-line" />
             <div className="mini-tiles">
-              <span />
-              <span />
+              <span>
+                <CategoryIcon category={p.category} size={17} />
+              </span>
+              <span>
+                <Sparkles size={17} />
+              </span>
             </div>
             <div className="mini-button" />
           </div>
           <span className="art-badge">
-            <Check size={16} /> Your skills. Your link.
+            <Check size={16} /> Made for your kind of work.
           </span>
         </div>
       </section>
@@ -146,11 +161,8 @@ export function DashboardOverview() {
           <section className="next-card">
             <CalendarDays size={22} />
             <div>
-              <strong>Up next: bookings</strong>
-              <p>
-                Availability, booking requests and manual payment verification are the next
-                milestone.
-              </p>
+              <strong>Your booking workspace</strong>
+              <p>A place for your time, your bookings and your next happy customer.</p>
             </div>
           </section>
         </aside>

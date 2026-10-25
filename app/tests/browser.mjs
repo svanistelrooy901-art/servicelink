@@ -69,9 +69,13 @@ try {
     await page.goto(`${origin}/dashboard`);
     await page.getByRole('button', { name: 'Explore the demo' }).waitFor();
     checks++;
+    if (width === 420)
+      await page.screenshot({ path: `${qaRoot}mobile-access-420.png`, fullPage: true });
     await page.getByRole('button', { name: 'Explore the demo' }).click();
     await page.getByRole('heading', { name: /Welcome/ }).waitFor();
     await assertNoOverflow();
+    if (width === 390)
+      await page.screenshot({ path: `${qaRoot}mobile-overview-390.png`, fullPage: true });
     if (width === 1440)
       await page.screenshot({ path: `${qaRoot}desktop-overview.png`, fullPage: true });
     await page.getByRole('link', { name: 'My profile', exact: true }).click();

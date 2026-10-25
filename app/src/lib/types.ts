@@ -6,6 +6,16 @@ export const categories = {
   cleaning: 'Cleaning service',
 } as const;
 export type Category = keyof typeof categories;
+export interface SocialLinks {
+  facebook: string;
+  instagram: string;
+  threads: string;
+}
+export interface GalleryPicture {
+  id: string;
+  src: string;
+  caption: string;
+}
 export interface Coverage {
   stateId: string;
   wholeState: boolean;
@@ -32,6 +42,10 @@ export interface ProviderProfile {
   whatsapp: string;
   showWhatsapp: boolean;
   photo: string;
+  banner: string;
+  bannerPosition: number;
+  social: SocialLinks;
+  gallery: GalleryPicture[];
   accent: 'forest' | 'plum' | 'ocean';
   coverage: Coverage[];
   services: Service[];

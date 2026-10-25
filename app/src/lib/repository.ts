@@ -2,7 +2,7 @@ import { usingLocal } from './config';
 import { createLocalRepository } from './localRepository';
 import { getSupabaseClient } from './supabase';
 import { emptyWorkspace } from '../data/demo';
-import { publicSnapshot, validateForPublish } from './profile';
+import { publicSnapshot, validateForPublish, withProfileDefaults } from './profile';
 import type { ProfileRepository, ProviderProfile, Workspace, PublicListing } from './types';
 function supabaseRepository(): ProfileRepository {
   const load = async (): Promise<Workspace> => {
@@ -23,8 +23,8 @@ function supabaseRepository(): ProfileRepository {
       .maybeSingle();
     if (pubError) throw pubError;
     return {
-      draft: data.draft,
-      published: published?.profile ?? null,
+      draft: withProfileDefaults(data.draft),
+      published: published?.profile ? withProfileDefaults(published.profile) : null,
       revision: data.revision,
       savedAt: data.saved_at,
       publishedAt: published?.published_at ?? null,
@@ -65,7 +65,9 @@ function supabaseRepository(): ProfileRepository {
         .eq('slug', slug)
         .maybeSingle();
       if (error) throw error;
-      return data ? { profile: data.profile, publishedAt: data.published_at } : null;
+      return data
+        ? { profile: withProfileDefaults(data.profile), publishedAt: data.published_at }
+        : null;
     },
     listPublic: async () => {
       const { data, error } = await getSupabaseClient()
@@ -75,7 +77,10 @@ function supabaseRepository(): ProfileRepository {
         .limit(100);
       if (error) throw error;
       return (data ?? []).map(
-        (p): PublicListing => ({ profile: p.profile, publishedAt: p.published_at }),
+        (p): PublicListing => ({
+          profile: withProfileDefaults(p.profile),
+          publishedAt: p.published_at,
+        }),
       );
     },
   };
