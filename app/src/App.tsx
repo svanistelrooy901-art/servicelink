@@ -19,11 +19,19 @@ import { AvailabilityPage } from './pages/AvailabilityPage';
 import { BookingsPage } from './pages/BookingsPage';
 import { BookingRequestPage } from './pages/BookingRequestPage';
 import { CustomerBookingPage } from './pages/CustomerBookingPage';
-import { usingLocal } from './lib/config';
+import { usingLocal, isStaging } from './lib/config';
 export function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        {isStaging && (
+          <div className="demo-banner" role="status">
+            <strong>Service Link staging</strong>
+            <span>
+              Use fictional details only. Do not send real money or messages during testing.
+            </span>
+          </div>
+        )}
         <Routes>
           <Route path="/" element={<Navigate to="/marketplace" replace />} />
           <Route path="/marketplace" element={<MarketplacePage />} />

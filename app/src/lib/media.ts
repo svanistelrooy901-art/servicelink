@@ -1,3 +1,5 @@
+import { usingLocal, mediaEnabled } from './config';
+import { getSupabaseClient } from './supabase';
 async function compressImage(file: File, maxDimension: number, maxLength: number): Promise<string> {
   if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 8 * 1024 * 1024)
     throw new Error('Choose a JPG, PNG or WebP under 8 MB.');
@@ -28,6 +30,34 @@ async function compressImage(file: File, maxDimension: number, maxLength: number
     URL.revokeObjectURL(url);
   }
 }
-export const compressProfilePhoto = (file: File) => compressImage(file, 480, 180000);
-export const compressProfileBanner = (file: File) => compressImage(file, 1600, 220000);
-export const compressGalleryPicture = (file: File) => compressImage(file, 1200, 120000);
+async function prepare(
+  file: File,
+  kind: 'portrait' | 'banner' | 'gallery' | 'qr',
+  dimension: number,
+  limit: number,
+) {
+  const data = await compressImage(file, dimension, limit);
+  if (usingLocal) return data;
+  if (!mediaEnabled) throw new Error('Image uploads are not enabled yet.');
+  const { data: session } = await getSupabaseClient().auth.getSession();
+  if (!session.session) throw new Error('Sign in to upload pictures.');
+  const bytes = Uint8Array.from(atob(data.split(',')[1]), (c) => c.charCodeAt(0));
+  const response = await fetch('/api/media/upload', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${session.session.access_token}`,
+      'Content-Type': 'image/webp',
+      'X-SL-Media-Kind': kind,
+    },
+    body: bytes,
+    cache: 'no-store',
+    referrerPolicy: 'no-referrer',
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error ?? 'Unable to upload image.');
+  return result.ref as string;
+}
+export const compressProfilePhoto = (file: File) => prepare(file, 'portrait', 480, 180000);
+export const compressPaymentQR = (file: File) => prepare(file, 'qr', 480, 180000);
+export const compressProfileBanner = (file: File) => prepare(file, 'banner', 1600, 220000);
+export const compressGalleryPicture = (file: File) => prepare(file, 'gallery', 1200, 120000);

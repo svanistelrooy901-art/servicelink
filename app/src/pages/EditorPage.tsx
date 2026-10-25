@@ -1,3 +1,4 @@
+import { MediaImage } from '../components/MediaImage';
 import { useState } from 'react';
 import { Plus, Trash2, Upload, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -10,7 +11,7 @@ import { SocialLinksEditor } from '../components/SocialLinksEditor';
 import { categories, type Service } from '../lib/types';
 import { normalizeSlug } from '../lib/profile';
 import { compressProfilePhoto } from '../lib/media';
-import { usingLocal } from '../lib/config';
+import { mediaEnabled } from '../lib/config';
 export function EditorPage({ section }: { section: 'profile' | 'services' | 'coverage' }) {
   const { profile: p, update, busy, mediaBusy, setMediaBusy } = useAppStore();
   const [mediaError, setMediaError] = useState('');
@@ -55,21 +56,21 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                 <div className="photo-editor">
                   <div className="editor-avatar">
                     {p.photo ? (
-                      <img src={p.photo} alt="Your portrait" />
+                      <MediaImage src={p.photo} alt="Your portrait" />
                     ) : (
                       <span>{p.name[0] || 'Y'}</span>
                     )}
                   </div>
                   <div>
                     <label
-                      className={`btn-secondary upload-label ${!usingLocal ? 'disabled' : ''}`}
+                      className={`btn-secondary upload-label ${!mediaEnabled ? 'disabled' : ''}`}
                     >
                       <Upload size={16} />
                       {mediaBusy ? 'Preparing photo…' : 'Upload photo'}
                       <input
                         type="file"
                         accept="image/jpeg,image/png,image/webp"
-                        disabled={!usingLocal || mediaBusy}
+                        disabled={!mediaEnabled || mediaBusy}
                         onChange={async (e) => {
                           const f = e.target.files?.[0];
                           if (!f) return;
@@ -93,7 +94,7 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                       </button>
                     )}
                     <p className="tiny">JPG, PNG or WebP · resized & compressed automatically.</p>
-                    {!usingLocal && (
+                    {!mediaEnabled && (
                       <p className="tiny">
                         Cloud photo uploads need the separate SL R2 integration.
                       </p>

@@ -1,3 +1,4 @@
+import { MediaImage } from './MediaImage';
 import { Link2 } from 'lucide-react';
 import { CategoryIcon } from './CategoryIcon';
 import type { ProviderProfile } from '../lib/types';
@@ -10,7 +11,7 @@ export function ProfileCover({ profile: p }: { profile: ProviderProfile }) {
       data-category={p.category}
     >
       {p.banner ? (
-        <img
+        <MediaImage
           className="profile-banner-image"
           src={p.banner}
           alt=""

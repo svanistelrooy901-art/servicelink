@@ -1,8 +1,9 @@
+import { MediaImage } from './MediaImage';
 import { useEffect, useRef, useState } from 'react';
 import { Images, Upload, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { compressGalleryPicture } from '../lib/media';
 import { MAX_GALLERY_PICTURES, moveGalleryPicture } from '../lib/gallery';
-import { usingLocal } from '../lib/config';
+import { mediaEnabled } from '../lib/config';
 import type { GalleryPicture } from '../lib/types';
 
 export function GalleryEditor({
@@ -45,7 +46,7 @@ export function GalleryEditor({
           {pictures.map((p, i) => (
             <article key={p.id} className="gallery-edit-card">
               <div className="gallery-edit-image">
-                <img src={p.src} alt={p.caption || `Work picture ${i + 1}`} />
+                <MediaImage src={p.src} alt={p.caption || `Work picture ${i + 1}`} />
                 {i < 2 && <span>On profile</span>}
               </div>
               <div className="gallery-edit-fields">
@@ -109,7 +110,7 @@ export function GalleryEditor({
       <button
         type="button"
         className="btn-secondary"
-        disabled={!usingLocal || preparing || remaining === 0}
+        disabled={!mediaEnabled || preparing || remaining === 0}
         onClick={() => input.current?.click()}
       >
         <Upload size={16} />
@@ -127,7 +128,7 @@ export function GalleryEditor({
         aria-label="Gallery picture files"
         aria-describedby="gallery-upload-guide"
         tabIndex={-1}
-        disabled={!usingLocal || preparing || remaining === 0}
+        disabled={!mediaEnabled || preparing || remaining === 0}
         onChange={async (e) => {
           const files = Array.from(e.target.files ?? []);
           e.target.value = '';
@@ -172,7 +173,7 @@ export function GalleryEditor({
           Preparing your pictures. Please wait before saving.
         </p>
       )}
-      {!usingLocal && <p className="tiny">Custom picture uploads are not available yet.</p>}
+      {!mediaEnabled && <p className="tiny">Custom picture uploads are not available yet.</p>}
       <p className="tiny">
         Save draft to keep changes, then Publish updates to show them on your profile.
       </p>

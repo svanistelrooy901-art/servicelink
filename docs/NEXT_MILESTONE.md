@@ -1,6 +1,6 @@
-# Milestone 2 status and next integration work
+# Remaining MVP work after M3 integration preparation
 
-Milestone 2 now implements a local demonstration and tested SQL foundation for provider-wide availability across services, booking requests and date-range enquiries, centrally stored reservations, blocked/manual bookings, separate booking/payment status and provider verification of QR/bank payments. Prepare this against an independent SL staging backend, then verify simultaneous booking conflicts.
+Milestone 2 now implements a local demonstration and tested SQL foundation for provider-wide availability across services, booking requests and date-range enquiries, centrally stored reservations, blocked/manual bookings, separate booking/payment status and provider verification of QR/bank payments. M3 now implements the guarded Worker/HTTP repository and reference-based media transport, disabled by default. Independent staging provisioning/configuration and real simultaneous booking verification remain blocked; see [MILESTONE_3.md](MILESTONE_3.md) and [STAGING_SETUP.md](STAGING_SETUP.md).
 
 Confirmed for milestone 2: provider acceptance first; customer name and mobile required, email optional. Provider chooses the payment deadline for each acceptance. The remaining decisions below affect a hosted paid pilot:
 
@@ -15,4 +15,4 @@ The first milestone's marketplace is a published-snapshot discovery foundation (
 
 Production deployment, paid subscriptions, real payment tests and external messaging still require a separate user instruction.
 
-Next technical milestone: create/configure an independent SL backend, integrate guarded booking APIs and R2 assets, and verify multi-device ownership, token privacy, conflict handling and expiry on staging. See [MILESTONE_2.md](MILESTONE_2.md).
+Next technical milestone: provide independent SL staging capacity and Cloudflare access, apply/review the prepared migrations, configure the implemented APIs and optional R2/Images bindings, then verify real Auth, multi-device ownership, token privacy, concurrent conflicts and expiry. No AL project may be paused or reused to make room. After staging acceptance, proceed with Refer Me and reviews using the confirmed rules above.

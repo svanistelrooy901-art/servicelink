@@ -1,3 +1,4 @@
+import { MediaImage } from '../components/MediaImage';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, MapPin, ArrowUpRight, HeartHandshake, BookOpen, Sparkles, X } from 'lucide-react';
@@ -171,7 +172,7 @@ export function MarketplacePage() {
             <article className={`listing-card theme-${p.accent}`} key={p.slug}>
               <div className="listing-cover">
                 {p.banner && (
-                  <img
+                  <MediaImage
                     className="listing-banner"
                     src={p.banner}
                     alt=""
@@ -184,7 +185,7 @@ export function MarketplacePage() {
                   {categories[p.category]}
                 </span>
                 <div className="listing-avatar">
-                  {p.photo ? <img src={p.photo} alt="" /> : p.name[0]}
+                  {p.photo ? <MediaImage src={p.photo} alt="" /> : p.name[0]}
                 </div>
               </div>
               <div className="listing-body">

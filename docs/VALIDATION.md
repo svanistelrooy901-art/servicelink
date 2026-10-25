@@ -5,9 +5,9 @@ Validated on 25 October 2026 with Node 24.22.1. No hosted system, real account, 
 | Check | Result |
 | --- | --- |
 | `npm ci` | Clean dependency install succeeds |
-| `npm run lint` | TypeScript passes |
+| `npm run lint` | Browser and Worker TypeScript pass |
 | `npm run build` | TypeScript + Vite production build pass |
-| `npm test` | 31 passing domain/database tests |
+| `npm test` | 37 passing domain/database/HTTP tests |
 | `npm run test:browser` | 52 assertions pass across 390px, 420px and 1440px |
 | `npm run test:booking-browser` | 54 assertions pass across the same viewports |
 | `npm run test:banner-browser` | 111 banner assertions pass across the same viewports |
@@ -18,6 +18,18 @@ Validated on 25 October 2026 with Node 24.22.1. No hosted system, real account, 
 | `npm audit --omit=dev` | 0 production dependency vulnerabilities reported at validation time |
 | Public-target review | Only reviewed app files, fictional data, sanitized config, source/license records and screenshots included |
 | `git diff --check` | Passes |
+
+## M3 integration evidence
+
+The current run also passes `npm run worker:check` (deployment dry-run only). New HTTP tests run the Worker handler and client repository against all migrations in PGlite, with two isolated clients and mocked Supabase Auth/REST, Images and R2 transport. They verify ownership, proofs/tokens, safe projections, stale revisions, conflicts/expiry, manual payment transitions, media authorization, quotas and cleanup. The runtime entrypoint contract and fail-closed error handling are covered. PGlite uses one serialized connection: real multi-connection races and hosted services remain unverified.
+
+A local Wrangler runtime smoke attempt could not start because this environment rejects `uv_interface_addresses`; no runtime-pass claim is made. Cloudflare bundling/dry-run succeeds. The four browser suites were rerun after M3 changes and all 375 assertions pass. A fixture-configured cloud login render additionally checks the staging notice, absence of demo fallback, overflow, page errors and external requests at 390px/1440px; it does not authenticate or contact a real project.
+
+Current local-demo visual evidence: [390px profile](qa/m3/profile-390.png), [420px gallery](qa/m3/gallery-420.png), [desktop editor](qa/m3/editor-1440.png). Fixture-only cloud entry: [390px](qa/m3/staging-entry-390.png), [desktop](qa/m3/staging-entry-1440.png). Mobile and desktop renders were inspected. No screenshots contain real account data or secrets.
+
+Live staging remains unavailable due to account free-project quota and missing Cloudflare authentication/targets. No hosted advisor, real Auth/SMTP, image-codec/R2, deployment, payment or messaging test ran. See [MILESTONE_3.md](MILESTONE_3.md) for the current limits and [STAGING_SETUP.md](STAGING_SETUP.md) for acceptance work.
+
+The sections below preserve M1/M2 behavior and visual evidence; statements about unavailable cloud transports describe those earlier milestones.
 
 ## Behaviors exercised
 

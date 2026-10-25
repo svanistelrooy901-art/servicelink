@@ -1,3 +1,4 @@
+import { MediaImage } from '../components/MediaImage';
 import { useEffect, useState, type FormEvent } from 'react';
 import { CalendarDays, Plus, Trash2 } from 'lucide-react';
 import { useBookings } from '../hooks/useBookings';
@@ -5,8 +6,8 @@ import { useAppStore } from '../hooks/useAppStore';
 import { bookingRepository } from '../lib/bookingRepository';
 import type { BookingSettings } from '../lib/bookingTypes';
 import { DAY_NAMES, formatMY, myDate, addDays, malaysiaInstant } from '../lib/bookingRules';
-import { compressProfilePhoto } from '../lib/media';
-import { usingLocal } from '../lib/config';
+import { compressPaymentQR } from '../lib/media';
+import { bookingsEnabled, mediaEnabled } from '../lib/config';
 export function AvailabilityPage() {
   const { data, busy, error, feedback, run } = useBookings();
   const { profile } = useAppStore();
@@ -24,7 +25,7 @@ export function AvailabilityPage() {
       setBase(data.revision);
     }
   }, [data, draft]);
-  if (!usingLocal)
+  if (!bookingsEnabled)
     return (
       <section className="panel">
         <h1>Booking setup</h1>
@@ -240,6 +241,7 @@ export function AvailabilityPage() {
                   <input
                     aria-label="Payment QR image"
                     type="file"
+                    disabled={!mediaEnabled}
                     accept="image/png,image/jpeg,image/webp"
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
@@ -248,7 +250,7 @@ export function AvailabilityPage() {
                       setMediaError('');
                       try {
                         patch({
-                          payment: { ...draft.payment, qrPhoto: await compressProfilePhoto(file) },
+                          payment: { ...draft.payment, qrPhoto: await compressPaymentQR(file) },
                         });
                       } catch (e) {
                         setMediaError(e instanceof Error ? e.message : 'Unable to prepare QR.');
@@ -260,7 +262,7 @@ export function AvailabilityPage() {
                 </label>
                 {draft.payment.qrPhoto && (
                   <div className="payment-qr">
-                    <img alt="Your payment QR" src={draft.payment.qrPhoto} />
+                    <MediaImage alt="Your payment QR" src={draft.payment.qrPhoto} />
                     <button
                       type="button"
                       className="text-btn"

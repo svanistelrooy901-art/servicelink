@@ -1,0 +1,12 @@
+# Copy to .dev.vars locally. Never commit actual values.
+SL_ENVIRONMENT=staging
+SL_APP_ORIGIN=http://localhost:8787
+SL_PROJECT_REF=YOUR_NEW_SL_REF
+SUPABASE_URL=https://YOUR_NEW_SL_REF.supabase.co
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_REPLACE
+SUPABASE_SECRET_KEY=
+# Generate two independent random secrets of at least 32 bytes; retain them for token retries.
+SL_TOKEN_SECRET=
+SL_RATE_SECRET=
+SL_BOOKINGS_ENABLED=false
+SL_MEDIA_ENABLED=false

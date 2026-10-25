@@ -2,7 +2,7 @@
 
 A Digital Sambal product for independent service providers across Malaysia.
 
-**Milestones 1 and 2 provide a working local demonstration**, with a separate Supabase adapter and SQL migration prepared for review. No Service Link cloud project, Worker, R2 bucket, production deployment or payment connection has been created.
+**Milestones 1 and 2 provide a working local demonstration. Milestone 3 adds guarded booking APIs and optional R2 media transport, tested locally and disabled by default.** Live staging is not deployed: independent Supabase provisioning hit the account free-project quota, and Cloudflare is not authenticated. No SL cloud resource or payment connection was created. See [M3 status](docs/MILESTONE_3.md) and [staging setup](docs/STAGING_SETUP.md).
 
 ## Run and review
 
@@ -54,15 +54,15 @@ See [validation evidence](docs/VALIDATION.md), [source assessment](docs/SOURCE_A
 
 ## Independent backend
 
-For a new SL Supabase project, use `app/.env.example` and the reviewed migration under `supabase/migrations/`. Set `VITE_DATA_BACKEND=supabase`, its own HTTPS project URL, publishable key and matching `VITE_SL_PROJECT_REF`. Cloud misconfiguration fails visibly and never silently switches to demo storage. The cloud adapter is type-checked and the SQL is exercised in embedded Postgres; hosted Auth and end-to-end cloud persistence still require the new project and verification.
+For a new SL Supabase project, use `app/.env.example` and all reviewed migrations under `supabase/migrations/`, in filename order. Set `VITE_DATA_BACKEND=supabase`, its own HTTPS project URL, publishable key and matching `VITE_SL_PROJECT_REF`. Cloud misconfiguration fails visibly and never silently switches to demo storage. The cloud adapter is type-checked and the SQL is exercised in embedded Postgres; hosted Auth and end-to-end cloud persistence still require the new project and verification.
 
-Billing, gateway payments, Refer Me and customer reviews are not activated. Booking/manual-payment simulation is available in local demo mode only. The displayed 14-day trial is the agreed offer; no trial is claimed to have started. No production, paid service, real payment or external message is authorized by this code.
+Billing, gateway payments, Refer Me and customer reviews are not activated. Booking/manual-payment simulation is available in local demo mode; the cloud transport awaits independent staging configuration and hosted verification. The displayed 14-day trial is the agreed offer; no trial is claimed to have started. No production, paid service, real payment or external message is authorized by this code.
 
 ## Milestone 2 update
 
 The local demonstration now includes **Availability** and **Bookings**, service-level appointment/date-range requests, shared capacity, private customer booking links, provider acceptance with amount/deadline, QR/bank instructions, customer payment reporting and explicit provider verification. Phone/WhatsApp bookings and blocked time share the same calendar. See [the full milestone-2 walkthrough and backend limits](docs/MILESTONE_2.md).
 
-Booking records are local-demo data until the independent booking backend is integrated. Cloud mode intentionally keeps booking unavailable. The new booking migration is prepared and tested, not hosted/applied. No real payment or external message is sent.
+Booking records in the demo stay in one browser. M3 adds the independent Worker booking repository behind matching frontend/server flags, both off by default. All migrations are prepared and locally tested, not hosted/applied. No real payment or external message is sent.
 
 ## Profile banners
 
@@ -72,7 +72,7 @@ Recommended upload: **1600 × 600 px (8:3)**, JPG/PNG/WebP up to 8 MB and up to 
 
 Use **Save draft**, then **Publish updates** to change the public banner. Replace/Remove or **Use service template** works the same way. Old profiles retain their content and receive empty-banner/centred defaults. Editor, full preview and public profile share the same cover component; marketplace cards use the published image/position.
 
-Uploads work in local demonstration mode. Hosted uploads remain disabled pending the independent SL R2 integration. The additive `20261025095911_sl_profile_banner.sql` migration is prepared for review only; it accepts bounded optional banner fields and preserves existing RLS/ownership.
+Uploads work in local demonstration mode. M3 implements hosted uploads behind disabled flags, pending SL-only R2/Images bindings and real staging validation. The additive `20261025095911_sl_profile_banner.sql` migration is prepared for review only; it accepts bounded optional banner fields and preserves existing RLS/ownership.
 
 Run `npm run test:banner-browser` in `app/` for compression, category, persistence, publication and viewport checks. [Mobile banner editor](docs/qa/banners/banner-editor-390.png) · [custom public banner](docs/qa/banners/public-banner-390.png).
 
@@ -84,6 +84,6 @@ In **My profile**, add optional Facebook, Instagram and Threads profile/page URL
 
 Use the arrows to choose the order; the first **2 pictures** appear as profile thumbnails. Optional captions also provide image descriptions. With more than two pictures, **More** opens a responsive popup containing the complete gallery. Pictures have no individual-view, zoom or image-navigation action. The popup can close through its button, Escape or backdrop; background scrolling is locked while open and focus returns on close. A gallery with one/two pictures needs no More button; an empty gallery is hidden.
 
-**Save draft → Publish updates** applies to links, captions, picture order, additions and removals. Existing public snapshots remain unchanged until publication. Legacy profiles get empty social links and an empty gallery. Hosted uploads are still disabled until the independent SL media integration is ready.
+**Save draft → Publish updates** applies to links, captions, picture order, additions and removals. Existing public snapshots remain unchanged until publication. Legacy profiles get empty social links and an empty gallery. M3 implements hosted uploads behind disabled flags; independent R2/Images configuration and real staging validation remain pending.
 
 Run `npm run test:social-gallery-browser` for the complete flow at 390px, 420px and 1440px. [Mobile profile](docs/qa/social-gallery/public-390.png) · [mobile popup](docs/qa/social-gallery/gallery-modal-390.png) · [desktop popup](docs/qa/social-gallery/gallery-modal-1440.png).

@@ -4,7 +4,7 @@ import { CategoryIcon } from './CategoryIcon';
 import { ProfileCover } from './ProfileCover';
 import { categories, type ProviderProfile } from '../lib/types';
 import { compressProfileBanner } from '../lib/media';
-import { usingLocal } from '../lib/config';
+import { mediaEnabled } from '../lib/config';
 
 export function BannerEditor({
   profile: p,
@@ -51,7 +51,7 @@ export function BannerEditor({
         <button
           type="button"
           className="btn-secondary"
-          disabled={!usingLocal || preparing}
+          disabled={!mediaEnabled || preparing}
           onClick={() => input.current?.click()}
         >
           <Upload size={16} />
@@ -64,7 +64,7 @@ export function BannerEditor({
           aria-label="Banner image file"
           aria-describedby="banner-size-guide"
           tabIndex={-1}
-          disabled={!usingLocal || preparing}
+          disabled={!mediaEnabled || preparing}
           onChange={async (e) => {
             const file = e.target.files?.[0];
             e.target.value = '';
@@ -130,7 +130,7 @@ export function BannerEditor({
           {error}
         </p>
       )}
-      {!usingLocal && (
+      {!mediaEnabled && (
         <p className="tiny">
           Image uploads will be available after Service Link media storage is connected. Service
           templates work now.

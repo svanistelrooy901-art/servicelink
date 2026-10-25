@@ -1,3 +1,4 @@
+import { MediaImage } from './MediaImage';
 import { useEffect, useId, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import type { GalleryPicture } from '../lib/types';
@@ -43,7 +44,7 @@ export function ProfileGallery({
       </div>
       <div className="gallery-teasers" data-testid="gallery-teasers">
         {pictures.slice(0, 2).map((p, i) => (
-          <img key={p.id} src={p.src} alt={alt(p, i)} loading="lazy" draggable={false} />
+          <MediaImage key={p.id} src={p.src} alt={alt(p, i)} loading="lazy" draggable={false} />
         ))}
       </div>
       <dialog
@@ -85,12 +86,13 @@ export function ProfileGallery({
           </button>
         </header>
         <div className="gallery-modal-grid">
-          {pictures.map((p, i) => (
-            <figure key={p.id}>
-              <img src={p.src} alt={alt(p, i)} loading="lazy" draggable={false} />
-              {p.caption && <figcaption>{p.caption}</figcaption>}
-            </figure>
-          ))}
+          {open &&
+            pictures.map((p, i) => (
+              <figure key={p.id}>
+                <MediaImage src={p.src} alt={alt(p, i)} loading="lazy" draggable={false} />
+                {p.caption && <figcaption>{p.caption}</figcaption>}
+              </figure>
+            ))}
         </div>
       </dialog>
     </section>
