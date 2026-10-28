@@ -1,3 +1,4 @@
+import { continueLocal } from './demo-headers.mjs';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
@@ -11,7 +12,15 @@ const port = 5197,
   origin = `http://127.0.0.1:${port}`;
 const server = spawn(
   process.execPath,
-  ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', String(port), '--strictPort'],
+  [
+    'node_modules/vite/bin/vite.js',
+    ...(process.env.SL_BROWSER_DIST ? ['preview', '--outDir', process.env.SL_BROWSER_DIST] : []),
+    '--host',
+    '127.0.0.1',
+    '--port',
+    String(port),
+    '--strictPort',
+  ],
   {
     cwd: appRoot,
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -57,7 +66,7 @@ try {
       if (!url.startsWith(origin) && !url.startsWith('data:')) {
         outbound.push(url);
         await route.abort();
-      } else await route.continue();
+      } else await continueLocal(route);
     });
     const page = await context.newPage();
     page.on('pageerror', (e) => errors.push(e.message));

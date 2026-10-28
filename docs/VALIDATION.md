@@ -97,3 +97,9 @@ Together with the profile (52), booking (54) and banner (111) suites, **375 brow
 - [Desktop gallery editor](qa/social-gallery/editor-1440.png)
 
 The migration and hosted-media limits are detailed in [INTEGRATION.md](INTEGRATION.md). Hosted storage remains unconfigured and no external infrastructure was changed.
+
+## Cloudflare demo build — 28 October 2026
+
+The isolated `build:demo` locks the artifact to local mode and strips known Supabase browser configuration even when hostile cloud values are provided by the environment. Normal/demo builds, browser/Worker TypeScript, 37 tests and the demo deploy dry-run pass. All 375 browser assertions also pass against compiled `dist-demo`, with global `_headers` applied by the test harness to exercise CSP. Mobile/public and desktop/workspace renders were visually inspected. No new dependencies or application data models were introduced.
+
+Cloudflare account access is required before deployment; no live URL or edge-header verification is claimed by these local checks. See [CLOUDFLARE_DEMO.md](CLOUDFLARE_DEMO.md).
