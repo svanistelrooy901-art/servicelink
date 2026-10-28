@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:demo": "node scripts/build-demo.mjs",
+    "demo:check": "wrangler deploy --config wrangler.demo.jsonc --dry-run --outdir .wrangler/demo-review-bundle",
+    "deploy:demo": "npm run build:demo && wrangler deploy --config wrangler.demo.jsonc",
+    "test:demo-browser": "node scripts/test-demo.mjs",
     "preview": "vite preview",
     "lint": "tsc --noEmit && tsc -p tsconfig.worker.json",
     "test": "node --test --experimental-strip-types tests/*.test.ts",

@@ -2,6 +2,8 @@
 
 A Digital Sambal product for independent service providers across Malaysia.
 
+For the Cloudflare-hosted browser-local demonstration, use the isolated [demo hosting guide](docs/CLOUDFLARE_DEMO.md): `npm run build:demo` and `npm run deploy:demo` inside `app`. This path needs no Supabase project or keys and keeps the M3 backend separate.
+
 **Milestones 1 and 2 provide a working local demonstration. Milestone 3 adds guarded booking APIs and optional R2 media transport, tested locally and disabled by default.** Live staging is not deployed: independent Supabase provisioning hit the account free-project quota, and Cloudflare is not authenticated. No SL cloud resource or payment connection was created. See [M3 status](docs/MILESTONE_3.md) and [staging setup](docs/STAGING_SETUP.md).
 
 ## Run and review

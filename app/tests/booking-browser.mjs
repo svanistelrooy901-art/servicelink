@@ -1,3 +1,4 @@
+import { continueLocal } from './demo-headers.mjs';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
@@ -11,7 +12,15 @@ await mkdir(qa, { recursive: true });
 const origin = 'http://127.0.0.1:5194';
 const server = spawn(
   process.execPath,
-  ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', '5194', '--strictPort'],
+  [
+    'node_modules/vite/bin/vite.js',
+    ...(process.env.SL_BROWSER_DIST ? ['preview', '--outDir', process.env.SL_BROWSER_DIST] : []),
+    '--host',
+    '127.0.0.1',
+    '--port',
+    '5194',
+    '--strictPort',
+  ],
   {
     cwd: root,
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -63,7 +72,7 @@ try {
       if (!u.startsWith(origin) && !u.startsWith('data:')) {
         external.push(u);
         await route.abort();
-      } else await route.continue();
+      } else await continueLocal(route);
     });
     const owner = await context.newPage();
     owner.on('pageerror', (e) => errors.push(e.message));
@@ -91,13 +100,11 @@ try {
     await owner
       .getByLabel('Payment instructions (optional)')
       .fill('Demonstration details only. Do not transfer real money.');
-    await owner
-      .getByLabel('Payment QR image')
-      .setInputFiles({
-        name: 'demo-payment-qr.png',
-        mimeType: 'image/png',
-        buffer: await QRCode.toBuffer('SERVICE LINK DEMO - DO NOT PAY', { width: 256, margin: 4 }),
-      });
+    await owner.getByLabel('Payment QR image').setInputFiles({
+      name: 'demo-payment-qr.png',
+      mimeType: 'image/png',
+      buffer: await QRCode.toBuffer('SERVICE LINK DEMO - DO NOT PAY', { width: 256, margin: 4 }),
+    });
     await owner.getByAltText('Your payment QR', { exact: true }).waitFor();
     checks++;
     await owner
