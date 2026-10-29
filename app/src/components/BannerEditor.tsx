@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useRef, useState } from 'react';
 import { Upload, Check } from 'lucide-react';
 import { CategoryIcon } from './CategoryIcon';
@@ -25,12 +26,12 @@ export function BannerEditor({
   return (
     <section className="panel banner-editor">
       <div>
-        <h2>Your profile banner</h2>
-        <p className="hint">Use a service template, or add your own image.</p>
+        <h2>{t('Your profile banner')}</h2>
+        <p className="hint">{t('Use a service template, or add your own image.')}</p>
       </div>
       <div
         className={`banner-preview provider-profile theme-${p.accent}`}
-        aria-label="Banner preview"
+        aria-label={t('Banner preview')}
       >
         <ProfileCover profile={p} />
       </div>
@@ -46,7 +47,7 @@ export function BannerEditor({
           }}
         >
           {!p.banner ? <Check size={16} /> : <CategoryIcon category={p.category} size={16} />}
-          Use service template
+          {t('Use service template')}
         </button>
         <button
           type="button"
@@ -55,13 +56,13 @@ export function BannerEditor({
           onClick={() => input.current?.click()}
         >
           <Upload size={16} />
-          {preparing ? 'Preparing banner…' : p.banner ? 'Replace banner' : 'Upload banner'}
+          {preparing ? t('Preparing banner…') : p.banner ? t('Replace banner') : t('Upload banner')}
         </button>
         <input
           ref={input}
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          aria-label="Banner image file"
+          aria-label={t('Banner image file')}
           aria-describedby="banner-size-guide"
           tabIndex={-1}
           disabled={!mediaEnabled || preparing}
@@ -74,7 +75,7 @@ export function BannerEditor({
             try {
               onChange({ banner: await compressProfileBanner(file), bannerPosition: 50 });
             } catch (e) {
-              setError(e instanceof Error ? e.message : 'Unable to prepare banner.');
+              setError(e instanceof Error ? e.message : t('Unable to prepare banner.'));
             } finally {
               setPreparing(false);
             }
@@ -83,16 +84,17 @@ export function BannerEditor({
       </div>
       <p className="tiny banner-template-note">
         <CategoryIcon category={p.category} size={16} />
-        {categories[p.category]} template · icon follows your service category.
+        {t(categories[p.category])} {t('template · icon follows your service category.')}
       </p>
       <p className="hint" id="banner-size-guide">
-        <strong>Recommended: 1600 × 600 px (8:3).</strong> JPG, PNG or WebP, up to 8 MB. Resized and
-        compressed automatically. Keep important details near the centre; other shapes are cropped
-        to fit.
+        <strong>{t('Recommended: 1600 × 600 px (8:3).')}</strong>{' '}
+        {t(
+          'JPG, PNG or WebP, up to 8 MB. Resized and compressed automatically. Keep important details near the centre; other shapes are cropped to fit.',
+        )}
       </p>
       {p.banner && (
         <div className="banner-position">
-          <label htmlFor="banner-focus">Banner vertical position</label>
+          <label htmlFor="banner-focus">{t('Banner vertical position')}</label>
           <input
             id="banner-focus"
             type="range"
@@ -104,8 +106,8 @@ export function BannerEditor({
             onChange={(e) => onChange({ bannerPosition: Number(e.target.value) })}
           />
           <div className="tiny">
-            <span>Show top</span>
-            <span>Show bottom</span>
+            <span>{t('Show top')}</span>
+            <span>{t('Show bottom')}</span>
           </div>
           <button
             type="button"
@@ -116,28 +118,31 @@ export function BannerEditor({
               onChange({ banner: '', bannerPosition: 50 });
             }}
           >
-            Remove banner
+            {t('Remove banner')}
           </button>
         </div>
       )}
       {preparing && (
         <p role="status" className="tiny">
-          Preparing your banner…
+          {t('Preparing your banner…')}
         </p>
       )}
       {error && (
         <p role="alert" className="error-text">
-          {error}
+          {t(error)}
         </p>
       )}
       {!mediaEnabled && (
         <p className="tiny">
-          Image uploads will be available after Service Link media storage is connected. Service
-          templates work now.
+          {t(
+            'Image uploads will be available after Service Link media storage is connected. Service templates work now.',
+          )}
         </p>
       )}
       <p className="tiny">
-        Save draft to keep changes. Publish updates when you’re ready for customers to see them.
+        {t(
+          'Save draft to keep changes. Publish updates when you’re ready for customers to see them.',
+        )}
       </p>
     </section>
   );

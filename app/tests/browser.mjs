@@ -65,6 +65,7 @@ try {
         await route.abort();
       } else await continueLocal(route);
     });
+    await context.addInitScript(() => { localStorage.setItem('sl.language', 'en'); });
     const page = await context.newPage();
     page.on('pageerror', (e) => pageErrors.push(e.message));
     const assertNoOverflow = async () => {

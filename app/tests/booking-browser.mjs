@@ -74,6 +74,7 @@ try {
         await route.abort();
       } else await continueLocal(route);
     });
+    await context.addInitScript(() => { localStorage.setItem('sl.language', 'en'); });
     const owner = await context.newPage();
     owner.on('pageerror', (e) => errors.push(e.message));
     const noOverflow = async (page) => {

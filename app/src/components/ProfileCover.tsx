@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { MediaImage } from './MediaImage';
 import { Link2 } from 'lucide-react';
 import { CategoryIcon } from './CategoryIcon';
@@ -20,16 +21,16 @@ export function ProfileCover({ profile: p }: { profile: ProviderProfile }) {
       ) : (
         <>
           <span className="cover-caption">
-            <Link2 size={15} /> YOUR NEXT CONNECTION
+            <Link2 size={15} /> {t('YOUR NEXT CONNECTION')}
           </span>
           <span className="cover-orbit" aria-hidden="true" />
           <span className="profile-cover-stamp" aria-hidden="true">
             <CategoryIcon category={p.category} size={35} />
           </span>
           <div className="cover-label">
-            Good people.
+            {t('Good people.')}
             <br />
-            Great services.
+            {t('Great services.')}
           </div>
         </>
       )}

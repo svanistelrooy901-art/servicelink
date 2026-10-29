@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useState, type ImgHTMLAttributes } from 'react';
 import { isMediaReference } from '../lib/mediaReference';
 import { getSupabaseClient } from '../lib/supabase';
@@ -41,7 +42,7 @@ export function MediaImage({
             });
         }
       }
-      if (!response.ok) throw new Error('Image unavailable.');
+      if (!response.ok) throw new Error(t('Image unavailable.'));
       object = URL.createObjectURL(await response.blob());
       if (active) setLoaded(object);
       else URL.revokeObjectURL(object);

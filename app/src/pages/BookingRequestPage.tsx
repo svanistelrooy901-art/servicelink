@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { repository } from '../lib/repository';
@@ -20,10 +21,10 @@ export function BookingRequestPage() {
       .then((x) => {
         if (active) {
           setP(x?.profile ?? null);
-          if (!x) setError('This provider is unavailable.');
+          if (!x) setError(t('This provider is unavailable.'));
         }
       })
-      .catch(() => active && setError('Unable to load this provider.'));
+      .catch(() => active && setError(t('Unable to load this provider.')));
     return () => {
       active = false;
     };
@@ -34,25 +35,29 @@ export function BookingRequestPage() {
         <Link to="/marketplace">
           <ServiceLinkBrand />
         </Link>
-        <Link to={`/p/${slug}`}>Back to profile</Link>
+        <Link to={`/p/${slug}`}>{t('Back to profile')}</Link>
       </header>
       {usingLocal && (
         <div className="demo-banner">
-          <strong>Local booking demo</strong>
-          <span>Use fictional details. No real payments or messages are sent.</span>
+          <strong>{t('Local booking demo')}</strong>
+          <span>{t('Use fictional details. No real payments or messages are sent.')}</span>
         </div>
       )}
       <section className="booking-public-card panel">
-        <span className="eyebrow">LET’S MAKE A CONNECTION</span>
-        <h1>Request a booking</h1>
-        {p && <p className="hint">With {p.name}</p>}
+        <span className="eyebrow">{t('LET’S MAKE A CONNECTION')}</span>
+        <h1>{t('Request a booking')}</h1>
+        {p && (
+          <p className="hint">
+            {t('With')} {p.name}
+          </p>
+        )}
         {!bookingsEnabled ? (
           <p className="booking-notice">
-            Booking requests are not enabled in this environment yet.
+            {t('Booking requests are not enabled in this environment yet.')}
           </p>
         ) : error ? (
           <p role="alert" className="error-box">
-            {error}
+            {t(error)}
           </p>
         ) : p ? (
           <BookingForm
@@ -70,7 +75,7 @@ export function BookingRequestPage() {
             }}
           />
         ) : (
-          <p>Loading provider…</p>
+          <p>{t('Loading provider…')}</p>
         )}
       </section>
     </main>

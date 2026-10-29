@@ -1,3 +1,7 @@
+import { useSyncExternalStore } from 'react';
+import { getLanguage, subscribe } from './i18n';
+import { LanguageSwitch } from './i18n/LanguageSwitch';
+import { t } from './i18n';
 import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
 import { ProtectedDashboard } from './components/ProtectedDashboard';
@@ -21,14 +25,18 @@ import { BookingRequestPage } from './pages/BookingRequestPage';
 import { CustomerBookingPage } from './pages/CustomerBookingPage';
 import { usingLocal, isStaging } from './lib/config';
 export function App() {
+  useSyncExternalStore(subscribe, getLanguage);
   return (
     <BrowserRouter>
+      <div className="language-toolbar">
+        <LanguageSwitch />
+      </div>
       <AuthProvider>
         {isStaging && (
           <div className="demo-banner" role="status">
-            <strong>Service Link staging</strong>
+            <strong>{t('Service Link staging')}</strong>
             <span>
-              Use fictional details only. Do not send real money or messages during testing.
+              {t('Use fictional details only. Do not send real money or messages during testing.')}
             </span>
           </div>
         )}
@@ -68,8 +76,8 @@ export function App() {
             path="*"
             element={
               <main className="empty-state">
-                <h1>Page not found</h1>
-                <Link to="/marketplace">Explore Service Link</Link>
+                <h1>{t('Page not found')}</h1>
+                <Link to="/marketplace">{t('Explore Service Link')}</Link>
               </main>
             }
           />

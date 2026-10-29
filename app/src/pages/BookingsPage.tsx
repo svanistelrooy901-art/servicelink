@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarDays, RefreshCw, Plus, ExternalLink } from 'lucide-react';
@@ -8,7 +9,6 @@ import { BookingForm, bookingAccessPath } from '../components/BookingForm';
 import type { BookingRecord, AcceptBooking, BookingWorkspace } from '../lib/bookingTypes';
 import {
   myDate,
-  formatMY,
   statusLabel,
   paymentLabel,
   money,
@@ -17,6 +17,7 @@ import {
   addDays,
   effectiveStatus,
 } from '../lib/bookingRules';
+import { formatMY } from '../i18n/format';
 import { bookingsEnabled } from '../lib/config';
 export function BookingsPage() {
   const { data, busy, error, feedback, refresh, run } = useBookings();
@@ -29,8 +30,8 @@ export function BookingsPage() {
   if (!bookingsEnabled)
     return (
       <section className="panel">
-        <h1>Bookings</h1>
-        <p>Bookings are not enabled in this environment yet.</p>
+        <h1>{t('Bookings')}</h1>
+        <p>{t('Bookings are not enabled in this environment yet.')}</p>
       </section>
     );
   const bookings = data?.bookings ?? [];
@@ -54,7 +55,7 @@ export function BookingsPage() {
       })),
     ...(data?.blocks
       .filter((b) => myDate(Date.parse(b.start)) <= date && myDate(Date.parse(b.end) - 1) >= date)
-      .map((b) => ({ ...b, label: 'Blocked time', detail: b.note || 'Unavailable' })) ?? []),
+      .map((b) => ({ ...b, label: t('Blocked time'), detail: b.note || t('Unavailable') })) ?? []),
   ].sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
   const visible = bookings
     .filter((b) => filter === 'all' || effectiveStatus(b) === filter)
@@ -63,36 +64,36 @@ export function BookingsPage() {
     <>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">A LITTLE MORE ORGANISED</span>
-          <h1>Good work, on the calendar.</h1>
-          <p>Review requests, protect your time and keep payment records clear.</p>
+          <span className="eyebrow">{t('A LITTLE MORE ORGANISED')}</span>
+          <h1>{t('Good work, on the calendar.')}</h1>
+          <p>{t('Review requests, protect your time and keep payment records clear.')}</p>
         </div>
         <button className="btn-secondary" onClick={refresh} disabled={busy}>
           <RefreshCw size={15} />
-          Refresh bookings
+          {t('Refresh bookings')}
         </button>
       </div>
       {error && (
         <p role="alert" className="error-box">
-          {error}
+          {t(error)}
         </p>
       )}
       {feedback && (
         <p role="status" className="success-box">
-          {feedback}
+          {t(feedback)}
         </p>
       )}
       <div className="booking-stats">
         <div>
-          <span>Awaiting your reply</span>
+          <span>{t('Awaiting your reply')}</span>
           <strong>{requested.length}</strong>
         </div>
         <div>
-          <span>Awaiting payment</span>
+          <span>{t('Awaiting payment')}</span>
           <strong>{awaiting.length}</strong>
         </div>
         <div>
-          <span>Confirmed bookings</span>
+          <span>{t('Confirmed bookings')}</span>
           <strong>{confirmed.length}</strong>
         </div>
       </div>
@@ -101,12 +102,12 @@ export function BookingsPage() {
           <div>
             <h2>
               <CalendarDays size={19} />
-              Your daily agenda
+              {t('Your daily agenda')}
             </h2>
-            <p className="hint">Shared across every service · Malaysia time.</p>
+            <p className="hint">{t('Shared across every service · Malaysia time.')}</p>
           </div>
           <label>
-            View date
+            {t('View date')}
             <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </label>
         </div>
@@ -116,7 +117,9 @@ export function BookingsPage() {
               <div className="agenda-entry" key={a.id}>
                 <span>
                   {formatMY(a.start)}
-                  <small>to {formatMY(a.end)}</small>
+                  <small>
+                    {t('to')} {formatMY(a.end)}
+                  </small>
                 </span>
                 <div>
                   <strong>{a.label}</strong>
@@ -125,33 +128,35 @@ export function BookingsPage() {
               </div>
             ))
           ) : (
-            <p className="hint">No accepted bookings or blocked time for this date.</p>
+            <p className="hint">{t('No accepted bookings or blocked time for this date.')}</p>
           )}
         </div>
         <Link className="editor-next" to="/dashboard/availability">
-          Edit working hours & blocked time →
+          {t('Edit working hours & blocked time →')}
         </Link>
       </section>
       <div className="booking-inbox-toolbar">
-        <h2>Booking inbox</h2>
+        <h2>{t('Booking inbox')}</h2>
         <button className="btn-secondary" onClick={() => setManualOpen((v) => !v)}>
           <Plus size={15} />
-          {manualOpen ? 'Close manual entry' : 'Add phone / WhatsApp booking'}
+          {manualOpen ? t('Close manual entry') : t('Add phone / WhatsApp booking')}
         </button>
       </div>
       {manualOpen && (
         <section className="panel manual-booking">
-          <h2>Add a booking received elsewhere</h2>
+          <h2>{t('Add a booking received elsewhere')}</h2>
           <p className="hint">
-            Record an agreed booking to keep availability accurate. Customer details remain private.
+            {t(
+              'Record an agreed booking to keep availability accurate. Customer details remain private.',
+            )}
           </p>
           {!workspace?.published ? (
-            <p>Publish your profile first to choose a service.</p>
+            <p>{t('Publish your profile first to choose a service.')}</p>
           ) : (
             <>
               <div className="form-grid">
                 <label>
-                  Agreed amount due (RM)
+                  {t('Agreed amount due (RM)')}
                   <input
                     type="number"
                     min={0}
@@ -162,7 +167,7 @@ export function BookingsPage() {
                   />
                 </label>
                 <label>
-                  Manual booking payment deadline
+                  {t('Manual booking payment deadline')}
                   <input
                     type="datetime-local"
                     required
@@ -177,7 +182,7 @@ export function BookingsPage() {
                 submitting={busy}
                 onSubmit={async (input) => {
                   if (!data) return;
-                  if (manualAmount === '') throw new Error('Enter the agreed amount due.');
+                  if (manualAmount === '') throw new Error(t('Enter the agreed amount due.'));
                   const amount = Math.round(Number(manualAmount) * 100);
                   const [day, time] = manualDeadline.split('T');
                   const result = await run(
@@ -187,7 +192,7 @@ export function BookingsPage() {
                         { amountDueCents: amount, paymentDeadline: malaysiaInstant(day, time) },
                         data.revision,
                       ),
-                    'Manual booking added; slot reserved.',
+                    t('Manual booking added; slot reserved.'),
                   );
                   if (result) setManualOpen(false);
                 }}
@@ -196,15 +201,15 @@ export function BookingsPage() {
           )}
         </section>
       )}
-      <div className="booking-filters" aria-label="Booking filters">
+      <div className="booking-filters" aria-label={t('Booking filters')}>
         {[
-          ['requested', 'Requests'],
-          ['accepted', 'Awaiting payment'],
-          ['confirmed', 'Confirmed'],
-          ['all', 'All bookings'],
+          ['requested', t('Requests')],
+          ['accepted', t('Awaiting payment')],
+          ['confirmed', t('Confirmed')],
+          ['all', t('All bookings')],
         ].map(([value, label]) => (
           <button key={value} aria-pressed={filter === value} onClick={() => setFilter(value)}>
-            {label}
+            {t(label)}
           </button>
         ))}
       </div>
@@ -219,7 +224,7 @@ export function BookingsPage() {
                 run(
                   () => bookingRepository.ownerAction(b.id, action, data.revision, a),
                   action === 'verify'
-                    ? 'Payment recorded as manually verified by provider.'
+                    ? t('Payment recorded as manually verified by provider.')
                     : `Booking ${action === 'accept' ? 'accepted' : action === 'decline' ? 'declined' : action === 'cancel' ? 'cancelled' : 'completed'}.`,
                 )
               }
@@ -228,10 +233,11 @@ export function BookingsPage() {
         {data && !visible.length && (
           <section className="panel empty-booking">
             <CalendarDays size={27} />
-            <h2>Your next connection is on its way.</h2>
+            <h2>{t('Your next connection is on its way.')}</h2>
             <p>
-              No bookings in this view yet. Enable booking requests in Availability and publish your
-              profile.
+              {t(
+                'No bookings in this view yet. Enable booking requests in Availability and publish your profile.',
+              )}
             </p>
           </section>
         )}
@@ -265,14 +271,14 @@ function OwnerBookingCard({
   async function accept() {
     setError('');
     try {
-      if (amount === '') throw new Error('Enter a final amount before accepting.');
+      if (amount === '') throw new Error(t('Enter a final amount before accepting.'));
       const [day, time] = deadline.split('T');
       await onAction('accept', {
         amountDueCents: Math.round(Number(amount) * 100),
         paymentDeadline: malaysiaInstant(day, time),
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Unable to accept booking.');
+      setError(e instanceof Error ? e.message : t('Unable to accept booking.'));
     }
   }
   return (
@@ -284,7 +290,7 @@ function OwnerBookingCard({
           </span>
           <h2>{b.service.name}</h2>
         </div>
-        <span className={`booking-status status-${status}`}>{statusLabel(status)}</span>
+        <span className={`booking-status status-${status}`}>{t(statusLabel(status))}</span>
       </div>
       <div className="owner-booking-grid">
         <section>
@@ -294,28 +300,36 @@ function OwnerBookingCard({
           <p className="booking-time">
             {formatMY(b.start)}
             <br />
-            to {formatMY(b.end)}
+            {t('to')} {formatMY(b.end)}
           </p>
           <p className="tiny">
-            {b.mode === 'date-range' ? 'Full date-range request' : 'Appointment request'}
+            {b.mode === 'date-range' ? t('Full date-range request') : t('Appointment request')}
           </p>
           {b.note && <p className="customer-note">{b.note}</p>}
           {b.accessToken && (
             <Link className="private-booking-link" to={bookingAccessPath(b)} target="_blank">
-              View private customer page
+              {t('View private customer page')}
               <ExternalLink size={13} />
             </Link>
           )}
         </section>
         <section>
-          <p className="payment-state">{paymentLabel(b.paymentStatus)}</p>
-          <strong className="booking-amount">{money(b.amountDueCents)}</strong>
-          {b.paymentDeadline && <p className="tiny">Deadline: {formatMY(b.paymentDeadline)}</p>}
-          {b.verifiedAt && <p className="tiny">Provider verified on {formatMY(b.verifiedAt)}</p>}
+          <p className="payment-state">{t(paymentLabel(b.paymentStatus))}</p>
+          <strong className="booking-amount">{t(money(b.amountDueCents))}</strong>
+          {b.paymentDeadline && (
+            <p className="tiny">
+              {t('Deadline:')} {formatMY(b.paymentDeadline)}
+            </p>
+          )}
+          {b.verifiedAt && (
+            <p className="tiny">
+              {t('Provider verified on')} {formatMY(b.verifiedAt)}
+            </p>
+          )}
           {status === 'requested' && (
             <fieldset disabled={busy} className="accept-booking">
               <label>
-                Final amount due (RM)
+                {t('Final amount due (RM)')}
                 <input
                   type="number"
                   min={0}
@@ -326,7 +340,7 @@ function OwnerBookingCard({
                 />
               </label>
               <label>
-                Payment deadline (MYT)
+                {t('Payment deadline (MYT)')}
                 <input
                   type="datetime-local"
                   required
@@ -335,15 +349,16 @@ function OwnerBookingCard({
                 />
               </label>
               <p className="tiny">
-                Choose a deadline before the service starts. The slot is released when an unpaid
-                window expires.
+                {t(
+                  'Choose a deadline before the service starts. The slot is released when an unpaid window expires.',
+                )}
               </p>
               <div className="booking-action-row">
                 <button className="btn-primary" onClick={accept}>
-                  Accept & reserve slot
+                  {t('Accept & reserve slot')}
                 </button>
                 <button className="text-btn" onClick={() => onAction('decline')}>
-                  Decline request
+                  {t('Decline request')}
                 </button>
               </div>
             </fieldset>
@@ -356,17 +371,17 @@ function OwnerBookingCard({
                   checked={checked}
                   onChange={(e) => setChecked(e.target.checked)}
                 />
-                I checked my bank / wallet and the full amount due has arrived.
+                {t('I checked my bank / wallet and the full amount due has arrived.')}
               </label>
               <button
                 disabled={!checked}
                 className="btn-primary"
                 onClick={() => onAction('verify')}
               >
-                Verify money received
+                {t('Verify money received')}
               </button>
               <p className="tiny">
-                A receipt or customer payment report alone is not bank verification.
+                {t('A receipt or customer payment report alone is not bank verification.')}
               </p>
             </fieldset>
           )}
@@ -376,7 +391,7 @@ function OwnerBookingCard({
               className="btn-secondary"
               onClick={() => onAction('complete')}
             >
-              Mark completed
+              {t('Mark completed')}
             </button>
           )}
           {['requested', 'accepted', 'confirmed'].includes(status) && (
@@ -386,35 +401,36 @@ function OwnerBookingCard({
               onClick={() => {
                 if (
                   window.confirm(
-                    'Cancel this booking? Any payment/refund must be handled manually.',
+                    t('Cancel this booking? Any payment/refund must be handled manually.'),
                   )
                 )
                   onAction('cancel');
               }}
             >
-              Cancel booking
+              {t('Cancel booking')}
             </button>
           )}
           {(b.refundFollowUp || (status === 'expired' && b.paymentStatus === 'claimed')) && (
             <p className="booking-notice">
-              Payment follow-up needed. Reconcile with the customer manually; Service Link has not
-              issued a refund or restored a reservation.
+              {t(
+                'Payment follow-up needed. Reconcile with the customer manually; Service Link has not issued a refund or restored a reservation.',
+              )}
             </p>
           )}
           {error && (
             <p role="alert" className="error-text">
-              {error}
+              {t(error)}
             </p>
           )}
         </section>
       </div>
       <details className="booking-audit">
-        <summary>Booking history</summary>
+        <summary>{t('Booking history')}</summary>
         <ol>
           {b.events.map((e, i) => (
             <li key={i}>
               <span>{formatMY(e.at)}</span>
-              {e.action}
+              {t(e.action)}
             </li>
           ))}
         </ol>

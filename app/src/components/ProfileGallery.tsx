@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { MediaImage } from './MediaImage';
 import { useEffect, useId, useRef, useState } from 'react';
 import { X } from 'lucide-react';
@@ -26,19 +27,20 @@ export function ProfileGallery({
   }, [open, pictures.length]);
   if (!pictures.length) return null;
   const alt = (p: GalleryPicture, index: number) =>
-    p.caption || `${name || 'Provider'} · work example ${index + 1}`;
+    p.caption ||
+    t('{name} · work example {number}', { name: name || t('Provider'), number: index + 1 });
   return (
     <section className="public-section profile-gallery">
       <div className="section-label">
-        <h2>A glimpse of my work</h2>
+        <h2>{t('A glimpse of my work')}</h2>
         {pictures.length > 2 && (
           <button
             type="button"
             className="gallery-more"
-            aria-label="More gallery pictures"
+            aria-label={t('More gallery pictures')}
             onClick={() => setOpen(true)}
           >
-            More <span>+{pictures.length - 2}</span>
+            {t('More')} <span>+{pictures.length - 2}</span>
           </button>
         )}
       </div>
@@ -70,16 +72,19 @@ export function ProfileGallery({
       >
         <header className="gallery-dialog-header">
           <div>
-            <span className="eyebrow">A GLIMPSE OF MY WORK</span>
+            <span className="eyebrow">{t('A GLIMPSE OF MY WORK')}</span>
             <h2 id={title}>
-              Gallery <small>{pictures.length} pictures</small>
+              {t('Gallery')}{' '}
+              <small>
+                {pictures.length} {t('pictures')}
+              </small>
             </h2>
           </div>
           <button
             type="button"
             autoFocus
             className="icon-btn"
-            aria-label="Close gallery"
+            aria-label={t('Close gallery')}
             onClick={() => setOpen(false)}
           >
             <X size={22} />

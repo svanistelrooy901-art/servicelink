@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { SocialIcon } from './SocialLinks';
 import {
   emptySocialLinks,
@@ -16,13 +17,15 @@ export function SocialLinksEditor({
   const links = value ?? emptySocialLinks();
   return (
     <section className="panel social-editor">
-      <h2>A little more of you</h2>
-      <p className="hint">Add your Facebook, Instagram or Threads link. Empty links stay hidden.</p>
+      <h2>{t('A little more of you')}</h2>
+      <p className="hint">
+        {t('Add your Facebook, Instagram or Threads link. Empty links stay hidden.')}
+      </p>
       {(Object.keys(socialPlatforms) as SocialPlatform[]).map((key) => (
         <div key={key}>
           <label htmlFor={`social-${key}`} className="social-field-label">
             <SocialIcon platform={key} />
-            {socialPlatforms[key].label} link
+            {t('{name} link', { name: socialPlatforms[key].label })}
           </label>
           <input
             id={`social-${key}`}
@@ -37,7 +40,7 @@ export function SocialLinksEditor({
           />
           {!validSocialLink(key, links[key]) && (
             <p id={`social-${key}-error`} className="error-text">
-              Use a full https:// {socialPlatforms[key].label} link.
+              {t('Use a full https:// {name} link.', { name: socialPlatforms[key].label })}
             </p>
           )}
         </div>

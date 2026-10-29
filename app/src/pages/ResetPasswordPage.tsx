@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useState, type FormEvent } from 'react';
 import { Eye, EyeOff, Loader2, LockKeyhole } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -20,11 +21,11 @@ export function ResetPasswordPage() {
     event.preventDefault();
     if (!authorized || saving) return;
     if (password.length < 8) {
-      setError('Use at least 8 characters.');
+      setError(t('Use at least 8 characters.'));
       return;
     }
     if (password !== confirmation) {
-      setError('Passwords do not match.');
+      setError(t('Passwords do not match.'));
       return;
     }
     setSaving(true);
@@ -35,7 +36,7 @@ export function ResetPasswordPage() {
       sessionStorage.removeItem(recoveryGrantKey);
       navigate('/dashboard', { replace: true });
     } catch (failure) {
-      setError(failure instanceof Error ? failure.message : 'Unable to reset your password.');
+      setError(failure instanceof Error ? failure.message : t('Unable to reset your password.'));
     } finally {
       setSaving(false);
     }
@@ -53,20 +54,22 @@ export function ResetPasswordPage() {
         <div className="mb-6">
           <ServiceLinkBrand />
         </div>
-        <h1 className="font-display text-2xl font-bold text-neutral-900">Choose a new password</h1>
+        <h1 className="font-display text-2xl font-bold text-neutral-900">
+          {t('Choose a new password')}
+        </h1>
         {!authorized ? (
           <>
             <p role="alert" className="mt-4 text-sm text-red-700">
-              Your recovery session is missing or expired. Please request a new link.
+              {t('Your recovery session is missing or expired. Please request a new link.')}
             </p>
             <Link to="/forgot-password" className="mt-4 inline-block text-primary-700 underline">
-              Request reset link
+              {t('Request reset link')}
             </Link>
           </>
         ) : (
           <form onSubmit={submit} className="mt-6 space-y-4">
             <label className="block">
-              <span className="label-field">New password</span>
+              <span className="label-field">{t('New password')}</span>
               <span className="relative block">
                 <input
                   className="input-field pr-12"
@@ -81,7 +84,7 @@ export function ResetPasswordPage() {
                   type="button"
                   onClick={() => setShow((v) => !v)}
                   className="absolute inset-y-0 right-0 min-h-11 min-w-11"
-                  aria-label={show ? 'Hide password' : 'Show password'}
+                  aria-label={show ? t('Hide password') : t('Show password')}
                 >
                   {show ? (
                     <EyeOff className="mx-auto h-4 w-4" />
@@ -91,9 +94,9 @@ export function ResetPasswordPage() {
                 </button>
               </span>
             </label>
-            <p className="text-xs text-neutral-500">Use at least 8 characters.</p>
+            <p className="text-xs text-neutral-500">{t('Use at least 8 characters.')}</p>
             <label className="block">
-              <span className="label-field">Confirm password</span>
+              <span className="label-field">{t('Confirm password')}</span>
               <input
                 className="input-field"
                 type={show ? 'text' : 'password'}
@@ -110,11 +113,11 @@ export function ResetPasswordPage() {
               ) : (
                 <LockKeyhole className="h-4 w-4" />
               )}{' '}
-              Save new password
+              {t('Save new password')}
             </button>
             {error && (
               <p role="alert" className="text-sm text-red-700">
-                {error}
+                {t(error)}
               </p>
             )}
           </form>

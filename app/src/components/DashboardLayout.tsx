@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { NavLink, Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -35,33 +36,33 @@ export function DashboardLayout() {
   const { signOut } = useAuth();
   const navigate = useNavigate();
   async function leave() {
-    if (store.dirty && !window.confirm('Leave without saving your latest changes?')) return;
+    if (store.dirty && !window.confirm(t('Leave without saving your latest changes?'))) return;
     try {
       if (usingLocal) sessionStorage.removeItem(DEMO_ACCESS_KEY);
       else await signOut();
       navigate('/login');
     } catch {
-      window.alert('Unable to sign out. Please try again.');
+      window.alert(t('Unable to sign out. Please try again.'));
     }
   }
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <Link to="/dashboard" aria-label="Service Link dashboard">
+        <Link to="/dashboard" aria-label={t('Service Link dashboard')}>
           <ServiceLinkBrand />
         </Link>
-        <span className="sidebar-label">YOUR WORKSPACE</span>
-        <nav aria-label="Dashboard">
+        <span className="sidebar-label">{t('YOUR WORKSPACE')}</span>
+        <nav aria-label={t('Dashboard')}>
           {nav.map(([path, label, Icon]) => (
             <NavLink key={path} to={`/dashboard${path ? `/${path}` : ''}`} end>
               <Icon size={18} />
-              <span>{label}</span>
+              <span>{t(label)}</span>
             </NavLink>
           ))}
         </nav>
         <Link className="market-link" to="/marketplace">
           <GlobeIcon />
-          Explore marketplace
+          {t('Explore marketplace')}
           <ArrowUpRight size={15} />
         </Link>
         <div className="sidebar-bottom">
@@ -70,60 +71,63 @@ export function DashboardLayout() {
               <Link2 size={18} />
             </span>
             <p>
-              A good service deserves
-              <br />a great first impression.
+              {t('A good service deserves')}
+              <br />
+              {t('a great first impression.')}
             </p>
           </div>
           <button className="logout" onClick={leave}>
             <LogOut size={16} />
-            Sign out{usingLocal ? ' of demo' : ''}
+            {t(usingLocal ? 'Sign out of demo' : 'Sign out')}
           </button>
           <small>
-            Made for independent people.
+            {t('Made for independent people.')}
             <br />
-            Made by Digital Sambal.
+            {t('Made by Digital Sambal.')}
           </small>
         </div>
       </aside>
       <div className="workspace">
         <header className="workspace-header">
           <div>
-            <span className="eyebrow">PROVIDER WORKSPACE</span>
-            <span className="workspace-title">Let’s make things happen.</span>
+            <span className="eyebrow">{t('PROVIDER WORKSPACE')}</span>
+            <span className="workspace-title">{t('Let’s make things happen.')}</span>
           </div>
           <div className="header-status">
             <span className={`status-dot ${store.workspace?.published ? 'live' : ''}`} />
-            {store.workspace?.published ? 'Published' : 'Draft profile'}
+            {store.workspace?.published ? t('Published') : t('Draft profile')}
           </div>
-          <button className="icon-btn mobile-signout" aria-label="Sign out" onClick={leave}>
+          <button className="icon-btn mobile-signout" aria-label={t('Sign out')} onClick={leave}>
             <LogOut size={16} />
           </button>
         </header>
         {usingLocal && (
           <div className="demo-banner">
-            <strong>Local demo</strong>
-            <span>Changes stay on this browser. Published links work on this device only.</span>
+            <strong>{t('Local demo')}</strong>
+            <span>
+              {t('Changes stay on this browser. Published links work on this device only.')}
+            </span>
           </div>
         )}
         <main className="dashboard-main">
           {store.error && (
             <div className="error-box" role="alert">
-              {store.error}
+              {t(store.error)}
             </div>
           )}
           {store.feedback && usesProfileDraft && (
             <div className="success-box" role="status">
               <Check size={17} />
-              {store.feedback}
+              {t(store.feedback)}
             </div>
           )}
           {store.profile ? (
             <Outlet />
           ) : !store.error ? (
-            <p className="loading">Loading your workspace…</p>
+            <p className="loading">{t('Loading your workspace…')}</p>
           ) : (
             <button className="btn-secondary" onClick={() => window.location.reload()}>
-              Reload workspace
+              {t('Reload workspace')}
             </button>
           )}
         </main>
@@ -132,14 +136,14 @@ export function DashboardLayout() {
             <span>
               <span className={`status-dot ${store.dirty ? 'unsaved' : ''}`} />
               {store.mediaBusy
-                ? 'Preparing images…'
+                ? t('Preparing images…')
                 : store.busy
-                  ? 'Saving…'
+                  ? t('Saving…')
                   : store.dirty
-                    ? 'Unsaved changes'
+                    ? t('Unsaved changes')
                     : store.workspace?.savedAt
-                      ? 'All changes saved'
-                      : 'Ready to make it yours'}
+                      ? t('All changes saved')
+                      : t('Ready to make it yours')}
             </span>
             <div>
               {store.dirty && (
@@ -148,7 +152,7 @@ export function DashboardLayout() {
                   disabled={store.busy || store.mediaBusy}
                   onClick={store.reset}
                 >
-                  Discard edits
+                  {t('Discard edits')}
                 </button>
               )}
               <button
@@ -157,7 +161,7 @@ export function DashboardLayout() {
                 onClick={store.save}
               >
                 <Save size={16} />
-                Save draft
+                {t('Save draft')}
               </button>
             </div>
           </footer>

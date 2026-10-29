@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { MediaImage } from '../components/MediaImage';
 import { useEffect, useState, type FormEvent } from 'react';
 import { CalendarDays, Plus, Trash2 } from 'lucide-react';
@@ -5,7 +6,8 @@ import { useBookings } from '../hooks/useBookings';
 import { useAppStore } from '../hooks/useAppStore';
 import { bookingRepository } from '../lib/bookingRepository';
 import type { BookingSettings } from '../lib/bookingTypes';
-import { DAY_NAMES, formatMY, myDate, addDays, malaysiaInstant } from '../lib/bookingRules';
+import { DAY_NAMES, myDate, addDays, malaysiaInstant } from '../lib/bookingRules';
+import { formatMY } from '../i18n/format';
 import { compressPaymentQR } from '../lib/media';
 import { bookingsEnabled, mediaEnabled } from '../lib/config';
 export function AvailabilityPage() {
@@ -28,10 +30,11 @@ export function AvailabilityPage() {
   if (!bookingsEnabled)
     return (
       <section className="panel">
-        <h1>Booking setup</h1>
+        <h1>{t('Booking setup')}</h1>
         <p>
-          Booking is not enabled in this environment yet. The independent booking backend must be
-          configured before accepting real customers.
+          {t(
+            'Booking is not enabled in this environment yet. The independent booking backend must be configured before accepting real customers.',
+          )}
         </p>
       </section>
     );
@@ -40,7 +43,7 @@ export function AvailabilityPage() {
     if (!draft) return;
     const result = await run(
       () => bookingRepository.saveSettings(draft, baseRevision),
-      'Availability and payment instructions saved.',
+      t('Availability and payment instructions saved.'),
     );
     if (result) setBase(result.revision);
   }
@@ -49,19 +52,21 @@ export function AvailabilityPage() {
     <>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">YOUR TIME, WELL SPENT</span>
-          <h1>Make room for good work.</h1>
-          <p>One shared calendar across all your services. All times use Malaysia time (MYT).</p>
+          <span className="eyebrow">{t('YOUR TIME, WELL SPENT')}</span>
+          <h1>{t('Make room for good work.')}</h1>
+          <p>
+            {t('One shared calendar across all your services. All times use Malaysia time (MYT).')}
+          </p>
         </div>
       </div>
       {error && (
         <p className="error-box" role="alert">
-          {error}
+          {t(error)}
         </p>
       )}
       {feedback && (
         <p className="success-box" role="status">
-          {feedback}
+          {t(feedback)}
         </p>
       )}
       {draft && data && (
@@ -70,7 +75,7 @@ export function AvailabilityPage() {
             <fieldset disabled={busy || mediaBusy}>
               <section className="panel">
                 <div className="section-label">
-                  <h2>Booking requests</h2>
+                  <h2>{t('Booking requests')}</h2>
                   <CalendarDays size={20} />
                 </div>
                 <label className="check-row">
@@ -79,14 +84,14 @@ export function AvailabilityPage() {
                     checked={draft.enabled}
                     onChange={(e) => patch({ enabled: e.target.checked })}
                   />
-                  Let customers request a booking
+                  {t('Let customers request a booking')}
                 </label>
                 <p className="hint">
-                  Requests need your acceptance. They do not reserve time until accepted.
+                  {t('Requests need your acceptance. They do not reserve time until accepted.')}
                 </p>
                 <div className="form-grid">
                   <label>
-                    Minimum notice (minutes)
+                    {t('Minimum notice (minutes)')}
                     <input
                       type="number"
                       min={0}
@@ -96,7 +101,7 @@ export function AvailabilityPage() {
                     />
                   </label>
                   <label>
-                    Buffer between bookings (minutes)
+                    {t('Buffer between bookings (minutes)')}
                     <input
                       type="number"
                       min={0}
@@ -108,9 +113,9 @@ export function AvailabilityPage() {
                 </div>
               </section>
               <section className="panel">
-                <h2>Your weekly hours</h2>
+                <h2>{t('Your weekly hours')}</h2>
                 <p className="hint">
-                  For appointments. Date-range enquiries are reviewed separately.
+                  {t('For appointments. Date-range enquiries are reviewed separately.')}
                 </p>
                 <div className="weekly-hours">
                   {draft.weekly.map((day, i) => (
@@ -127,10 +132,10 @@ export function AvailabilityPage() {
                             })
                           }
                         />
-                        {DAY_NAMES[day.day]}
+                        {t(DAY_NAMES[day.day])}
                       </label>
                       <input
-                        aria-label={`${DAY_NAMES[day.day]} start`}
+                        aria-label={t('{day} start', { day: t(DAY_NAMES[day.day]) })}
                         type="time"
                         disabled={!day.enabled}
                         value={day.start}
@@ -142,9 +147,9 @@ export function AvailabilityPage() {
                           })
                         }
                       />
-                      <span>to</span>
+                      <span>{t('to')}</span>
                       <input
-                        aria-label={`${DAY_NAMES[day.day]} end`}
+                        aria-label={t('{day} end', { day: t(DAY_NAMES[day.day]) })}
                         type="time"
                         disabled={!day.enabled}
                         value={day.end}
@@ -161,7 +166,7 @@ export function AvailabilityPage() {
                 </div>
               </section>
               <section className="panel">
-                <h2>How each service is requested</h2>
+                <h2>{t('How each service is requested')}</h2>
                 {profile?.services.map((s) => (
                   <label key={s.id}>
                     {s.name}
@@ -179,23 +184,24 @@ export function AvailabilityPage() {
                         })
                       }
                     >
-                      <option value="appointment">Appointment · date and time</option>
-                      <option value="date-range">Date-range enquiry</option>
+                      <option value="appointment">{t('Appointment · date and time')}</option>
+                      <option value="date-range">{t('Date-range enquiry')}</option>
                     </select>
                   </label>
                 ))}
                 <p className="tiny">
-                  Acceptance of a date range reserves the entire continuous period. Discuss the
-                  scope before accepting.
+                  {t(
+                    'Acceptance of a date range reserves the entire continuous period. Discuss the scope before accepting.',
+                  )}
                 </p>
               </section>
               <section className="panel">
-                <h2>How customers can pay you</h2>
+                <h2>{t('How customers can pay you')}</h2>
                 <p className="hint">
-                  Bank transfer or your QR is enough. A gateway account is optional.
+                  {t('Bank transfer or your QR is enough. A gateway account is optional.')}
                 </p>
                 <label>
-                  Bank name
+                  {t('Bank name')}
                   <input
                     maxLength={80}
                     value={draft.payment.bankName}
@@ -205,7 +211,7 @@ export function AvailabilityPage() {
                   />
                 </label>
                 <label>
-                  Account holder
+                  {t('Account holder')}
                   <input
                     maxLength={120}
                     value={draft.payment.accountName}
@@ -215,7 +221,7 @@ export function AvailabilityPage() {
                   />
                 </label>
                 <label>
-                  Account number
+                  {t('Account number')}
                   <input
                     inputMode="numeric"
                     maxLength={40}
@@ -226,7 +232,7 @@ export function AvailabilityPage() {
                   />
                 </label>
                 <label>
-                  Payment instructions (optional)
+                  {t('Payment instructions (optional)')}
                   <textarea
                     rows={3}
                     maxLength={600}
@@ -237,9 +243,9 @@ export function AvailabilityPage() {
                   />
                 </label>
                 <label className="btn-secondary upload-label">
-                  Upload payment QR
+                  {t('Upload payment QR')}
                   <input
-                    aria-label="Payment QR image"
+                    aria-label={t('Payment QR image')}
                     type="file"
                     disabled={!mediaEnabled}
                     accept="image/png,image/jpeg,image/webp"
@@ -253,7 +259,7 @@ export function AvailabilityPage() {
                           payment: { ...draft.payment, qrPhoto: await compressPaymentQR(file) },
                         });
                       } catch (e) {
-                        setMediaError(e instanceof Error ? e.message : 'Unable to prepare QR.');
+                        setMediaError(e instanceof Error ? e.message : t('Unable to prepare QR.'));
                       } finally {
                         setMediaBusy(false);
                       }
@@ -262,41 +268,43 @@ export function AvailabilityPage() {
                 </label>
                 {draft.payment.qrPhoto && (
                   <div className="payment-qr">
-                    <MediaImage alt="Your payment QR" src={draft.payment.qrPhoto} />
+                    <MediaImage alt={t('Your payment QR')} src={draft.payment.qrPhoto} />
                     <button
                       type="button"
                       className="text-btn"
                       onClick={() => patch({ payment: { ...draft.payment, qrPhoto: '' } })}
                     >
-                      Remove QR
+                      {t('Remove QR')}
                     </button>
                   </div>
                 )}
                 {mediaError && (
                   <p role="alert" className="error-text">
-                    {mediaError}
+                    {t(mediaError)}
                   </p>
                 )}
                 <p className="tiny">
-                  Shown only with an accepted booking. Existing accepted bookings keep their
-                  original payment instructions. Test that your QR remains scannable before use.
+                  {t(
+                    'Shown only with an accepted booking. Existing accepted bookings keep their original payment instructions. Test that your QR remains scannable before use.',
+                  )}
                 </p>
               </section>
               <button className="btn-primary" disabled={busy || mediaBusy}>
-                Save availability & payment details
+                {t('Save availability & payment details')}
               </button>
             </fieldset>
           </form>
           <aside className="booking-blocks">
             <section className="panel">
-              <h2>Time off & blocked time</h2>
+              <h2>{t('Time off & blocked time')}</h2>
               <p className="hint">
-                Private notes stay in your workspace. Accepted bookings cannot be overwritten by a
-                block.
+                {t(
+                  'Private notes stay in your workspace. Accepted bookings cannot be overwritten by a block.',
+                )}
               </p>
               <fieldset disabled={busy}>
                 <label>
-                  Block date
+                  {t('Block date')}
                   <input
                     type="date"
                     min={myDate()}
@@ -307,7 +315,7 @@ export function AvailabilityPage() {
                 </label>
                 <div className="form-grid">
                   <label>
-                    From
+                    {t('From')}
                     <input
                       type="time"
                       value={blockStart}
@@ -315,7 +323,7 @@ export function AvailabilityPage() {
                     />
                   </label>
                   <label>
-                    Until
+                    {t('Until')}
                     <input
                       type="time"
                       value={blockEnd}
@@ -324,7 +332,7 @@ export function AvailabilityPage() {
                   </label>
                 </div>
                 <label>
-                  Private note
+                  {t('Private note')}
                   <input
                     maxLength={150}
                     value={blockNote}
@@ -345,13 +353,13 @@ export function AvailabilityPage() {
                           },
                           data.revision,
                         ),
-                      'Time blocked.',
+                      t('Time blocked.'),
                     );
                     if (result && baseRevision === data.revision) setBase(result.revision);
                   }}
                 >
                   <Plus size={16} />
-                  Block time
+                  {t('Block time')}
                 </button>
               </fieldset>
               <div className="block-list">
@@ -359,18 +367,20 @@ export function AvailabilityPage() {
                   <article key={b.id}>
                     <div>
                       <strong>{formatMY(b.start)}</strong>
-                      <p>Until {formatMY(b.end)}</p>
-                      <small>{b.note || 'Blocked time'}</small>
+                      <p>
+                        {t('Until')} {formatMY(b.end)}
+                      </p>
+                      <small>{b.note || t('Blocked time')}</small>
                     </div>
                     <button
                       type="button"
                       disabled={busy}
-                      aria-label={`Remove block ${b.note || formatMY(b.start)}`}
+                      aria-label={t('Remove block {name}', { name: b.note || formatMY(b.start) })}
                       className="icon-btn"
                       onClick={async () => {
                         const result = await run(
                           () => bookingRepository.removeBlock(b.id, data.revision),
-                          'Block removed.',
+                          t('Block removed.'),
                         );
                         if (result && baseRevision === data.revision) setBase(result.revision);
                       }}
@@ -379,12 +389,13 @@ export function AvailabilityPage() {
                     </button>
                   </article>
                 ))}
-                {!data.blocks.length && <p className="tiny">No blocked time yet.</p>}
+                {!data.blocks.length && <p className="tiny">{t('No blocked time yet.')}</p>}
               </div>
             </section>
             <section className="booking-notice">
-              A booking is never bank-verified automatically. Check your bank or wallet before
-              confirming a payment.
+              {t(
+                'A booking is never bank-verified automatically. Check your bank or wallet before confirming a payment.',
+              )}
             </section>
           </aside>
         </div>

@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Eye, EyeOff, Loader2, LockKeyhole } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -50,11 +51,11 @@ function PasswordSetupForm() {
     setError('');
 
     if (password.length < MINIMUM_PASSWORD_LENGTH) {
-      setError(`Use at least ${MINIMUM_PASSWORD_LENGTH} characters.`);
+      setError(t('Use at least {count} characters.', { count: MINIMUM_PASSWORD_LENGTH }));
       return;
     }
     if (password !== confirmation) {
-      setError('Passwords do not match. Re-enter both passwords and try again.');
+      setError(t('Passwords do not match. Re-enter both passwords and try again.'));
       return;
     }
 
@@ -64,7 +65,7 @@ function PasswordSetupForm() {
       const { data, error: identityError } = await getSupabaseClient().auth.getUser();
       if (!mounted.current) return;
       if (identityError || data.user?.id !== authenticatedUserId) {
-        throw new Error('Your account has changed. Sign in again before setting your password.');
+        throw new Error(t('Your account has changed. Sign in again before setting your password.'));
       }
       const { error: updateError } = await getSupabaseClient().auth.updateUser({ password });
       if (!mounted.current) return;
@@ -76,7 +77,7 @@ function PasswordSetupForm() {
         setError(
           updateError instanceof Error
             ? updateError.message
-            : 'Unable to save your password. Please try again.',
+            : t('Unable to save your password. Please try again.'),
         );
     } finally {
       submissionInFlight.current = false;
@@ -94,15 +95,15 @@ function PasswordSetupForm() {
           <ServiceLinkBrand />
         </div>
         <h1 id="set-password-title" className="font-display text-2xl font-bold text-neutral-900">
-          Set your password
+          {t('Set your password')}
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-neutral-500">
-          Create a password for signing in as {user?.email}.
+          {t('Create a password for signing in as')} {user?.email}.
         </p>
 
         <form onSubmit={submit} className="mt-6 space-y-4">
           <label className="block">
-            <span className="label-field">New password</span>
+            <span className="label-field">{t('New password')}</span>
             <span className="relative block">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -118,7 +119,7 @@ function PasswordSetupForm() {
                 type="button"
                 onClick={() => setShowPassword((visible) => !visible)}
                 className="absolute inset-y-0 right-0 min-h-11 min-w-11 text-neutral-500 hover:text-neutral-800"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? t('Hide password') : t('Show password')}
               >
                 {showPassword ? (
                   <EyeOff className="mx-auto h-4 w-4" />
@@ -129,10 +130,10 @@ function PasswordSetupForm() {
             </span>
           </label>
           <p id="password-requirements" className="text-xs text-neutral-500">
-            Use at least {MINIMUM_PASSWORD_LENGTH} characters.
+            {t('Use at least')} {MINIMUM_PASSWORD_LENGTH} {t('characters.')}
           </p>
           <label className="block">
-            <span className="label-field">Confirm password</span>
+            <span className="label-field">{t('Confirm password')}</span>
             <input
               type={showPassword ? 'text' : 'password'}
               autoComplete="new-password"
@@ -149,13 +150,13 @@ function PasswordSetupForm() {
             ) : (
               <LockKeyhole className="h-4 w-4" />
             )}
-            {submitting ? 'Saving password…' : 'Continue to Service Link'}
+            {submitting ? t('Saving password…') : t('Continue to Service Link')}
           </button>
         </form>
 
         {error && (
           <p role="alert" className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">
-            {error}
+            {t(error)}
           </p>
         )}
       </section>

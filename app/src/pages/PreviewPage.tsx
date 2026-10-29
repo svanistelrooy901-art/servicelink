@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, Globe, ExternalLink, Copy, Check } from 'lucide-react';
@@ -24,31 +25,34 @@ export function PreviewPage() {
     <>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">04 · READY WHEN YOU ARE</span>
-          <h1>A final look. A fresh start.</h1>
-          <p>Review your profile, then make your latest work public.</p>
+          <span className="eyebrow">{t('04 · READY WHEN YOU ARE')}</span>
+          <h1>{t('A final look. A fresh start.')}</h1>
+          <p>{t('Review your profile, then make your latest work public.')}</p>
         </div>
       </div>
       <section className="publish-panel panel">
         <div>
-          <h2>{live ? 'Your profile is published' : 'Your profile is still a draft'}</h2>
+          <h2>{live ? t('Your profile is published') : t('Your profile is still a draft')}</h2>
           <p className="hint">
             {unpublishedChanges
-              ? 'You have changes that are not published yet.'
+              ? t('You have changes that are not published yet.')
               : live
-                ? 'Save drafts freely. Only Publish changes what customers see.'
-                : 'Your draft stays private until you publish.'}
+                ? t('Save drafts freely. Only Publish changes what customers see.')
+                : t('Your draft stays private until you publish.')}
           </p>
-          {usingLocal && <p className="tiny">Demo publication stays on this browser and device.</p>}
+          {usingLocal && (
+            <p className="tiny">{t('Demo publication stays on this browser and device.')}</p>
+          )}
           {live && (
             <div className="published-link">
               <Link to={`/p/${live.slug}`} target="_blank">
-                /p/{live.slug}
+                {t('/p/')}
+                {live.slug}
                 <ExternalLink size={14} />
               </Link>
               <button
                 className="icon-btn"
-                aria-label="Copy published profile link"
+                aria-label={t('Copy published profile link')}
                 onClick={async () => {
                   try {
                     await navigator.clipboard.writeText(
@@ -68,25 +72,25 @@ export function PreviewPage() {
         <div className="publish-actions">
           <button disabled={busy || mediaBusy} className="btn-primary" onClick={publish}>
             <Globe size={17} />
-            {live ? 'Publish updates' : 'Publish profile'}
+            {live ? t('Publish updates') : t('Publish profile')}
           </button>
           {live && (
             <button disabled={busy || mediaBusy} className="text-btn" onClick={unpublish}>
-              Unpublish profile
+              {t('Unpublish profile')}
             </button>
           )}
         </div>
       </section>
       {errors.length > 0 && (
         <div className="publish-checklist">
-          <strong>A little more to finish before publishing</strong>
+          <strong>{t('A little more to finish before publishing')}</strong>
           <ul>
             {errors.map((e) => (
-              <li key={e}>{e}</li>
+              <li key={e}>{t(e)}</li>
             ))}
           </ul>
           <Link to="/dashboard/profile">
-            Continue editing
+            {t('Continue editing')}
             <Arrow />
           </Link>
         </div>
@@ -94,14 +98,14 @@ export function PreviewPage() {
       <div className="preview-toolbar">
         <span>
           <Eye size={16} />
-          Draft preview · actions disabled
+          {t('Draft preview · actions disabled')}
         </span>
         <div className="segmented">
           <button aria-pressed={width === 'mobile'} onClick={() => setWidth('mobile')}>
-            Mobile
+            {t('Mobile')}
           </button>
           <button aria-pressed={width === 'desktop'} onClick={() => setWidth('desktop')}>
-            Desktop
+            {t('Desktop')}
           </button>
         </div>
       </div>

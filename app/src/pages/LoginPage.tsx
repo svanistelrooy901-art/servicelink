@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Loader2, LockKeyhole } from 'lucide-react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
@@ -24,7 +25,7 @@ export function LoginPage() {
     return (
       <main
         className="flex min-h-screen items-center justify-center bg-neutral-50"
-        aria-label="Checking your session"
+        aria-label={t('Checking your session')}
       >
         <Loader2 className="h-8 w-8 animate-spin text-primary-700" aria-hidden="true" />
       </main>
@@ -48,8 +49,8 @@ export function LoginPage() {
       const message = signInFailure instanceof Error ? signInFailure.message : '';
       setSignInError(
         code === 'invalid_credentials' || /invalid login credentials/i.test(message)
-          ? 'Email or password is incorrect. Please try again.'
-          : 'Unable to sign in right now. Please try again.',
+          ? t('Email or password is incorrect. Please try again.')
+          : t('Unable to sign in right now. Please try again.'),
       );
     } finally {
       submissionInFlight.current = false;
@@ -78,14 +79,14 @@ export function LoginPage() {
           id="login-title"
           className="font-display text-3xl font-bold tracking-tight text-neutral-900"
         >
-          Welcome back
+          {t('Welcome back')}
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-neutral-500">
-          Sign in to your Service Link account.
+          {t('Sign in to your Service Link account.')}
         </p>
         <form onSubmit={submitPassword} className="mt-6 space-y-4">
           <label className="block">
-            <span className="label-field">Email</span>
+            <span className="label-field">{t('Email')}</span>
             <input
               type="email"
               inputMode="email"
@@ -100,7 +101,7 @@ export function LoginPage() {
             />
           </label>
           <label className="block">
-            <span className="label-field">Password</span>
+            <span className="label-field">{t('Password')}</span>
             <input
               type="password"
               autoComplete="current-password"
@@ -117,7 +118,7 @@ export function LoginPage() {
               to="/forgot-password"
               className="text-sm font-medium text-primary-700 hover:underline"
             >
-              Forgot password?
+              {t('Forgot password?')}
             </Link>
           </div>
           <button
@@ -131,18 +132,18 @@ export function LoginPage() {
             ) : (
               <LockKeyhole className="h-4 w-4" aria-hidden="true" />
             )}
-            {submitting ? 'Signing in…' : 'Sign In'}
+            {submitting ? t('Signing in…') : t('Sign In')}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-neutral-600">
-          New to Service Link?{' '}
+          {t('New to Service Link?')}{' '}
           <Link to="/signup" className="font-semibold text-primary-700 underline">
-            Create an account
+            {t('Create an account')}
           </Link>
         </p>
         {(signInError || sessionError) && (
           <p role="alert" className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">
-            {signInError || 'Sign-in is temporarily unavailable. Please try again.'}
+            {t(signInError || 'Sign-in is temporarily unavailable. Please try again.')}
           </p>
         )}
       </section>

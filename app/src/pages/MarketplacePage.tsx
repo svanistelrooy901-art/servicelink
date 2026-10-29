@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { MediaImage } from '../components/MediaImage';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -6,8 +7,9 @@ import { CategoryIcon } from '../components/CategoryIcon';
 import { ServiceLinkBrand } from '../components/ServiceLinkBrand';
 import { repository } from '../lib/repository';
 import { categories, type PublicListing } from '../lib/types';
-import { geography, stateById, matchesCoverage, coverageLabels } from '../lib/geography';
-import { priceLabel } from '../lib/profile';
+import { geography, stateById, matchesCoverage } from '../lib/geography';
+import { coverageLabels } from '../i18n/format';
+import { priceLabel } from '../i18n/format';
 import { usingLocal } from '../lib/config';
 export function MarketplacePage() {
   const [list, setList] = useState<PublicListing[]>([]);
@@ -24,7 +26,7 @@ export function MarketplacePage() {
     repository
       .listPublic()
       .then((data) => active && setList(data))
-      .catch(() => active && setError('Unable to load providers. Please try again.'))
+      .catch(() => active && setError(t('Unable to load providers. Please try again.')))
       .finally(() => active && setLoading(false));
     return () => {
       active = false;
@@ -51,27 +53,28 @@ export function MarketplacePage() {
           <ServiceLinkBrand />
         </Link>
         <Link className="btn-secondary" to="/dashboard">
-          Provider workspace
+          {t('Provider workspace')}
           <ArrowUpRight size={15} />
         </Link>
       </header>
       {usingLocal && (
         <div className="demo-banner">
-          <strong>Local demo</strong>
-          <span>Only profiles published in this browser appear here.</span>
+          <strong>{t('Local demo')}</strong>
+          <span>{t('Only profiles published in this browser appear here.')}</span>
         </div>
       )}
       <main className="marketplace-main">
         <section className="market-hero">
-          <span className="eyebrow">GOOD PEOPLE. GREAT SERVICES.</span>
+          <span className="eyebrow">{t('GOOD PEOPLE. GREAT SERVICES.')}</span>
           <h1>
-            A little help.
-            <br />A world of difference.
+            {t('A little help.')}
+            <br />
+            {t('A world of difference.')}
           </h1>
           <p>
-            Find independent people who care about what they do.
+            {t('Find independent people who care about what they do.')}
             <br />
-            Across Malaysia. Around your corner.
+            {t('Across Malaysia. Around your corner.')}
           </p>
           <span className="market-hero-mark" aria-hidden="true">
             <HeartHandshake size={52} />
@@ -83,30 +86,30 @@ export function MarketplacePage() {
             </span>
           </span>
         </section>
-        <section className="market-filters" aria-label="Search providers">
+        <section className="market-filters" aria-label={t('Search providers')}>
           <label className="search-input">
             <Search size={18} />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              aria-label="Search services or providers"
-              placeholder="What can we help you with?"
+              aria-label={t('Search services or providers')}
+              placeholder={t('What can we help you with?')}
             />
           </label>
           <div className="filter-row">
             <label>
-              Service
+              {t('Service')}
               <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                <option value="">All services</option>
+                <option value="">{t('All services')}</option>
                 {Object.entries(categories).map(([id, label]) => (
                   <option key={id} value={id}>
-                    {label}
+                    {t(label)}
                   </option>
                 ))}
               </select>
             </label>
             <label>
-              State / territory
+              {t('State / territory')}
               <select
                 value={state}
                 onChange={(e) => {
@@ -114,7 +117,7 @@ export function MarketplacePage() {
                   setDistrict('');
                 }}
               >
-                <option value="">All Malaysia</option>
+                <option value="">{t('All Malaysia')}</option>
                 {geography.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.name}
@@ -123,13 +126,13 @@ export function MarketplacePage() {
               </select>
             </label>
             <label>
-              District / zone
+              {t('District / zone')}
               <select
                 disabled={!state}
                 value={district}
                 onChange={(e) => setDistrict(e.target.value)}
               >
-                <option value="">Whole selected state</option>
+                <option value="">{t('Whole selected state')}</option>
                 {stateById(state)?.subdivisions.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name}
@@ -139,30 +142,32 @@ export function MarketplacePage() {
             </label>
           </div>
           <p className="tiny">
-            Matched by service coverage. A provider’s home base does not limit these results.
+            {t('Matched by service coverage. A provider’s home base does not limit these results.')}
           </p>
         </section>
         <div className="section-label results-label">
           <h2>
             {loading
-              ? 'Finding providers…'
-              : `${results.length} ${results.length === 1 ? 'provider' : 'providers'} for you`}
+              ? t('Finding providers…')
+              : t(results.length === 1 ? '{count} provider for you' : '{count} providers for you', {
+                  count: results.length,
+                })}
           </h2>
-          <p className="hint">Browse. Compare. Connect.</p>
+          <p className="hint">{t('Browse. Compare. Connect.')}</p>
         </div>
         {error && (
           <p role="alert" className="error-box">
-            {error}
+            {t(error)}
           </p>
         )}
         {!loading && !results.length && (
           <section className="empty-state">
             <MapPin size={30} />
-            <h2>A new connection is on its way.</h2>
-            <p>No published profiles match these filters yet.</p>
+            <h2>{t('A new connection is on its way.')}</h2>
+            <p>{t('No published profiles match these filters yet.')}</p>
             {usingLocal && (
               <Link className="btn-primary" to="/dashboard/preview">
-                Publish your demo profile
+                {t('Publish your demo profile')}
               </Link>
             )}
           </section>
@@ -182,7 +187,7 @@ export function MarketplacePage() {
                 )}
                 <span className="category-badge">
                   <CategoryIcon category={p.category} size={13} />
-                  {categories[p.category]}
+                  {t(categories[p.category])}
                 </span>
                 <div className="listing-avatar">
                   {p.photo ? <MediaImage src={p.photo} alt="" /> : p.name[0]}
@@ -197,11 +202,11 @@ export function MarketplacePage() {
                   <MapPin size={14} />
                   {coverageLabels(p.coverage).join(' · ')}
                 </p>
-                <p className="tiny">New on Service Link · No reviews yet</p>
+                <p className="tiny">{t('New on Service Link · No reviews yet')}</p>
                 <div className="listing-price">{p.services[0] && priceLabel(p.services[0])}</div>
                 <div className="listing-actions">
                   <Link className="btn-secondary" to={`/p/${p.slug}`}>
-                    View profile
+                    {t('View profile')}
                     <ArrowUpRight size={15} />
                   </Link>
                   <label className="check-row">
@@ -221,7 +226,7 @@ export function MarketplacePage() {
                         )
                       }
                     />
-                    Compare
+                    {t('Compare')}
                   </label>
                 </div>
               </div>
@@ -231,14 +236,15 @@ export function MarketplacePage() {
         {selected.length > 0 && (
           <aside className="compare-bar">
             <span>
-              {selected.length}/3 selected · {categories[selected[0].profile.category]}
+              {selected.length}
+              {t('/3 selected ·')} {t(categories[selected[0].profile.category])}
             </span>
             <button className="btn-primary" onClick={() => setShowCompare((v) => !v)}>
-              {showCompare ? 'Hide comparison' : 'Compare providers'}
+              {showCompare ? t('Hide comparison') : t('Compare providers')}
             </button>
             <button
               className="icon-btn"
-              aria-label="Clear comparison"
+              aria-label={t('Clear comparison')}
               onClick={() => {
                 setCompare([]);
                 setShowCompare(false);
@@ -250,16 +256,17 @@ export function MarketplacePage() {
         )}
         {showCompare && selected.length > 0 && (
           <section className="comparison panel">
-            <h2>Find the right fit</h2>
+            <h2>{t('Find the right fit')}</h2>
             <p className="hint">
-              Compare up to three providers in one category. Services and packages may have
-              different inclusions.
+              {t(
+                'Compare up to three providers in one category. Services and packages may have different inclusions.',
+              )}
             </p>
             <div className="table-scroll">
               <table>
                 <thead>
                   <tr>
-                    <th>Provider</th>
+                    <th>{t('Provider')}</th>
                     {selected.map(({ profile: p }) => (
                       <th key={p.slug}>
                         <Link to={`/p/${p.slug}`}>{p.name}</Link>
@@ -269,14 +276,14 @@ export function MarketplacePage() {
                 </thead>
                 <tbody>
                   {[
-                    'Services & prices',
-                    'Service coverage',
-                    'Experience',
-                    'Languages',
-                    'Reviews',
+                    t('Services & prices'),
+                    t('Service coverage'),
+                    t('Experience'),
+                    t('Languages'),
+                    t('Reviews'),
                   ].map((label, i) => (
-                    <tr key={label}>
-                      <th>{label}</th>
+                    <tr key={t(label)}>
+                      <th>{t(label)}</th>
                       {selected.map(({ profile: p }) => (
                         <td key={p.slug}>
                           {i === 0
@@ -285,7 +292,7 @@ export function MarketplacePage() {
                                   <strong>{s.name}</strong>
                                   <br />
                                   {priceLabel(s)}
-                                  {s.durationMinutes ? ` · ${s.durationMinutes} min` : ''}
+                                  {s.durationMinutes ? ` · ${s.durationMinutes} ${t('min')}` : ''}
                                   <br />
                                   {s.description}
                                 </p>
@@ -293,10 +300,10 @@ export function MarketplacePage() {
                             : i === 1
                               ? coverageLabels(p.coverage).join('; ')
                               : i === 2
-                                ? `${p.experienceYears} years`
+                                ? t('{count} years', { count: p.experienceYears })
                                 : i === 3
-                                  ? p.languages || 'Not specified'
-                                  : 'New on Service Link'}
+                                  ? p.languages || t('Not specified')
+                                  : t('New on Service Link')}
                         </td>
                       ))}
                     </tr>
@@ -306,7 +313,7 @@ export function MarketplacePage() {
             </div>
           </section>
         )}
-        <p className="market-footer">Service Link · A Digital Sambal product</p>
+        <p className="market-footer">{t('Service Link · A Digital Sambal product')}</p>
       </main>
     </div>
   );
