@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { MediaImage } from '../components/MediaImage';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -5,12 +6,12 @@ import { bookingRepository } from '../lib/bookingRepository';
 import type { BookingRecord } from '../lib/bookingTypes';
 import {
   effectiveStatus,
-  formatMY,
   money,
   statusLabel,
   paymentLabel,
   receiptShareHref,
 } from '../lib/bookingRules';
+import { formatMY } from '../i18n/format';
 import { ServiceLinkBrand } from '../components/ServiceLinkBrand';
 import { usingLocal } from '../lib/config';
 export function CustomerBookingPage() {
@@ -25,9 +26,9 @@ export function CustomerBookingPage() {
     try {
       const result = await bookingRepository.customerRead(id, token);
       setB(result);
-      setError(result ? '' : 'This private booking link is invalid or unavailable.');
+      setError(result ? '' : t('This private booking link is invalid or unavailable.'));
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Unable to load booking.');
+      setError(e instanceof Error ? e.message : t('Unable to load booking.'));
     } finally {
       setLoaded(true);
     }
@@ -54,7 +55,7 @@ export function CustomerBookingPage() {
     try {
       setB(await bookingRepository.customerAction(id, token, value));
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Unable to update booking.');
+      setError(e instanceof Error ? e.message : t('Unable to update booking.'));
     } finally {
       setBusy(false);
     }
@@ -69,130 +70,140 @@ export function CustomerBookingPage() {
           <ServiceLinkBrand />
         </Link>
         <button className="btn-secondary" onClick={refresh} disabled={busy}>
-          Refresh status
+          {t('Refresh status')}
         </button>
       </header>
       {usingLocal && (
         <div className="demo-banner">
-          <strong>Local booking demo</strong>
-          <span>Fictional data only. This link works in this browser, not on another device.</span>
+          <strong>{t('Local booking demo')}</strong>
+          <span>
+            {t('Fictional data only. This link works in this browser, not on another device.')}
+          </span>
         </div>
       )}
       <section className="booking-public-card panel">
-        <span className="eyebrow">YOUR BOOKING</span>
-        <h1>{b ? b.reference : 'Booking status'}</h1>
+        <span className="eyebrow">{t('YOUR BOOKING')}</span>
+        <h1>{b ? b.reference : t('Booking status')}</h1>
         {error && (
           <p role="alert" className="error-box">
-            {error}
+            {t(error)}
           </p>
         )}
-        {!loaded && <p>Loading booking…</p>}
+        {!loaded && <p>{t('Loading booking…')}</p>}
         {b && status && (
           <>
-            <div className={`booking-status status-${status}`}>{statusLabel(status)}</div>
+            <div className={`booking-status status-${status}`}>{t(statusLabel(status))}</div>
             <h2>{b.service.name}</h2>
-            <p className="hint">With {b.providerName}</p>
+            <p className="hint">
+              {t('With')} {b.providerName}
+            </p>
             <dl className="booking-summary">
               <div>
-                <dt>From</dt>
+                <dt>{t('From')}</dt>
                 <dd>{formatMY(b.start)}</dd>
               </div>
               <div>
-                <dt>Until</dt>
+                <dt>{t('Until')}</dt>
                 <dd>{formatMY(b.end)}</dd>
               </div>
               <div>
-                <dt>Payment</dt>
-                <dd>{paymentLabel(b.paymentStatus)}</dd>
+                <dt>{t('Payment')}</dt>
+                <dd>{t(paymentLabel(b.paymentStatus))}</dd>
               </div>
               <div>
-                <dt>{status === 'requested' ? 'Estimated price' : 'Amount due'}</dt>
-                <dd>{money(b.amountDueCents)}</dd>
+                <dt>{status === 'requested' ? t('Estimated price') : t('Amount due')}</dt>
+                <dd>{t(money(b.amountDueCents))}</dd>
               </div>
             </dl>
             {status === 'requested' && (
               <p className="booking-notice">
-                Your request has been recorded. The provider must review and accept it. No payment
-                is due, and the time is not reserved yet.
+                {t(
+                  'Your request has been recorded. The provider must review and accept it. No payment is due, and the time is not reserved yet.',
+                )}
               </p>
             )}
             {canPay && b.paymentDetails && (
               <section className="payment-instructions">
-                <h2>Pay the provider directly</h2>
+                <h2>{t('Pay the provider directly')}</h2>
                 <p>
-                  Payment deadline: <strong>{formatMY(b.paymentDeadline!)}</strong>
+                  {t('Payment deadline:')} <strong>{formatMY(b.paymentDeadline!)}</strong>
                 </p>
                 {b.paymentDetails.qrPhoto && (
                   <MediaImage
                     className="customer-payment-qr"
                     src={b.paymentDetails.qrPhoto}
                     access={{ id, token }}
-                    alt="Provider payment QR"
+                    alt={t('Provider payment QR')}
                   />
                 )}
                 {b.paymentDetails.bankName && (
                   <dl>
-                    <dt>Bank</dt>
+                    <dt>{t('Bank')}</dt>
                     <dd>{b.paymentDetails.bankName}</dd>
-                    <dt>Account holder</dt>
+                    <dt>{t('Account holder')}</dt>
                     <dd>{b.paymentDetails.accountName}</dd>
-                    <dt>Account number</dt>
+                    <dt>{t('Account number')}</dt>
                     <dd>{b.paymentDetails.accountNumber}</dd>
                   </dl>
                 )}
                 <p className="payment-copy">{b.paymentDetails.instructions}</p>
                 <p className="tiny">
-                  Use {b.reference} as the payment reference. Check the recipient details in your
-                  banking app.
+                  {t('Use')} {b.reference}{' '}
+                  {t('as the payment reference. Check the recipient details in your banking app.')}
                 </p>
                 {usingLocal && (
                   <p className="booking-notice">
-                    Demonstration only. Do not send real money using these details.
+                    {t('Demonstration only. Do not send real money using these details.')}
                   </p>
                 )}
                 {b.paymentStatus !== 'claimed' && (
                   <button disabled={busy} className="btn-primary" onClick={() => action('claim')}>
-                    I have paid · notify provider
+                    {t('I have paid · notify provider')}
                   </button>
                 )}
                 {receipt ? (
                   usingLocal ? (
                     <button disabled className="btn-secondary">
-                      WhatsApp receipt sharing · demo disabled
+                      {t('WhatsApp receipt sharing · demo disabled')}
                     </button>
                   ) : (
                     <a className="btn-secondary" href={receipt} rel="noreferrer" target="_blank">
-                      Open WhatsApp to share receipt
+                      {t('Open WhatsApp to share receipt')}
                     </a>
                   )
                 ) : (
                   <p className="tiny">
-                    The provider has not made a WhatsApp number available. Contact them through your
-                    existing conversation to share a receipt.
+                    {t(
+                      'The provider has not made a WhatsApp number available. Contact them through your existing conversation to share a receipt.',
+                    )}
                   </p>
                 )}
                 <p className="tiny">
-                  WhatsApp opens a draft. You must attach the receipt and send it yourself.
-                  Reporting payment does not verify it.
+                  {t(
+                    'WhatsApp opens a draft. You must attach the receipt and send it yourself. Reporting payment does not verify it.',
+                  )}
                 </p>
               </section>
             )}
             {b.paymentStatus === 'claimed' && (
               <p className="booking-notice">
-                Your payment report is unverified. The provider must check that money arrived. If
-                the payment window expires, contact them before paying again.
+                {t(
+                  'Your payment report is unverified. The provider must check that money arrived. If the payment window expires, contact them before paying again.',
+                )}
               </p>
             )}
             {status === 'expired' && (
               <p className="booking-notice">
-                The payment window expired and the slot was released. Do not pay using this booking.
-                If you already paid, contact the provider for manual reconciliation.
+                {t(
+                  'The payment window expired and the slot was released. Do not pay using this booking. If you already paid, contact the provider for manual reconciliation.',
+                )}
               </p>
             )}
             {b.refundFollowUp && (
               <p className="booking-notice">
-                Payment or a payment report remains on this cancelled booking. Contact the provider
-                to resolve it manually; no refund has been issued by Service Link.
+                {t(
+                  'Payment or a payment report remains on this cancelled booking. Contact the provider to resolve it manually; no refund has been issued by Service Link.',
+                )}
               </p>
             )}
             <div className="booking-customer-actions">
@@ -204,28 +215,31 @@ export function CustomerBookingPage() {
                     setCopied(true);
                   } catch {
                     setError(
-                      'Copy this page address from your browser to save the private booking link.',
+                      t(
+                        'Copy this page address from your browser to save the private booking link.',
+                      ),
                     );
                   }
                 }}
               >
-                {copied ? 'Private link copied' : 'Copy private booking link'}
+                {copied ? t('Private link copied') : t('Copy private booking link')}
               </button>
               {['requested', 'accepted'].includes(status) && b.paymentStatus !== 'claimed' && (
                 <button
                   disabled={busy}
                   className="text-btn"
                   onClick={() => {
-                    if (window.confirm('Cancel this booking request?')) action('cancel');
+                    if (window.confirm(t('Cancel this booking request?'))) action('cancel');
                   }}
                 >
-                  Cancel request
+                  {t('Cancel request')}
                 </button>
               )}
             </div>
             <p className="tiny">
-              Save this private link to check your booking. Anyone holding it can access this
-              booking’s details.
+              {t(
+                'Save this private link to check your booking. Anyone holding it can access this booking’s details.',
+              )}
             </p>
           </>
         )}

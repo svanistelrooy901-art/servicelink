@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { Facebook, Instagram } from 'lucide-react';
 import threadsIcon from '../assets/threads.svg';
 import type { SocialLinks as Links } from '../lib/types';
@@ -14,14 +15,14 @@ export function SocialLinks({ links, preview }: { links?: Links; preview: boolea
   );
   if (!present.length) return null;
   return (
-    <nav className="profile-social" aria-label="Social media">
+    <nav className="profile-social" aria-label={t('Social media')}>
       {present.map((key) =>
         preview ? (
           <button
             key={key}
             type="button"
             disabled
-            aria-label={`${socialPlatforms[key].label} profile (preview)`}
+            aria-label={t('{name} profile (preview)', { name: socialPlatforms[key].label })}
           >
             <SocialIcon platform={key} />
           </button>
@@ -31,7 +32,7 @@ export function SocialLinks({ links, preview }: { links?: Links; preview: boolea
             href={links![key]}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`${socialPlatforms[key].label} profile`}
+            aria-label={t('{name} profile', { name: socialPlatforms[key].label })}
             title={socialPlatforms[key].label}
           >
             <SocialIcon platform={key} />

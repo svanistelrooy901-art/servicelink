@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import type { ProviderProfile } from '../lib/types';
 import type {
@@ -22,7 +23,7 @@ export function BookingForm({
   initialServiceId,
   onSubmit,
   submitting = false,
-  submitLabel = 'Send booking request',
+  submitLabel = t('Send booking request'),
 }: {
   profile: ProviderProfile;
   initialServiceId?: string;
@@ -162,24 +163,27 @@ export function BookingForm({
         requestId,
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Unable to send this request.');
+      setError(e instanceof Error ? e.message : t('Unable to send this request.'));
     }
   }
   if (!availability)
-    return <p role={error ? 'alert' : 'status'}>{error || 'Loading available times…'}</p>;
+    return <p role={error ? 'alert' : 'status'}>{t(error || 'Loading available times…')}</p>;
   if (!availability.settings.enabled)
     return (
-      <div className="booking-notice">This provider has not enabled booking requests yet.</div>
+      <div className="booking-notice">
+        {t('This provider has not enabled booking requests yet.')}
+      </div>
     );
   return (
     <form className="booking-form" onSubmit={submit}>
       <fieldset disabled={submitting}>
         <div className="booking-notice">
-          All times are Malaysia time (MYT). This is a request; the provider must accept before any
-          payment is due.
+          {t(
+            'All times are Malaysia time (MYT). This is a request; the provider must accept before any payment is due.',
+          )}
         </div>
         <label>
-          Choose a service
+          {t('Choose a service')}
           <select value={serviceId} onChange={(e) => setServiceId(e.target.value)}>
             {profile.services.map((s) => (
               <option key={s.id} value={s.id}>
@@ -190,7 +194,7 @@ export function BookingForm({
         </label>
         <div className="form-grid">
           <label>
-            {mode === 'date-range' ? 'Requested start date' : 'Preferred date'}
+            {mode === 'date-range' ? t('Requested start date') : t('Preferred date')}
             <input
               type="date"
               required
@@ -205,7 +209,7 @@ export function BookingForm({
           </label>
           {mode === 'date-range' ? (
             <label>
-              Departure / end date (not included)
+              {t('Departure / end date (not included)')}
               <input
                 type="date"
                 required
@@ -216,14 +220,14 @@ export function BookingForm({
             </label>
           ) : (
             <label>
-              Preferred start time
+              {t('Preferred start time')}
               <select
                 required
                 value={times.includes(time) ? time : ''}
                 onChange={(e) => setTime(e.target.value)}
               >
                 <option value="">
-                  {times.length ? 'Choose an available time' : 'No available times this day'}
+                  {times.length ? t('Choose an available time') : t('No available times this day')}
                 </option>
                 {times.map((t) => (
                   <option key={t} value={t}>
@@ -236,7 +240,7 @@ export function BookingForm({
         </div>
         {mode === 'appointment' && !service?.durationMinutes && (
           <label>
-            Requested duration (minutes)
+            {t('Requested duration (minutes)')}
             <input
               type="number"
               min={30}
@@ -249,13 +253,14 @@ export function BookingForm({
         )}
         {mode === 'date-range' && (
           <p className="tiny">
-            Dates are an enquiry for the full requested range. Acceptance reserves that continuous
-            period; discuss live-in/day-care details with the provider first.
+            {t(
+              'Dates are an enquiry for the full requested range. Acceptance reserves that continuous period; discuss live-in/day-care details with the provider first.',
+            )}
           </p>
         )}
         <div className="form-grid">
           <label>
-            Service state / territory
+            {t('Service state / territory')}
             <select
               required
               value={state}
@@ -272,9 +277,9 @@ export function BookingForm({
             </select>
           </label>
           <label>
-            Service district / zone
+            {t('Service district / zone')}
             <select required value={district} onChange={(e) => setDistrict(e.target.value)}>
-              <option value="">Choose your district</option>
+              <option value="">{t('Choose your district')}</option>
               {divisions.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.name}
@@ -284,7 +289,7 @@ export function BookingForm({
           </label>
         </div>
         <label>
-          Your name
+          {t('Your name')}
           <input
             required
             maxLength={80}
@@ -295,19 +300,19 @@ export function BookingForm({
         </label>
         <div className="form-grid">
           <label>
-            Mobile number
+            {t('Mobile number')}
             <input
               type="tel"
               required
               maxLength={40}
               autoComplete="tel"
-              placeholder="e.g. +60 12 345 6789"
+              placeholder={t('e.g. +60 12 345 6789')}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
           </label>
           <label>
-            Email (optional)
+            {t('Email (optional)')}
             <input
               type="email"
               maxLength={254}
@@ -318,18 +323,20 @@ export function BookingForm({
           </label>
         </div>
         <label>
-          A short note (optional)
+          {t('A short note (optional)')}
           <textarea
             rows={3}
             maxLength={600}
-            placeholder="Share useful service details. Please leave out private addresses or sensitive information."
+            placeholder={t(
+              'Share useful service details. Please leave out private addresses or sensitive information.',
+            )}
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
         </label>
         <p className="booking-estimate">
-          Estimated service price <strong>{money(estimate)}</strong>
-          <small>Provider confirms the final amount and any extras before you pay.</small>
+          {t('Estimated service price')} <strong>{t(money(estimate))}</strong>
+          <small>{t('Provider confirms the final amount and any extras before you pay.')}</small>
         </p>
         <label className="check-row">
           <input
@@ -338,18 +345,18 @@ export function BookingForm({
             checked={consent}
             onChange={(e) => setConsent(e.target.checked)}
           />
-          I agree to share these details with this provider to handle my booking.
+          {t('I agree to share these details with this provider to handle my booking.')}
         </label>
         {error && (
           <p role="alert" className="error-box">
-            {error}
+            {t(error)}
           </p>
         )}
         <button
           className="btn-primary"
           disabled={submitting || (mode === 'appointment' && !times.length)}
         >
-          {submitting ? 'Sending…' : submitLabel}
+          {submitting ? t('Sending…') : submitLabel}
         </button>
       </fieldset>
     </form>

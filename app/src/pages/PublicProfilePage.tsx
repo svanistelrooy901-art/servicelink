@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ProfilePresentation } from '../components/ProfilePresentation';
@@ -20,7 +21,7 @@ export function PublicProfilePage() {
           setError('');
         }
       } catch {
-        if (active) setError('Unable to load this profile. Try again shortly.');
+        if (active) setError(t('Unable to load this profile. Try again shortly.'));
       } finally {
         if (active) setLoading(false);
       }
@@ -40,19 +41,19 @@ export function PublicProfilePage() {
         <Link to="/marketplace">
           <ServiceLinkBrand />
         </Link>
-        <Link to="/marketplace">Find a service</Link>
+        <Link to="/marketplace">{t('Find a service')}</Link>
       </header>
       {usingLocal && (
         <div className="demo-banner">
-          <strong>Local demo</strong>
-          <span>Fictional/sample profile. Publication is visible on this browser only.</span>
+          <strong>{t('Local demo')}</strong>
+          <span>{t('Fictional/sample profile. Publication is visible on this browser only.')}</span>
         </div>
       )}
       {loading ? (
-        <p className="loading">Loading profile…</p>
+        <p className="loading">{t('Loading profile…')}</p>
       ) : error ? (
         <p className="empty-state" role="alert">
-          {error}
+          {t(error)}
         </p>
       ) : data ? (
         <div className="public-container">
@@ -60,10 +61,10 @@ export function PublicProfilePage() {
         </div>
       ) : (
         <section className="empty-state">
-          <h1>Profile unavailable</h1>
-          <p>This link may have changed, or the provider has unpublished their profile.</p>
+          <h1>{t('Profile unavailable')}</h1>
+          <p>{t('This link may have changed, or the provider has unpublished their profile.')}</p>
           <Link className="btn-primary" to="/marketplace">
-            Explore services
+            {t('Explore services')}
           </Link>
         </section>
       )}

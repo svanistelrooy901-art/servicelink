@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { MediaImage } from './MediaImage';
 import { useEffect, useRef, useState } from 'react';
 import { Images, Upload, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -34,28 +35,34 @@ export function GalleryEditor({
   return (
     <section className="panel gallery-editor">
       <div className="section-label">
-        <h2>Your work, in pictures</h2>
+        <h2>{t('Your work, in pictures')}</h2>
         <span className="count-badge">{pictures.length}/8</span>
       </div>
       <p className="hint">
-        The first 2 pictures appear on your profile. More opens the full gallery. Use the arrows to
-        choose the order.
+        {t(
+          'The first 2 pictures appear on your profile. More opens the full gallery. Use the arrows to choose the order.',
+        )}
       </p>
       {pictures.length ? (
         <div className="gallery-edit-grid">
           {pictures.map((p, i) => (
             <article key={p.id} className="gallery-edit-card">
               <div className="gallery-edit-image">
-                <MediaImage src={p.src} alt={p.caption || `Work picture ${i + 1}`} />
-                {i < 2 && <span>On profile</span>}
+                <MediaImage
+                  src={p.src}
+                  alt={p.caption || t('Work picture {number}', { number: i + 1 })}
+                />
+                {i < 2 && <span>{t('On profile')}</span>}
               </div>
               <div className="gallery-edit-fields">
-                <label htmlFor={`gallery-caption-${p.id}`}>Caption for picture {i + 1}</label>
+                <label htmlFor={`gallery-caption-${p.id}`}>
+                  {t('Caption for picture')} {i + 1}
+                </label>
                 <input
                   id={`gallery-caption-${p.id}`}
                   maxLength={140}
                   value={p.caption}
-                  placeholder="Optional description"
+                  placeholder={t('Optional description')}
                   disabled={preparing}
                   onChange={(e) =>
                     onChange(
@@ -69,7 +76,7 @@ export function GalleryEditor({
                   <button
                     type="button"
                     className="icon-btn"
-                    aria-label={`Move picture ${i + 1} earlier`}
+                    aria-label={t('Move picture {number} earlier', { number: i + 1 })}
                     disabled={preparing || i === 0}
                     onClick={() => onChange(moveGalleryPicture(pictures, i, -1))}
                   >
@@ -78,7 +85,7 @@ export function GalleryEditor({
                   <button
                     type="button"
                     className="icon-btn"
-                    aria-label={`Move picture ${i + 1} later`}
+                    aria-label={t('Move picture {number} later', { number: i + 1 })}
                     disabled={preparing || i === pictures.length - 1}
                     onClick={() => onChange(moveGalleryPicture(pictures, i, 1))}
                   >
@@ -87,7 +94,7 @@ export function GalleryEditor({
                   <button
                     type="button"
                     className="icon-btn"
-                    aria-label={`Remove picture ${i + 1}`}
+                    aria-label={t('Remove picture {number}', { number: i + 1 })}
                     disabled={preparing}
                     onClick={() => {
                       setError('');
@@ -104,7 +111,7 @@ export function GalleryEditor({
       ) : (
         <div className="gallery-edit-empty">
           <Images size={28} />
-          <span>A few pictures can tell your story.</span>
+          <span>{t('A few pictures can tell your story.')}</span>
         </div>
       )}
       <button
@@ -115,17 +122,17 @@ export function GalleryEditor({
       >
         <Upload size={16} />
         {preparing
-          ? 'Preparing pictures…'
+          ? t('Preparing pictures…')
           : remaining === 0
-            ? 'Gallery full · 8 pictures'
-            : 'Add work pictures'}
+            ? t('Gallery full · 8 pictures')
+            : t('Add work pictures')}
       </button>
       <input
         ref={input}
         type="file"
         multiple
         accept="image/jpeg,image/png,image/webp"
-        aria-label="Gallery picture files"
+        aria-label={t('Gallery picture files')}
         aria-describedby="gallery-upload-guide"
         tabIndex={-1}
         disabled={!mediaEnabled || preparing || remaining === 0}
@@ -136,7 +143,12 @@ export function GalleryEditor({
           setError('');
           if (files.length > remaining) {
             setError(
-              `You can add ${remaining} more picture${remaining === 1 ? '' : 's'}. Maximum 8 in total.`,
+              t(
+                remaining === 1
+                  ? 'You can add {count} more picture. Maximum 8 in total.'
+                  : 'You can add {count} more pictures. Maximum 8 in total.',
+                { count: remaining },
+              ),
             );
             return;
           }
@@ -153,7 +165,7 @@ export function GalleryEditor({
             if (mounted.current) onChange([...pictures, ...ready]);
           } catch (e) {
             if (mounted.current)
-              setError(e instanceof Error ? e.message : 'Unable to prepare these pictures.');
+              setError(e instanceof Error ? e.message : t('Unable to prepare these pictures.'));
           } finally {
             working.current = false;
             if (mounted.current) setPreparing(false);
@@ -161,21 +173,25 @@ export function GalleryEditor({
         }}
       />
       <p className="tiny" id="gallery-upload-guide">
-        Up to 8 pictures. JPG, PNG or WebP, max 8 MB each. Resized and compressed automatically.
+        {t(
+          'Up to 8 pictures. JPG, PNG or WebP, max 8 MB each. Resized and compressed automatically.',
+        )}
       </p>
       {error && (
         <p role="alert" className="error-text">
-          {error}
+          {t(error)}
         </p>
       )}
       {preparing && (
         <p role="status" className="tiny">
-          Preparing your pictures. Please wait before saving.
+          {t('Preparing your pictures. Please wait before saving.')}
         </p>
       )}
-      {!mediaEnabled && <p className="tiny">Custom picture uploads are not available yet.</p>}
+      {!mediaEnabled && (
+        <p className="tiny">{t('Custom picture uploads are not available yet.')}</p>
+      )}
       <p className="tiny">
-        Save draft to keep changes, then Publish updates to show them on your profile.
+        {t('Save draft to keep changes, then Publish updates to show them on your profile.')}
       </p>
     </section>
   );

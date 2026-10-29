@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { MediaImage } from '../components/MediaImage';
 import { useState } from 'react';
 import { Plus, Trash2, Upload, ArrowRight } from 'lucide-react';
@@ -18,16 +19,16 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
   if (!p) return null;
   const titles = {
     profile: [
-      'Make a great introduction.',
-      'Tell your story. Help customers get to know the person behind the service.',
+      t('Make a great introduction.'),
+      t('Tell your story. Help customers get to know the person behind the service.'),
     ],
     services: [
-      'Good work deserves a clear offer.',
-      'Keep it simple: what you do, what’s included and what it costs.',
+      t('Good work deserves a clear offer.'),
+      t('Keep it simple: what you do, what’s included and what it costs.'),
     ],
     coverage: [
-      'Where can you make a difference?',
-      'Choose the places you serve. Customers will find you by service coverage.',
+      t('Where can you make a difference?'),
+      t('Choose the places you serve. Customers will find you by service coverage.'),
     ],
   };
   const changeService = (id: string, patch: Partial<Service>) =>
@@ -38,10 +39,10 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
         <div>
           <span className="eyebrow">
             {section === 'profile'
-              ? '01 · YOUR STORY'
+              ? t('01 · YOUR STORY')
               : section === 'services'
-                ? '02 · YOUR SERVICES'
-                : '03 · YOUR REACH'}
+                ? t('02 · YOUR SERVICES')
+                : t('03 · YOUR REACH')}
           </span>
           <h1>{titles[section][0]}</h1>
           <p>{titles[section][1]}</p>
@@ -52,11 +53,11 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
           {section === 'profile' && (
             <>
               <section className="panel">
-                <h2>The face behind the service</h2>
+                <h2>{t('The face behind the service')}</h2>
                 <div className="photo-editor">
                   <div className="editor-avatar">
                     {p.photo ? (
-                      <MediaImage src={p.photo} alt="Your portrait" />
+                      <MediaImage src={p.photo} alt={t('Your portrait')} />
                     ) : (
                       <span>{p.name[0] || 'Y'}</span>
                     )}
@@ -66,7 +67,7 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                       className={`btn-secondary upload-label ${!mediaEnabled ? 'disabled' : ''}`}
                     >
                       <Upload size={16} />
-                      {mediaBusy ? 'Preparing photo…' : 'Upload photo'}
+                      {mediaBusy ? t('Preparing photo…') : t('Upload photo')}
                       <input
                         type="file"
                         accept="image/jpeg,image/png,image/webp"
@@ -80,7 +81,7 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                             update({ photo: await compressProfilePhoto(f) });
                           } catch (e) {
                             setMediaError(
-                              e instanceof Error ? e.message : 'Unable to prepare image.',
+                              e instanceof Error ? e.message : t('Unable to prepare image.'),
                             );
                           } finally {
                             setMediaBusy(false);
@@ -90,83 +91,85 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                     </label>
                     {p.photo && (
                       <button className="text-btn" onClick={() => update({ photo: '' })}>
-                        Remove
+                        {t('Remove')}
                       </button>
                     )}
-                    <p className="tiny">JPG, PNG or WebP · resized & compressed automatically.</p>
+                    <p className="tiny">
+                      {t('JPG, PNG or WebP · resized & compressed automatically.')}
+                    </p>
                     {!mediaEnabled && (
                       <p className="tiny">
-                        Cloud photo uploads need the separate SL R2 integration.
+                        {t('Cloud photo uploads need the separate SL R2 integration.')}
                       </p>
                     )}
                   </div>
                 </div>
                 {mediaError && (
                   <p role="alert" className="error-text">
-                    {mediaError}
+                    {t(mediaError)}
                   </p>
                 )}
                 <div className="form-grid">
                   <label>
-                    Display name
+                    {t('Display name')}
                     <input
                       maxLength={80}
                       value={p.name}
                       onChange={(e) => update({ name: e.target.value })}
                       autoComplete="name"
-                      placeholder="How customers know you"
+                      placeholder={t('How customers know you')}
                     />
                   </label>
                   <label>
-                    Service category
+                    {t('Service category')}
                     <select
                       value={p.category}
                       onChange={(e) => update({ category: e.target.value as typeof p.category })}
                     >
                       {Object.entries(categories).map(([id, label]) => (
                         <option key={id} value={id}>
-                          {label}
+                          {t(label)}
                         </option>
                       ))}
                     </select>
                   </label>
                 </div>
                 <label>
-                  Your headline
+                  {t('Your headline')}
                   <input
                     maxLength={120}
                     value={p.headline}
                     onChange={(e) => update({ headline: e.target.value })}
-                    placeholder="A short line about what you do best"
+                    placeholder={t('A short line about what you do best')}
                   />
-                  <span className="tiny">Make it personal. Make it clear.</span>
+                  <span className="tiny">{t('Make it personal. Make it clear.')}</span>
                 </label>
                 <label>
-                  About you
+                  {t('About you')}
                   <textarea
                     maxLength={1500}
                     rows={5}
                     value={p.bio}
                     onChange={(e) => update({ bio: e.target.value })}
-                    placeholder="Your approach, experience and who you help…"
+                    placeholder={t('Your approach, experience and who you help…')}
                   />
                   <span className="tiny">{p.bio.length}/1500</span>
                 </label>
               </section>
               <section className="panel">
-                <h2>A few helpful details</h2>
+                <h2>{t('A few helpful details')}</h2>
                 <div className="form-grid">
                   <label>
-                    Based in (city only)
+                    {t('Based in (city only)')}
                     <input
                       maxLength={100}
                       value={p.base}
                       onChange={(e) => update({ base: e.target.value })}
-                      placeholder="e.g. George Town, Pulau Pinang"
+                      placeholder={t('e.g. George Town, Pulau Pinang')}
                     />
                   </label>
                   <label>
-                    Years of experience
+                    {t('Years of experience')}
                     <input
                       type="number"
                       min={0}
@@ -177,39 +180,39 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                   </label>
                 </div>
                 <label>
-                  Languages
+                  {t('Languages')}
                   <input
                     maxLength={120}
                     value={p.languages}
                     onChange={(e) => update({ languages: e.target.value })}
-                    placeholder="Bahasa Melayu, English…"
+                    placeholder={t('Bahasa Melayu, English…')}
                   />
                 </label>
                 <label>
-                  Profile link
+                  {t('Profile link')}
                   <div className="slug-field">
-                    <span>/p/</span>
+                    <span>{t('/p/')}</span>
                     <input
-                      aria-label="Profile link"
+                      aria-label={t('Profile link')}
                       maxLength={60}
                       value={p.slug}
                       onChange={(e) => update({ slug: normalizeSlug(e.target.value) })}
-                      placeholder="your-name"
+                      placeholder={t('your-name')}
                     />
                   </div>
                   <span className="tiny">
-                    Changing your published link retires the old link when you publish again.
+                    {t('Changing your published link retires the old link when you publish again.')}
                   </span>
                 </label>
                 <label>
-                  WhatsApp number
+                  {t('WhatsApp number')}
                   <input
                     type="tel"
                     inputMode="tel"
                     maxLength={40}
                     value={p.whatsapp}
                     onChange={(e) => update({ whatsapp: e.target.value })}
-                    placeholder="e.g. +60 12 345 6789"
+                    placeholder={t('e.g. +60 12 345 6789')}
                   />
                 </label>
                 <label className="check-row">
@@ -218,10 +221,10 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                     checked={p.showWhatsapp}
                     onChange={(e) => update({ showWhatsapp: e.target.checked })}
                   />
-                  Show my WhatsApp number publicly
+                  {t('Show my WhatsApp number publicly')}
                 </label>
                 <p className="tiny">
-                  Only enable this if you want customers to contact you at this number.
+                  {t('Only enable this if you want customers to contact you at this number.')}
                 </p>
               </section>
               <SocialLinksEditor value={p.social} onChange={(social) => update({ social })} />
@@ -232,24 +235,24 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                 onProcessingChange={setMediaBusy}
               />
               <section className="panel">
-                <h2>Your colour, your character</h2>
+                <h2>{t('Your colour, your character')}</h2>
                 <div className="theme-options">
-                  {(['forest', 'plum', 'ocean'] as const).map((t) => (
+                  {(['forest', 'plum', 'ocean'] as const).map((theme) => (
                     <button
                       type="button"
-                      aria-pressed={p.accent === t}
-                      className={`theme-option theme-${t} ${p.accent === t ? 'selected' : ''}`}
-                      key={t}
-                      onClick={() => update({ accent: t })}
+                      aria-pressed={p.accent === theme}
+                      className={`theme-option theme-${theme} ${p.accent === theme ? 'selected' : ''}`}
+                      key={theme}
+                      onClick={() => update({ accent: theme })}
                     >
                       <span />
-                      {t[0].toUpperCase() + t.slice(1)}
+                      {t(theme[0].toUpperCase() + theme.slice(1))}
                     </button>
                   ))}
                 </div>
               </section>
               <Link className="editor-next" to="/dashboard/services">
-                Next: add your services
+                {t('Next: add your services')}
                 <ArrowRight size={17} />
               </Link>
             </>
@@ -259,8 +262,8 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
               <section className="panel">
                 <div className="section-label">
                   <div>
-                    <h2>Your service catalogue</h2>
-                    <p className="hint">A clear offer helps customers choose.</p>
+                    <h2>{t('Your service catalogue')}</h2>
+                    <p className="hint">{t('A clear offer helps customers choose.')}</p>
                   </div>
                   <span className="count-badge">{p.services.length}/20</span>
                 </div>
@@ -268,37 +271,39 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
               {p.services.map((s, i) => (
                 <section className="panel service-editor" key={s.id}>
                   <div className="section-label">
-                    <span className="eyebrow">SERVICE {String(i + 1).padStart(2, '0')}</span>
+                    <span className="eyebrow">
+                      {t('SERVICE')} {String(i + 1).padStart(2, '0')}
+                    </span>
                     <button
                       className="icon-btn"
-                      aria-label={`Delete service ${i + 1}`}
+                      aria-label={t('Delete service {number}', { number: i + 1 })}
                       onClick={() => update({ services: p.services.filter((x) => x.id !== s.id) })}
                     >
                       <Trash2 size={17} />
                     </button>
                   </div>
                   <label>
-                    Service name
+                    {t('Service name')}
                     <input
                       maxLength={100}
                       value={s.name}
                       onChange={(e) => changeService(s.id, { name: e.target.value })}
-                      placeholder="e.g. Weekend home cleaning"
+                      placeholder={t('e.g. Weekend home cleaning')}
                     />
                   </label>
                   <label>
-                    What’s included?
+                    {t('What’s included?')}
                     <textarea
                       maxLength={600}
                       rows={3}
                       value={s.description}
                       onChange={(e) => changeService(s.id, { description: e.target.value })}
-                      placeholder="What will customers get?"
+                      placeholder={t('What will customers get?')}
                     />
                   </label>
                   <div className="form-grid">
                     <label>
-                      Price basis
+                      {t('Price basis')}
                       <select
                         value={s.priceBasis}
                         onChange={(e) =>
@@ -310,14 +315,14 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                       >
                         {['hour', 'session', 'day', 'package', 'quote'].map((v) => (
                           <option value={v} key={v}>
-                            {v === 'quote' ? 'Request a quote' : `Per ${v}`}
+                            {v === 'quote' ? t('Request a quote') : t(`Per ${v}`)}
                           </option>
                         ))}
                       </select>
                     </label>
                     {s.priceBasis !== 'quote' && (
                       <label>
-                        Price (RM)
+                        {t('Price (RM)')}
                         <input
                           type="number"
                           min={0}
@@ -335,14 +340,14 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                   </div>
                   <div className="form-grid">
                     <label>
-                      Duration (minutes, optional)
+                      {t('Duration (minutes, optional)')}
                       <input
                         type="number"
                         min={15}
                         max={43200}
                         step={1}
                         value={s.durationMinutes ?? ''}
-                        placeholder="Varies / discuss first"
+                        placeholder={t('Varies / discuss first')}
                         onChange={(e) =>
                           changeService(s.id, {
                             durationMinutes: e.target.value === '' ? null : Number(e.target.value),
@@ -351,16 +356,16 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                       />
                     </label>
                     <label>
-                      Service location
+                      {t('Service location')}
                       <select
                         value={s.delivery}
                         onChange={(e) =>
                           changeService(s.id, { delivery: e.target.value as Service['delivery'] })
                         }
                       >
-                        <option value="in-person">In person</option>
-                        <option value="online">Online</option>
-                        <option value="both">In person & online</option>
+                        <option value="in-person">{t('In person')}</option>
+                        <option value="online">{t('Online')}</option>
+                        <option value="both">{t('In person & online')}</option>
                       </select>
                     </label>
                   </div>
@@ -387,10 +392,10 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                 }
               >
                 <Plus size={19} />
-                Add a service
+                {t('Add a service')}
               </button>
               <Link className="editor-next" to="/dashboard/coverage">
-                Next: choose your coverage
+                {t('Next: choose your coverage')}
                 <ArrowRight size={17} />
               </Link>
             </>
@@ -398,14 +403,14 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
           {section === 'coverage' && (
             <>
               <section className="panel">
-                <h2>Good connections, in the right places</h2>
+                <h2>{t('Good connections, in the right places')}</h2>
                 <CoverageSelector
                   value={p.coverage}
                   onChange={(coverage) => update({ coverage })}
                 />
               </section>
               <Link className="editor-next" to="/dashboard/preview">
-                Next: preview your profile
+                {t('Next: preview your profile')}
                 <ArrowRight size={17} />
               </Link>
             </>
@@ -413,14 +418,17 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
         </fieldset>
         <aside className="live-preview">
           <div className="preview-heading">
-            <span className="eyebrow">LIVE PREVIEW</span>
-            <span className="live-indicator">Updates as you type</span>
+            <span className="eyebrow">{t('LIVE PREVIEW')}</span>
+            <span className="live-indicator">{t('Updates as you type')}</span>
           </div>
           <div className="phone-shell">
-            <div className="phone-address">servicelink · /p/{p.slug || 'your-name'}</div>
+            <div className="phone-address">
+              {t('servicelink · /p/')}
+              {p.slug || t('your-name')}
+            </div>
             <ProfilePresentation profile={p} preview />
           </div>
-          <p className="tiny">The same design your customers will see.</p>
+          <p className="tiny">{t('The same design your customers will see.')}</p>
         </aside>
       </div>
     </>

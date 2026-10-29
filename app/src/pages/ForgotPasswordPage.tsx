@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { Loader2, Mail } from 'lucide-react';
@@ -27,7 +28,7 @@ export function ForgotPasswordPage() {
       if (requestError) throw requestError;
       setSent(true);
     } catch {
-      setError('Unable to send a recovery email right now. Please try again later.');
+      setError(t('Unable to send a recovery email right now. Please try again later.'));
     } finally {
       setSending(false);
     }
@@ -39,20 +40,23 @@ export function ForgotPasswordPage() {
         <div className="mb-6">
           <ServiceLinkBrand />
         </div>
-        <h1 className="font-display text-2xl font-bold text-neutral-900">Reset your password</h1>
+        <h1 className="font-display text-2xl font-bold text-neutral-900">
+          {t('Reset your password')}
+        </h1>
         {sent ? (
           <p role="status" className="mt-4 text-sm text-neutral-700">
-            If an account exists for that email, we have sent a password reset link. Check your
-            inbox and spam folder.
+            {t(
+              'If an account exists for that email, we have sent a password reset link. Check your inbox and spam folder.',
+            )}
           </p>
         ) : (
           <>
             <p className="mt-2 text-sm text-neutral-500">
-              Enter your account email and we will send a reset link.
+              {t('Enter your account email and we will send a reset link.')}
             </p>
             <form onSubmit={submit} className="mt-6 space-y-4">
               <label className="block">
-                <span className="label-field">Email</span>
+                <span className="label-field">{t('Email')}</span>
                 <input
                   type="email"
                   autoComplete="email"
@@ -69,21 +73,21 @@ export function ForgotPasswordPage() {
                 ) : (
                   <Mail className="h-4 w-4" />
                 )}{' '}
-                Send reset link
+                {t('Send reset link')}
               </button>
             </form>
           </>
         )}
         {error && (
           <p role="alert" className="mt-4 text-sm text-red-700">
-            {error}
+            {t(error)}
           </p>
         )}
         <Link
           to="/login"
           className="mt-6 inline-block text-sm font-medium text-primary-700 hover:underline"
         >
-          Back to sign in
+          {t('Back to sign in')}
         </Link>
       </section>
     </main>

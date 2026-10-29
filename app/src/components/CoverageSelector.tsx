@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { Plus, Trash2, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { geography, stateById } from '../lib/geography';
@@ -14,7 +15,7 @@ export function CoverageSelector({
   return (
     <div className="coverage-editor">
       <p className="hint">
-        Choose where you provide your services. You can cover multiple states and districts.
+        {t('Choose where you provide your services. You can cover multiple states and districts.')}
       </p>
       {value.map((c, i) => {
         const s = stateById(c.stateId);
@@ -30,7 +31,7 @@ export function CoverageSelector({
             <button
               type="button"
               className="icon-btn remove-area"
-              aria-label={`Remove ${s.name}`}
+              aria-label={t('Remove {name}', { name: s.name })}
               onClick={() => onChange(value.filter((_, j) => j !== i))}
             >
               <Trash2 size={16} />
@@ -41,7 +42,7 @@ export function CoverageSelector({
                 checked={c.wholeState}
                 onChange={(e) => update({ wholeState: e.target.checked, subdivisionIds: [] })}
               />{' '}
-              Entire state / territory
+              {t('Entire state / territory')}
             </label>
             {!c.wholeState && (
               <div className="district-options">
@@ -69,10 +70,10 @@ export function CoverageSelector({
       {available.length > 0 && (
         <div className="add-area">
           <label className="sr-only" htmlFor="add-state">
-            Add a state or federal territory
+            {t('Add a state or federal territory')}
           </label>
           <select id="add-state" value={state} onChange={(e) => setState(e.target.value)}>
-            <option value="">Select state / federal territory</option>
+            <option value="">{t('Select state / federal territory')}</option>
             {available.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -89,12 +90,14 @@ export function CoverageSelector({
             }}
           >
             <Plus size={16} />
-            Add
+            {t('Add')}
           </button>
         </div>
       )}
       <p className="tiny">
-        District choices use the shared DOSM geography list. Your home address is never needed here.
+        {t(
+          'District choices use the shared DOSM geography list. Your home address is never needed here.',
+        )}
       </p>
     </div>
   );

@@ -68,6 +68,7 @@ try {
         await route.abort();
       } else await continueLocal(route);
     });
+    await context.addInitScript(() => { localStorage.setItem('sl.language', 'en'); });
     const page = await context.newPage();
     page.on('pageerror', (e) => errors.push(e.message));
     await page.goto(`${origin}/login`);

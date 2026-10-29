@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -43,13 +44,13 @@ export function AuthCallbackPage() {
     // Capture once, then scrub credentials on success AND every failure path.
     window.history.replaceState(window.history.state, '', window.location.pathname);
     if (input.kind === 'error') {
-      setError('This sign-in link is invalid or has expired. Please request a new link.');
+      setError(t('This sign-in link is invalid or has expired. Please request a new link.'));
       return () => {
         mounted = false;
       };
     }
     if (!auth || !complete) {
-      setError('Authentication is unavailable. Please try again later.');
+      setError(t('Authentication is unavailable. Please try again later.'));
       return () => {
         mounted = false;
       };
@@ -65,14 +66,14 @@ export function AuthCallbackPage() {
           if (mounted) setInvitation(account);
         })
         .catch(() => {
-          if (mounted) setError('This invitation is invalid or has expired.');
+          if (mounted) setError(t('This invitation is invalid or has expired.'));
         });
     } else {
       complete()
         .then(({ data, error: failure }) => {
           if (!mounted) return;
           if (failure || !data.user) {
-            setError('This sign-in link is invalid or has expired. Please request a new link.');
+            setError(t('This sign-in link is invalid or has expired. Please request a new link.'));
             return;
           }
           const invite = input.kind === 'invite-token';
@@ -83,7 +84,7 @@ export function AuthCallbackPage() {
           );
         })
         .catch(() => {
-          if (mounted) setError('Sign-in failed. Please request a new link.');
+          if (mounted) setError(t('Sign-in failed. Please request a new link.'));
         });
     }
     return () => {
@@ -99,9 +100,9 @@ export function AuthCallbackPage() {
     try {
       const current = await auth.getSession();
       if (current.error || current.data.session || !mounted.current)
-        throw new Error('Session changed.');
+        throw new Error(t('Session changed.'));
       const { data, error: failure } = await complete();
-      if (failure || !data.user) throw new Error('Verification failed.');
+      if (failure || !data.user) throw new Error(t('Verification failed.'));
       const active = await auth.getSession();
       if (!mounted.current || active.error || active.data.session?.user.id !== data.user.id) return;
       navigate(isPasswordSetupPending(data.user.id) ? '/auth/set-password' : '/dashboard', {
@@ -110,7 +111,9 @@ export function AuthCallbackPage() {
     } catch {
       if (mounted.current)
         setError(
-          'Unable to confirm this link. It may have expired or already been used. Try signing in, or request a new signup email.',
+          t(
+            'Unable to confirm this link. It may have expired or already been used. Try signing in, or request a new signup email.',
+          ),
         );
     } finally {
       busy.current = false;
@@ -124,11 +127,11 @@ export function AuthCallbackPage() {
     try {
       const { data, error: failure } = await complete(invitation.id);
       if (failure || !data.user || data.user.id !== invitation.id)
-        throw new Error('Unable to accept this invitation. Please request a new link.');
+        throw new Error(t('Unable to accept this invitation. Please request a new link.'));
       markPasswordSetupPending(data.user.id);
       navigate('/auth/set-password', { replace: true });
     } catch (failure) {
-      setError(failure instanceof Error ? failure.message : 'Unable to accept this invitation.');
+      setError(failure instanceof Error ? failure.message : t('Unable to accept this invitation.'));
     } finally {
       setSubmitting(false);
     }
@@ -142,18 +145,24 @@ export function AuthCallbackPage() {
         </div>
         {error ? (
           <>
-            <h1 className="font-display text-xl font-bold text-neutral-900">Unable to sign in</h1>
+            <h1 className="font-display text-xl font-bold text-neutral-900">
+              {t('Unable to sign in')}
+            </h1>
             <p role="alert" className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-700">
-              {error}
+              {t(error)}
             </p>
           </>
         ) : input.kind === 'signup-token' ? (
           <>
-            <h1 className="font-display text-2xl font-bold text-neutral-900">Confirm your email</h1>
+            <h1 className="font-display text-2xl font-bold text-neutral-900">
+              {t('Confirm your email')}
+            </h1>
             <p className="mt-3 text-sm leading-relaxed text-neutral-600">
               {user
-                ? 'You are already signed in. Sign out before confirming an email for another account.'
-                : 'Confirm your email address and sign in to Service Link.'}
+                ? t(
+                    'You are already signed in. Sign out before confirming an email for another account.',
+                  )
+                : t('Confirm your email address and sign in to Service Link.')}
             </p>
             <button
               type="button"
@@ -161,16 +170,16 @@ export function AuthCallbackPage() {
               onClick={confirmSignup}
               className="btn-primary mt-5 min-h-11 w-full disabled:opacity-70"
             >
-              {submitting ? 'Confirming…' : 'Confirm email and sign in'}
+              {submitting ? t('Confirming…') : t('Confirm email and sign in')}
             </button>
           </>
         ) : invitation ? (
           <>
             <h1 className="font-display text-xl font-bold text-neutral-900">
-              Accept your invitation
+              {t('Accept your invitation')}
             </h1>
             <p className="mt-3 text-sm text-neutral-600">
-              Continue to Service Link as <strong>{invitation.email}</strong>.
+              {t('Continue to Service Link as')} <strong>{invitation.email}</strong>.
             </p>
             <button
               type="button"
@@ -178,7 +187,7 @@ export function AuthCallbackPage() {
               onClick={acceptInvitation}
               className="btn-primary mt-5 min-h-11 w-full"
             >
-              {submitting ? 'Accepting…' : 'Continue with this account'}
+              {submitting ? t('Accepting…') : t('Continue with this account')}
             </button>
             <button
               type="button"
@@ -186,7 +195,7 @@ export function AuthCallbackPage() {
               disabled={submitting}
               className="btn-secondary mt-3 min-h-11 w-full"
             >
-              Cancel
+              {t('Cancel')}
             </button>
           </>
         ) : (
@@ -194,17 +203,17 @@ export function AuthCallbackPage() {
             <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary-700" />
             <p className="mt-3 inline-flex items-center gap-2 text-sm text-neutral-600">
               <CheckCircle2 className="h-4 w-4" />
-              Completing secure sign-in…
+              {t('Completing secure sign-in…')}
             </p>
           </div>
         )}
         <p className="mt-6 text-center text-sm">
           <Link to="/login" className="font-semibold text-primary-700 underline">
-            Back to sign in
+            {t('Back to sign in')}
           </Link>{' '}
           ·{' '}
           <Link to="/signup" className="font-semibold text-primary-700 underline">
-            Signup
+            {t('Signup')}
           </Link>
         </p>
       </section>

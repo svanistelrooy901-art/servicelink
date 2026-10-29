@@ -18,7 +18,8 @@
     "test:banner-browser": "node tests/banner-browser.mjs",
     "test:social-gallery-browser": "node tests/social-gallery-browser.mjs",
     "worker:check": "wrangler deploy --dry-run --outdir .wrangler/review-bundle",
-    "dev:worker": "wrangler dev --local"
+    "dev:worker": "wrangler dev --local",
+    "test:language-browser": "node tests/language-browser.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.116.0",

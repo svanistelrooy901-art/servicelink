@@ -1236,3 +1236,43 @@ td {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* Always in normal flow: language selection never covers mobile controls. */
+.language-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 20px;
+  background: #fffaf4;
+  border-bottom: 1px solid #e9e2d9;
+}
+.language-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #596273;
+}
+.language-switch button {
+  min-width: 44px;
+  min-height: 36px;
+  padding: 5px 10px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #46566a;
+}
+.language-switch button[aria-pressed='true'] {
+  background: #e2ebff;
+  color: #173f8a;
+}
+.language-switch button:focus-visible {
+  outline: 3px solid #2457b9;
+  outline-offset: 2px;
+}
+@media (max-width: 640px) {
+  .language-toolbar {
+    padding: 5px 12px;
+  }
+  .workspace-header {
+    flex-wrap: wrap;
+  }
+}

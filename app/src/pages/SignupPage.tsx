@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { ServiceLinkBrand } from '../components/ServiceLinkBrand';
@@ -24,7 +25,7 @@ export function SignupPage() {
       if (failure) throw failure;
       setSent(true);
     } catch {
-      setError('Unable to create your account. Please try again.');
+      setError(t('Unable to create your account. Please try again.'));
     } finally {
       setBusy(false);
     }
@@ -34,23 +35,24 @@ export function SignupPage() {
     <main className="access-page">
       <section className="access-card">
         <ServiceLinkBrand />
-        <h1>Make your services easy to find.</h1>
-        <p>One plan. All MVP features. 14-day free trial.</p>
+        <h1>{t('Make your services easy to find.')}</h1>
+        <p>{t('One plan. All MVP features. 14-day free trial.')}</p>
         <div className="price-note">
-          RM9.90 monthly · RM49 first annual year
+          {t('RM9.90 monthly · RM49 first annual year')}
           <br />
-          <strong>RM99/year on annual renewal from year two.</strong>
-          <small>Gateway use is optional. Transaction charges are separate.</small>
+          <strong>{t('RM99/year on annual renewal from year two.')}</strong>
+          <small>{t('Gateway use is optional. Transaction charges are separate.')}</small>
         </div>
         {sent ? (
           <p role="status">
-            Check your email to confirm your account. If it already exists, sign in or reset your
-            password.
+            {t(
+              'Check your email to confirm your account. If it already exists, sign in or reset your password.',
+            )}
           </p>
         ) : (
           <form onSubmit={submit}>
             <label>
-              Email
+              {t('Email')}
               <input
                 type="email"
                 required
@@ -60,7 +62,7 @@ export function SignupPage() {
               />
             </label>
             <label>
-              Password
+              {t('Password')}
               <input
                 type="password"
                 required
@@ -71,14 +73,14 @@ export function SignupPage() {
               />
             </label>
             <button className="btn-primary" disabled={busy}>
-              {busy ? 'Creating account…' : 'Create account'}
+              {busy ? t('Creating account…') : t('Create account')}
             </button>
           </form>
         )}
-        {error && <p role="alert">{error}</p>}
-        <Link to="/login">Already have an account? Sign in</Link>
+        {error && <p role="alert">{t(error)}</p>}
+        <Link to="/login">{t('Already have an account? Sign in')}</Link>
         <p className="tiny">
-          Membership checkout and trial activation are not enabled in this foundation.
+          {t('Membership checkout and trial activation are not enabled in this foundation.')}
         </p>
       </section>
     </main>

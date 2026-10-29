@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
@@ -13,7 +14,7 @@ function exchangeRecoveryCode(code: string): Promise<string> {
   inFlight = getSupabaseClient()
     .auth.exchangeCodeForSession(code)
     .then(({ data, error }) => {
-      if (error || !data.user) throw error ?? new Error('Invalid recovery session');
+      if (error || !data.user) throw error ?? new Error(t('Invalid recovery session'));
       return data.user.id;
     });
   return inFlight;
@@ -26,7 +27,7 @@ export function RecoveryPage() {
     let mounted = true;
     const code = recoveryCallbackCode(window.location.search, window.location.hash);
     if (!code) {
-      setError('This password reset link is invalid or has expired. Request a new one.');
+      setError(t('This password reset link is invalid or has expired. Request a new one.'));
       return () => {
         mounted = false;
       };
@@ -40,7 +41,7 @@ export function RecoveryPage() {
       })
       .catch(() => {
         if (mounted)
-          setError('This password reset link is invalid or has expired. Request a new one.');
+          setError(t('This password reset link is invalid or has expired. Request a new one.'));
       });
     return () => {
       mounted = false;
@@ -52,15 +53,15 @@ export function RecoveryPage() {
       {error ? (
         <div className="text-center">
           <p role="alert" className="text-sm text-red-700">
-            {error}
+            {t(error)}
           </p>
           <Link className="mt-4 inline-block text-primary-700 underline" to="/forgot-password">
-            Request another link
+            {t('Request another link')}
           </Link>
         </div>
       ) : (
         <div className="flex items-center gap-3 text-sm text-neutral-600">
-          <Loader2 className="h-5 w-5 animate-spin" /> Verifying recovery link…
+          <Loader2 className="h-5 w-5 animate-spin" /> {t('Verifying recovery link…')}
         </div>
       )}
     </main>
