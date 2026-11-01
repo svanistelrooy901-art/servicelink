@@ -1,6 +1,6 @@
 # Integration status and architecture
 
-The M3 booking/media transport is ready for review behind disabled flags. **Live staging has not been deployed or verified.** Independent SL project creation hit the account free-project quota; Cloudflare CLI has no authenticated target. No existing project was paused, deleted or upgraded. No hosted resource, migration, payment or message was created. AdvisorLink stayed read-only.
+The M3 booking/media transport is prepared behind disabled flags. **Backend staging is partially provisioned, not deployed or end-to-end verified.** On 1 November the owner approved pausing AL staging and using Digital Sambal for a new Singapore SL project. Provider foundation and the independent public-grant correction are applied there. Booking migration confirmation expired twice; dependent migrations remain unapplied. See [PHASE_1_STATUS.md](PHASE_1_STATUS.md) for the exact history and verification. AL production remains unchanged; no subscription, real payment, customer email or SL backend deployment was performed.
 
 Use [STAGING_SETUP.md](STAGING_SETUP.md) for the current configuration sequence and [MILESTONE_3.md](MILESTONE_3.md) for exact behavior, tests and limitations. Earlier milestone documents describe their historical state.
 
@@ -22,8 +22,9 @@ Use only an independent Service Link project. `supabase/config.toml` is an indep
 | `20261025102409_sl_social_gallery.sql` | Optional platform links and eight-picture gallery |
 | `20261025114351_sl_cloud_booking_api.sql` | Versioned owner APIs, sanitized availability, snapshots, safe DTOs and private rate limiting |
 | `20261025114907_sl_r2_media.sql` | Private asset registry, ownership/purpose checks, reference-based hosted media and cleanup |
+| `20261101074808_sl_explicit_public_profile_grants.sql` | Remove inherited table-level anonymous grants; preserve only intended public columns |
 
-The final media migration rejects inline images for hosted writes and limits profile JSON to 64KB; earlier larger inline ceilings remain only historical/local-demo design. Upload pictures through the owner media API instead. Existing demo data is not automatically imported.
+The media migration rejects inline images for hosted writes and limits profile JSON to 64KB; earlier larger inline ceilings remain only historical/local-demo design. Upload pictures through the owner media API instead. Existing demo data is not automatically imported.
 
 RLS and explicit grants protect exposed tables. Owner RPCs use `auth.uid()` from a verified JWT, never editable metadata; guest/media wrappers require the server role. Security-definer functions have empty search paths and explicit ownership checks. Old unversioned owner-write grants are revoked. Server keys never reach the browser. Run hosted advisors and real concurrent/two-account checks before a pilot. Embedded SQL tests substitute Auth and serialize one connection; they are not hosted certification.
 

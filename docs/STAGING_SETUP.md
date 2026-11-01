@@ -1,6 +1,6 @@
 # Independent Service Link staging setup
 
-**Backend staging status (1 November 2026): not provisioned.** The connected Digital Sambal organization remains Free with both AdvisorLink projects active and no Service Link project. The browser-local Cloudflare demo is already hosted; that does not supply shared backend data. This workspace has no Cloudflare account authentication. No AdvisorLink project, bucket, Worker, merchant, secret or domain may be reused. This guide describes work still required, not completed configuration.
+**Backend staging status (1 November 2026): not provisioned.** The owner-approved organization is Digital Sambal (Free). AL staging has been paused; the new Service Link Staging project is ACTIVE_HEALTHY. See PHASE_1_STATUS.md for the partial schema and confirmation blocker. The browser-local Cloudflare demo is already hosted; that does not supply shared backend data. This workspace has no Cloudflare account authentication. No AdvisorLink project, bucket, Worker, merchant, secret or domain may be reused. This guide describes work still required, not completed configuration.
 
 ## Review locally now
 
@@ -29,7 +29,7 @@ npm run worker:check
 
 Use a new SL-only project once account capacity is available. Keep production deployment separate. Record the new project reference privately; never put server secrets in Git, `VITE_*` variables, screenshots or support logs.
 
-Review and apply **all** `supabase/migrations/*.sql` in filename order to an empty SL staging project. The final two migrations add the versioned booking API, private rate limiter and media registry. The booking foundation requires `btree_gist`. Do not cherry-pick only the media migration and do not apply them to AdvisorLink.
+For a fresh empty project, review and apply **all** `supabase/migrations/*.sql` in filename order. For the existing SL staging project, consult PHASE_1_STATUS.md first: foundation and the independent grant correction already exist, and the remaining migrations have not been applied. The final two migrations add the versioned booking API, private rate limiter and media registry. The booking foundation requires `btree_gist`. Do not cherry-pick only the media migration and do not apply them to AdvisorLink.
 
 Run Supabase security/performance advisors against SL after applying. Check RLS, private-schema exposure, explicit grants and function search paths. Generate database types from this project before broadening direct client queries. Keep public signup email confirmation enabled and configure an appropriate test SMTP/sending policy without contacting real customers.
 
