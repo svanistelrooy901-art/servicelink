@@ -19,7 +19,9 @@
     "test:social-gallery-browser": "node tests/social-gallery-browser.mjs",
     "worker:check": "wrangler deploy --dry-run --outdir .wrangler/review-bundle",
     "dev:worker": "wrangler dev --local",
-    "test:language-browser": "node tests/language-browser.mjs"
+    "test:language-browser": "node tests/language-browser.mjs",
+    "staging:check": "node scripts/staging.mjs",
+    "build:staging": "node scripts/staging.mjs --build"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.116.0",

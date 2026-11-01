@@ -34,7 +34,7 @@ test('staging HTTP APIs: two isolated clients, booking ownership/tokens, retries
   const upstream: string[] = [];
   try {
     await db.exec(
-      `create role anon;create role authenticated;create role service_role;create schema auth;create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth,public to anon,authenticated,service_role;grant execute on function auth.uid() to anon,authenticated,service_role;`,
+      `create role anon;create role authenticated;create role service_role;create schema auth;create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth,public to anon,authenticated,service_role;grant execute on function auth.uid() to anon,authenticated,service_role;alter default privileges in schema public grant execute on functions to anon;`,
     );
     const root = new URL('../../supabase/migrations/', import.meta.url);
     for (const file of (await readdir(root)).filter((f) => f.endsWith('.sql')).sort())
@@ -44,6 +44,16 @@ test('staging HTTP APIs: two isolated clients, booking ownership/tokens, retries
         const err = e as { message: string; position?: string };
         throw new Error(`${file}: ${err.message} at ${err.position}`);
       }
+    const hardening = (
+      await db.query(
+        `select (select n.nspname from pg_extension e join pg_namespace n on n.oid=e.extnamespace where e.extname='btree_gist') as extension_schema, to_regclass('sl_private.booking_events_booking_id_idx') is not null as event_index, has_function_privilege('anon','public.sl_write_workspace(jsonb,jsonb,integer,text)','execute') as anonymous_write`,
+      )
+    ).rows[0];
+    assert.deepEqual(hardening, {
+      extension_schema: 'extensions',
+      event_index: true,
+      anonymous_write: false,
+    });
     await db.query('insert into auth.users values($1),($2)', [owner, other]);
     const profile = publicSnapshot(demoProfile());
     profile.showWhatsapp = true;
