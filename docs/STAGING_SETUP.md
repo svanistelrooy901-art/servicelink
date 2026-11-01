@@ -1,6 +1,6 @@
 # Independent Service Link staging setup
 
-**Current status: prepared, disabled and undeployed.** The account free-project quota blocked a new Supabase project, and Cloudflare is not authenticated. No AdvisorLink project, bucket, Worker, merchant, secret or domain may be reused. This guide describes work still required, not completed configuration.
+**Backend staging status (1 November 2026): not provisioned.** The connected Digital Sambal organization remains Free with both AdvisorLink projects active and no Service Link project. The browser-local Cloudflare demo is already hosted; that does not supply shared backend data. This workspace has no Cloudflare account authentication. No AdvisorLink project, bucket, Worker, merchant, secret or domain may be reused. This guide describes work still required, not completed configuration.
 
 ## Review locally now
 
@@ -8,13 +8,13 @@ From the repository root:
 
 ```sh
 git fetch origin
-git switch feat/sl-m3-cloud-integration
+git switch feat/sl-phase1-staging-readiness
 cd app
 npm ci
 npm run dev -- --host 127.0.0.1 --port 5178
 ```
 
-For the first checkout, use `git switch --track origin/feat/sl-m3-cloud-integration` instead. Open `http://127.0.0.1:5178/login` and choose **Explore the demo**. Commands run inside `app`, where `package.json` lives. The default local mode uses fictional browser data and needs no cloud credentials. Review profile publication, gallery and the complete request → accept → report → verify flow in two tabs of the same browser.
+For the first checkout, use `git switch --track origin/feat/sl-phase1-staging-readiness` instead. Open `http://127.0.0.1:5178/login` and choose **Explore the demo**. Commands run inside `app`, where `package.json` lives. The default local mode uses fictional browser data and needs no cloud credentials. Review profile publication, gallery and the complete request → accept → report → verify flow in two tabs of the same browser.
 
 ```sh
 npm run lint
@@ -37,7 +37,7 @@ Auth Site URL must equal the exact frontend origin; allow `/auth/callback` and `
 
 ## 2. Browser configuration
 
-Copy `app/.env.example` to `app/.env.local`, then fill only SL publishable values:
+For the guarded cloud build, copy `app/.env.staging.example` to `app/.env.staging.local`, then fill only SL publishable values:
 
 ```dotenv
 VITE_DATA_BACKEND=supabase
@@ -98,3 +98,23 @@ Use two provider accounts, an anonymous customer and separate browser/device ses
 5. Run hosted advisors, inspect redacted logs and measure DB/R2/Images/Worker usage. Never log Authorization headers, request bodies, guest URLs or tokens. Keep staging notices and noindex/private-page headers.
 
 The current embedded tests do not replace this list. Refer Me, reviews, membership lifecycle and optional gateway remain later work; SL membership and customers paying freelancers must stay separate.
+
+
+## Phase 1 guarded build workflow
+
+The latest configuration/build tooling is in `feat/sl-phase1-staging-readiness`, including the existing BM/EN interface. `npm run staging:check` validates local configuration only and prints field names, never credential values. It rejects demo fallback, project/URL/key mismatch, inconsistent flags, non-staging/demo origins, placeholder or shared secrets and server keys in public configuration. The first rollout uses the exact `https://servicelink-staging.<account>.workers.dev` origin. Custom domains and localhost cloud review need a separate deliberate configuration.
+
+After a new SL project exists and all migrations have been applied, fill `.env.staging.local` and `.dev.vars` (see the tables above). Set booking flags consistently; keep media flags false during the first auth/profile/booking checks.
+
+```sh
+cd app
+npm run staging:check
+npm run build:staging
+npx wrangler deploy --config wrangler.staging.generated.json --dry-run
+```
+
+`build:staging` uses cloud mode and writes **dist-staging**, without altering **dist-demo**. It generates a gitignored config for **servicelink-staging** with no media bindings and no server secrets, plus noindex and cloud-compatible CSP headers. A failed preparation deletes the generated config and staging output so an old build cannot be mistaken for the new one. Build success is not proof that migrations, Auth redirects or the hosted API work.
+
+After authenticating to the intended owner Cloudflare account, use Wrangler's `secret put --help` guidance to set **SUPABASE_SECRET_KEY**, **SL_TOKEN_SECRET** and **SL_RATE_SECRET** on the generated staging config. `.dev.vars` provides local development values only: it is not uploaded by a deploy. Set secrets without echoing values or committing them. Then deploy explicitly with `npx wrangler deploy --config wrangler.staging.generated.json`. Do not run the demo deploy command for this step. Check that Auth Site URL and redirect URLs use the returned staging origin before enabling signup tests.
+
+Media comes next: private R2 and Images bindings, reviewed cost/account availability, corresponding server/browser flags and actual upload authorization tests. The initial generated config intentionally rejects media=true instead of pretending those bindings exist. No media resource, subscription or external email has been created by this phase.
