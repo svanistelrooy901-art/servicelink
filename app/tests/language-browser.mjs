@@ -82,7 +82,10 @@ try {
     await visible('Ringkasan');
     await page.getByRole('link', { name: 'Profil saya', exact: true }).click();
     await visible('Banner profil anda');
-    await visible('Hasil kerja anda, dalam gambar');
+    await visible('Portfolio');
+    await visible('Tambah projek');
+    assert.equal(await page.locator('option[value="photography"]').textContent(), 'Fotografi');
+    checks++;
     await page
       .getByPlaceholder('Nama yang pelanggan kenali', { exact: true })
       .fill('Kerja English Kekal');
@@ -117,6 +120,7 @@ try {
     await page.getByRole('link', { name: 'Ketersediaan', exact: true }).click();
     await visible('Isnin');
     await visible('Cara pelanggan membayar anda');
+    await visible('Templat invois');
     await page.getByLabel('Benarkan pelanggan memohon tempahan', { exact: true }).check();
     await page
       .getByRole('button', { name: 'Simpan ketersediaan & maklumat bayaran', exact: true })
@@ -126,6 +130,7 @@ try {
     await switchTo('en');
     await visible('Monday');
     await visible('How customers can pay you');
+    await visible('Invoice template');
     await switchTo('bm');
     await page.getByRole('link', { name: 'Tempahan', exact: true }).click();
     await visible('Peti masuk tempahan');
