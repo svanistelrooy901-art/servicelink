@@ -17,6 +17,11 @@ import {
   effectiveStatus,
   rangeError,
   estimateCents,
+  defaultBookingMode,
+  emptyInvoiceTemplate,
+  eventRequestError,
+  myDate,
+  validBookingAmount,
 } from './bookingRules.ts';
 import { normalizeMalaysiaWhatsapp } from './whatsappNumber.ts';
 import { matchesCoverage } from './geography.ts';
@@ -100,11 +105,13 @@ export function createLocalBookingRepository(
     const service = p.services.find((s) => s.id === input.serviceId);
     if (!service) throw new Error('This service is no longer available.');
     if (!w.settings.enabled) throw new Error('Booking requests are not enabled yet.');
-    const expected =
-      w.settings.modes[service.id] ?? (p.category === 'confinement' ? 'date-range' : 'appointment');
+    const expected = w.settings.modes[service.id] ?? defaultBookingMode(p.category);
     if (input.mode !== expected)
       throw new Error('This service’s booking mode changed. Refresh and try again.');
-    const schedule = scheduleError(w.settings, input.start, input.end, input.mode, clock());
+    const schedule =
+      input.mode === 'event'
+        ? eventRequestError(input.start, input.end, input.event, w.settings.noticeMinutes, clock())
+        : scheduleError(w.settings, input.start, input.end, input.mode, clock());
     if (schedule) throw new Error(schedule);
     if (
       input.mode === 'appointment' &&
@@ -129,7 +136,7 @@ export function createLocalBookingRepository(
     if (!input.consent) throw new Error('Agree to share these details with the provider.');
     if (!/^[a-zA-Z0-9-]{16,80}$/.test(input.requestId))
       throw new Error('Refresh this form and try again.');
-    const conflict = capacityError(w, input.start, input.end);
+    const conflict = input.mode === 'event' ? null : capacityError(w, input.start, input.end);
     if (conflict) throw new Error(conflict);
     const now = new Date(clock()).toISOString(),
       id = crypto.randomUUID();
@@ -157,7 +164,14 @@ export function createLocalBookingRepository(
       status: 'requested',
       paymentStatus: 'not_due',
       bufferMinutes: 0,
-      amountDueCents: estimateCents(service, input.start, input.end),
+      amountDueCents:
+        input.mode === 'event' ? null : estimateCents(service, input.start, input.end),
+      ...(input.mode === 'event' && input.event
+        ? {
+            requestedDate: myDate(Date.parse(input.start)),
+            event: { venue: input.event.venue.trim(), preferredTime: input.event.preferredTime },
+          }
+        : {}),
       paymentDeadline: null,
       paymentDetails: null,
       createdAt: now,
@@ -173,16 +187,36 @@ export function createLocalBookingRepository(
     };
   }
   function accept(w: BookingWorkspace, b: BookingRecord, a: AcceptBooking) {
+    const total = a.totalPriceCents ?? a.amountDueCents;
+    if (
+      !validBookingAmount(total) ||
+      !validBookingAmount(a.amountDueCents) ||
+      a.amountDueCents > total
+    )
+      throw new Error('The deposit must be between RM0 and the total price.');
+    const scope = a.agreedScope?.trim() ?? '';
+    if (scope.length > 600 || (b.mode === 'event' && !scope))
+      throw new Error('Enter the agreed scope (up to 600 characters).');
+    if (b.mode === 'event') {
+      if (
+        !a.start ||
+        !a.end ||
+        !Number.isFinite(Date.parse(a.start)) ||
+        myDate(Date.parse(a.start)) !== b.requestedDate ||
+        Date.parse(a.end) - Date.parse(a.start) > 86400000
+      )
+        throw new Error('Set the final event times on the requested date, for up to 24 hours.');
+      b.start = a.start;
+      b.end = a.end;
+    }
     const schedule = scheduleError(w.settings, b.start, b.end, b.mode, clock());
     if (schedule) throw new Error(schedule);
     const conflict = capacityError(w, b.start, b.end, b.id);
     if (conflict) throw new Error(conflict);
-    if (!Number.isInteger(a.amountDueCents) || a.amountDueCents < 0 || a.amountDueCents > 10000000)
-      throw new Error('Enter a valid amount due.');
+    const deadline = a.paymentDeadline ? Date.parse(a.paymentDeadline) : NaN;
     if (
-      !Number.isFinite(Date.parse(a.paymentDeadline)) ||
-      Date.parse(a.paymentDeadline) <= clock() ||
-      Date.parse(a.paymentDeadline) > Date.parse(b.start)
+      a.amountDueCents > 0 &&
+      (!Number.isFinite(deadline) || deadline <= clock() || deadline > Date.parse(b.start))
     )
       throw new Error(
         'The payment deadline must be in the future and no later than the booking start.',
@@ -197,8 +231,17 @@ export function createLocalBookingRepository(
     b.paymentStatus = a.amountDueCents === 0 ? 'not_due' : 'unpaid';
     b.bufferMinutes = w.settings.bufferMinutes;
     b.amountDueCents = a.amountDueCents;
+    b.totalPriceCents = total;
+    b.agreedScope = scope;
+    const template = w.settings.invoice;
+    b.invoice = {
+      ...emptyInvoiceTemplate,
+      ...template,
+      businessName: template?.businessName.trim() || b.providerName,
+      issuedAt: new Date(clock()).toISOString(),
+    };
     b.paymentDeadline = a.amountDueCents === 0 ? null : a.paymentDeadline;
-    b.paymentDetails = structuredClone(p);
+    b.paymentDetails = a.amountDueCents > 0 ? structuredClone(p) : null;
   }
   const fingerprint = (i: BookingInput) =>
     JSON.stringify([
@@ -214,6 +257,7 @@ export function createLocalBookingRepository(
       i.customerEmail,
       i.note,
       i.consent,
+      ...(i.mode === 'event' ? [i.event?.venue, i.event?.preferredTime] : []),
     ]);
   return {
     load,
@@ -275,6 +319,8 @@ export function createLocalBookingRepository(
       }),
     manual: (input, a, r) =>
       transact(async (w) => {
+        if (w.bookings.some((booking) => booking.requestId === input.requestId))
+          throw new Error('This request key was already used. Refresh the form.');
         const b = await build(w, input, 'provider');
         accept(w, b, a);
         b.events.push({ at: new Date(clock()).toISOString(), action: 'Accepted by provider' });

@@ -1,5 +1,12 @@
 import { isMediaReference } from './mediaReference.ts';
-import type { BookingSettings, BookingRecord, BookingStatus, BookingMode } from './bookingTypes.ts';
+import type {
+  BookingSettings,
+  BookingRecord,
+  BookingStatus,
+  BookingMode,
+  EventRequest,
+  InvoiceTemplate,
+} from './bookingTypes.ts';
 import type { Service } from './types.ts';
 export const DAY_NAMES = [
   'Sunday',
@@ -45,6 +52,66 @@ export function formatMY(value: string) {
 export function localInput(value: string) {
   return `${myDate(new Date(value).getTime())}T${new Intl.DateTimeFormat('en-GB', { timeZone: MY_ZONE, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(value))}`;
 }
+export const emptyInvoiceTemplate: InvoiceTemplate = {
+  businessName: '',
+  registration: '',
+  contact: '',
+  address: '',
+  logo: '',
+  note: '',
+};
+export const invoiceFieldLimits = {
+  businessName: 120,
+  registration: 60,
+  contact: 160,
+  address: 300,
+  note: 600,
+};
+export function defaultBookingMode(category: string): BookingMode {
+  return category === 'confinement'
+    ? 'date-range'
+    : category === 'photography'
+      ? 'event'
+      : 'appointment';
+}
+export function eventRequestError(
+  start: string,
+  end: string,
+  event: EventRequest | null | undefined,
+  notice: number,
+  now = Date.now(),
+) {
+  const a = Date.parse(start),
+    b = Date.parse(end);
+  if (
+    !Number.isFinite(a) ||
+    !Number.isFinite(b) ||
+    b - a !== 86400000 ||
+    localInput(start).slice(11) !== '00:00' ||
+    b <= now + notice * 60000
+  )
+    return 'Choose an event date that fits the provider’s minimum notice.';
+  if (
+    !event ||
+    typeof event.venue !== 'string' ||
+    !event.venue.trim() ||
+    event.venue.length > 200 ||
+    typeof event.preferredTime !== 'string' ||
+    (event.preferredTime && !/^([01]\d|2[0-3]):[0-5]\d$/.test(event.preferredTime))
+  )
+    return 'Enter a venue and a valid preferred time, if known.';
+  return null;
+}
+export function parseBookingAmount(value: string) {
+  if (!/^\d+(?:\.\d{1,2})?$/.test(value.trim()))
+    throw new Error('Enter an amount with up to two decimal places.');
+  const cents = Math.round(Number(value) * 100);
+  if (!validBookingAmount(cents)) throw new Error('Enter an amount between RM0 and RM100,000.');
+  return cents;
+}
+export const validBookingAmount = (cents: number) =>
+  Number.isInteger(cents) && cents >= 0 && cents <= 10000000;
+
 export function defaultBookingSettings(): BookingSettings {
   return {
     enabled: false,
@@ -53,6 +120,7 @@ export function defaultBookingSettings(): BookingSettings {
     bufferMinutes: 0,
     modes: {},
     payment: { bankName: '', accountName: '', accountNumber: '', instructions: '', qrPhoto: '' },
+    invoice: { ...emptyInvoiceTemplate },
   };
 }
 export function settingsErrors(s: BookingSettings): string[] {
@@ -74,7 +142,7 @@ export function settingsErrors(s: BookingSettings): string[] {
     e.push('Notice must be 0–43,200 minutes.');
   if (!Number.isInteger(s.bufferMinutes) || s.bufferMinutes < 0 || s.bufferMinutes > 180)
     e.push('Buffer must be 0–180 minutes.');
-  if (Object.values(s.modes).some((m) => !['appointment', 'date-range'].includes(m)))
+  if (Object.values(s.modes).some((m) => !['appointment', 'date-range', 'event'].includes(m)))
     e.push('Choose a valid booking mode.');
   if (
     s.payment.bankName.length > 80 ||
@@ -90,6 +158,20 @@ export function settingsErrors(s: BookingSettings): string[] {
       s.payment.qrPhoto.length > 180000)
   )
     e.push('Use a compressed QR image.');
+  const invoice = s.invoice;
+  if (
+    invoice &&
+    (Object.entries(invoiceFieldLimits).some(([key, limit]) => {
+      const value = invoice[key as keyof typeof invoiceFieldLimits];
+      return typeof value !== 'string' || value.length > limit;
+    }) ||
+      typeof invoice.logo !== 'string' ||
+      (invoice.logo &&
+        ((!isMediaReference(invoice.logo) &&
+          !/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(invoice.logo)) ||
+          invoice.logo.length > 180000)))
+  )
+    e.push('Check invoice settings and use a compressed logo.');
   return [...new Set(e)];
 }
 export function effectiveStatus(b: BookingRecord, now = Date.now()): BookingStatus {
@@ -133,7 +215,7 @@ export function scheduleError(
   if (invalid) return invalid;
   if (Date.parse(start) < now + settings.noticeMinutes * 60000)
     return `This provider needs ${settings.noticeMinutes} minutes’ notice.`;
-  if (mode === 'date-range') return null; // Range enquiries are assessed by the provider, not fixed-hour slots.
+  if (mode !== 'appointment') return null;
   const date = myDate(Date.parse(start));
   if (myDate(Date.parse(end) - 1) !== date)
     return 'An appointment must fit within one working day.';

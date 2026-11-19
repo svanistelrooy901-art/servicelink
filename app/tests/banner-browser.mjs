@@ -81,6 +81,7 @@ try {
       ['tutor', 'book-open'],
       ['makeup', 'paintbrush'],
       ['cleaning', 'sparkles'],
+      ['photography', 'camera'],
     ]) {
       await page.getByLabel('Service category').selectOption(category);
       check(await cover.getAttribute('data-category'), category, 'Template follows category');

@@ -14,6 +14,13 @@ export function coverageLabels(value: Coverage[]) {
   return englishCoverage(value).map((label) => t(label));
 }
 export function priceLabel(service: Service) {
-  if (service.priceBasis === 'quote' || service.price === null) return t('Request a quote');
-  return `${new Intl.NumberFormat(locale(), { style: 'currency', currency: 'MYR', maximumFractionDigits: 2 }).format(service.price)} / ${t(service.priceBasis)}`;
+  if (service.price === null) return t('Request a quote');
+  const price = new Intl.NumberFormat(locale(), {
+    style: 'currency',
+    currency: 'MYR',
+    maximumFractionDigits: 2,
+  }).format(service.price);
+  return service.priceBasis === 'quote'
+    ? t('From {price}', { price })
+    : `${price} / ${t(service.priceBasis)}`;
 }

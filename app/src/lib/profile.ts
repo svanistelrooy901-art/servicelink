@@ -3,7 +3,7 @@ import { categories, type ProviderProfile } from './types.ts';
 import { coverageErrors } from './geography.ts';
 import { normalizeMalaysiaWhatsapp } from './whatsappNumber.ts';
 import { emptySocialLinks, socialPlatforms, validSocialLink } from './social.ts';
-import { galleryErrors } from './gallery.ts';
+import { galleryErrors, portfolioErrors } from './gallery.ts';
 export function normalizeSlug(value: string) {
   return value
     .trim()
@@ -46,6 +46,17 @@ export function publicSnapshot(p: ProviderProfile): ProviderProfile {
       threads: p.social?.threads ?? '',
     },
     gallery: (p.gallery ?? []).map(({ id, src, caption }) => ({ id, src, caption })),
+    ...(p.portfolio
+      ? {
+          portfolio: p.portfolio.map(({ id, title, description, serviceId, pictures }) => ({
+            id,
+            title,
+            description,
+            serviceId,
+            pictures: pictures.map(({ id, src, caption }) => ({ id, src, caption })),
+          })),
+        }
+      : {}),
     accent: p.accent,
     coverage: p.coverage.map((c) => ({
       stateId: c.stateId,
@@ -136,6 +147,10 @@ export function validateForPublish(p: ProviderProfile): string[] {
           );
   }
   if (p.gallery !== undefined) errors.push(...galleryErrors(p.gallery));
+  if (p.portfolio !== undefined) {
+    errors.push(...portfolioErrors(p.portfolio, new Set(p.services.map((s) => s.id))));
+    if (p.gallery?.length) errors.push('Move existing gallery pictures into your portfolio first.');
+  }
   return [...new Set(errors)];
 }
 export function priceLabel(service: ProviderProfile['services'][number]) {

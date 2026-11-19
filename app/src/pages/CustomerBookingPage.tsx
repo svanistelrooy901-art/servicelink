@@ -1,4 +1,5 @@
 import { t } from '../i18n';
+import { BookingInvoice } from '../components/BookingInvoice';
 import { MediaImage } from '../components/MediaImage';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -98,22 +99,69 @@ export function CustomerBookingPage() {
               {t('With')} {b.providerName}
             </p>
             <dl className="booking-summary">
-              <div>
-                <dt>{t('From')}</dt>
-                <dd>{formatMY(b.start)}</dd>
-              </div>
-              <div>
-                <dt>{t('Until')}</dt>
-                <dd>{formatMY(b.end)}</dd>
-              </div>
+              {b.mode === 'event' && !b.invoice ? (
+                <div>
+                  <dt>{t('Preferred date')}</dt>
+                  <dd>
+                    {b.requestedDate}
+                    {b.event?.preferredTime && ` · ${b.event.preferredTime}`}
+                  </dd>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <dt>{t('From')}</dt>
+                    <dd>{formatMY(b.start)}</dd>
+                  </div>
+                  <div>
+                    <dt>{t('Until')}</dt>
+                    <dd>{formatMY(b.end)}</dd>
+                  </div>
+                </>
+              )}
+              {b.event && (
+                <div>
+                  <dt>{t('Venue or area')}</dt>
+                  <dd>{b.event.venue}</dd>
+                </div>
+              )}
               <div>
                 <dt>{t('Payment')}</dt>
-                <dd>{t(paymentLabel(b.paymentStatus))}</dd>
+                <dd>
+                  {t(
+                    b.totalPriceCents != null && b.amountDueCents === 0
+                      ? 'No deposit required'
+                      : paymentLabel(b.paymentStatus),
+                  )}
+                </dd>
               </div>
-              <div>
-                <dt>{status === 'requested' ? t('Estimated price') : t('Amount due')}</dt>
-                <dd>{t(money(b.amountDueCents))}</dd>
-              </div>
+              {b.totalPriceCents != null ? (
+                <>
+                  <div>
+                    <dt>{t('Total price')}</dt>
+                    <dd>{money(b.totalPriceCents)}</dd>
+                  </div>
+                  <div>
+                    <dt>{t('Deposit')}</dt>
+                    <dd>{money(b.amountDueCents)}</dd>
+                  </div>
+                  <div>
+                    <dt>{t('Balance after deposit')}</dt>
+                    <dd>{money(b.totalPriceCents - (b.amountDueCents ?? 0))}</dd>
+                  </div>
+                  {b.agreedScope && (
+                    <div>
+                      <dt>{t('Agreed scope')}</dt>
+                      <dd>{b.agreedScope}</dd>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div>
+                  <dt>{status === 'requested' ? t('Estimated price') : t('Amount due')}</dt>
+                  <dd>{t(money(b.amountDueCents))}</dd>
+                </div>
+              )}
             </dl>
             {status === 'requested' && (
               <p className="booking-notice">
@@ -207,6 +255,7 @@ export function CustomerBookingPage() {
               </p>
             )}
             <div className="booking-customer-actions">
+              <BookingInvoice booking={b} access={{ id, token }} />
               <button
                 className="btn-secondary"
                 onClick={async () => {

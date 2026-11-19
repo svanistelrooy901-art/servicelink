@@ -7,7 +7,7 @@ import { mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
 import QRCode from 'qrcode';
 const root = fileURLToPath(new URL('..', import.meta.url)),
-  qa = fileURLToPath(new URL('../../docs/qa/m2/', import.meta.url));
+  qa = fileURLToPath(new URL('../qa-output/booking/', import.meta.url));
 await mkdir(qa, { recursive: true });
 const origin = 'http://127.0.0.1:5194';
 const server = spawn(
@@ -74,7 +74,9 @@ try {
         await route.abort();
       } else await continueLocal(route);
     });
-    await context.addInitScript(() => { localStorage.setItem('sl.language', 'en'); });
+    await context.addInitScript(() => {
+      localStorage.setItem('sl.language', 'en');
+    });
     const owner = await context.newPage();
     owner.on('pageerror', (e) => errors.push(e.message));
     const noOverflow = async (page) => {
@@ -107,6 +109,15 @@ try {
       buffer: await QRCode.toBuffer('SERVICE LINK DEMO - DO NOT PAY', { width: 256, margin: 4 }),
     });
     await owner.getByAltText('Your payment QR', { exact: true }).waitFor();
+    await owner.getByLabel('Business name', { exact: true }).fill('Mamu Demo Studio');
+    await owner.getByLabel('Business registration', { exact: true }).fill('DEMO-REG-42');
+    await owner.getByLabel('Invoice note', { exact: true }).fill('Balance due after service.');
+    await owner.getByLabel('Upload invoice logo', { exact: true }).setInputFiles({
+      name: 'demo-logo.png',
+      mimeType: 'image/png',
+      buffer: await QRCode.toBuffer('FAKE LOGO - DEMO', { width: 160 }),
+    });
+    await owner.getByAltText('Business logo', { exact: true }).waitFor();
     checks++;
     await owner
       .getByRole('button', { name: 'Save availability & payment details', exact: true })
@@ -156,7 +167,11 @@ try {
     checks++;
     await owner.getByRole('link', { name: 'Bookings', exact: true }).click();
     await owner.getByRole('heading', { name: 'Demo Guest', exact: true }).waitFor();
-    await owner.getByLabel('Final amount due (RM)').fill('50');
+    await owner.getByLabel('Total price (RM)', { exact: true }).fill('100');
+    await owner.getByLabel('Deposit (RM)', { exact: true }).fill('125');
+    await owner.getByRole('button', { name: 'Accept & reserve slot', exact: true }).click();
+    await owner.getByRole('alert').filter({ hasText: 'The deposit must be between' }).waitFor();
+    await owner.getByLabel('Deposit (RM)', { exact: true }).fill('37.50');
     await owner.getByLabel('Payment deadline (MYT)').fill(deadline);
     await owner.getByRole('button', { name: 'Accept & reserve slot', exact: true }).click();
     await owner.getByRole('status').filter({ hasText: 'Booking accepted' }).waitFor();
@@ -166,6 +181,18 @@ try {
       .getByRole('heading', { name: 'Pay the provider directly', exact: true })
       .waitFor();
     await customer.getByText('DEMO-DO-NOT-PAY', { exact: true }).waitFor();
+    await customer.getByRole('button', { name: 'View invoice', exact: true }).click();
+    const invoice = customer.getByRole('dialog', { name: 'Invoice', exact: true });
+    await invoice.getByText('Mamu Demo Studio', { exact: true }).waitFor();
+    await invoice.getByText(/^RM\s*37\.50$/).waitFor();
+    await invoice.getByText(/^RM\s*62\.50$/).waitFor();
+    await invoice.getByAltText('Business logo', { exact: true }).waitFor();
+    if (width === 390) {
+      await customer.screenshot({ path: `${qa}invoice-390.png` });
+      await customer.pdf({ path: `${qa}invoice-print.pdf`, format: 'A4' });
+    }
+    await invoice.getByRole('button', { name: 'Close invoice', exact: true }).click();
+    checks += 4;
     await customer.getByAltText('Provider payment QR', { exact: true }).waitFor();
     assert.equal(
       await customer
@@ -224,8 +251,8 @@ try {
     );
     checks++;
     await owner.getByRole('button', { name: 'Add phone / WhatsApp booking', exact: true }).click();
-    await owner.getByLabel('Agreed amount due (RM)', { exact: true }).fill('50');
-    await owner.getByLabel('Manual booking payment deadline', { exact: true }).fill(deadline);
+    await owner.getByLabel('Total price (RM)', { exact: true }).fill('50');
+    await owner.getByLabel('Deposit (RM)', { exact: true }).fill('0');
     const manual = owner.locator('.manual-booking');
     await manual.getByLabel('Preferred date', { exact: true }).fill(bookingDate);
     await manual.getByLabel('Preferred start time').selectOption('11:00');
@@ -237,7 +264,7 @@ try {
       .check();
     await manual.getByRole('button', { name: 'Add accepted manual booking', exact: true }).click();
     await owner.getByRole('status').filter({ hasText: 'Manual booking added' }).waitFor();
-    await owner.getByRole('button', { name: 'Awaiting payment', exact: true }).click();
+    await owner.getByRole('button', { name: 'Confirmed', exact: true }).click();
     await owner.getByRole('heading', { name: 'Demo Manual Customer', exact: true }).waitFor();
     checks++;
     owner.once('dialog', (d) => d.accept());
@@ -252,6 +279,56 @@ try {
     await owner.getByRole('button', { name: 'Confirmed', exact: true }).click();
     await owner.getByRole('heading', { name: 'Demo Guest', exact: true }).waitFor();
     checks++;
+    if (width === 390) {
+      await owner.getByRole('link', { name: 'My profile', exact: true }).click();
+      await owner.getByLabel('Service category').selectOption('photography');
+      await owner.getByRole('link', { name: 'Services', exact: true }).click();
+      await owner.getByRole('button', { name: 'Weddings & Nikah', exact: true }).click();
+      await owner.getByLabel('Starting price (RM, optional)', { exact: true }).fill('900');
+      await owner.getByRole('link', { name: 'My profile', exact: true }).click();
+      await owner.getByRole('button', { name: 'Add project', exact: true }).click();
+      await owner.getByLabel('Project title', { exact: true }).fill('Nikah demo');
+      await owner
+        .getByLabel('Linked service (optional)', { exact: true })
+        .selectOption({ label: 'Weddings & Nikah' });
+      await owner.getByRole('link', { name: 'Preview & publish', exact: true }).click();
+      await owner.getByRole('button', { name: 'Publish updates', exact: true }).click();
+      await owner.getByRole('status').filter({ hasText: 'Profile published' }).waitFor();
+      await customer.goto(`${origin}/marketplace`);
+      await customer.locator('.filter-row select').first().selectOption('photography');
+      await customer.getByText('Aina · Demo Provider', { exact: true }).waitFor();
+      await customer.goto(`${origin}/p/aina-demo`);
+      await customer.getByRole('button', { name: 'Nikah demo', exact: true }).click();
+      await customer.getByRole('link', { name: 'Book this service', exact: true }).click();
+      await customer.getByLabel('Preferred date', { exact: true }).fill(bookingDate);
+      await customer.getByText(/From RM.*900/).waitFor();
+      await customer.getByLabel('Venue or area', { exact: true }).fill('Fictional Hall');
+      await customer.getByLabel('Service district / zone').selectOption('my-07-04');
+      await customer.getByLabel('Your name', { exact: true }).fill('Demo Event Guest');
+      await customer.getByLabel('Mobile number', { exact: true }).fill('0120000000');
+      await customer
+        .getByLabel('I agree to share these details with this provider to handle my booking.')
+        .check();
+      await customer.getByRole('button', { name: 'Send booking request', exact: true }).click();
+      await customer.getByText('Awaiting provider', { exact: true }).waitFor();
+      await owner.getByRole('link', { name: 'Bookings', exact: true }).click();
+      const eventCard = owner.locator('.owner-booking').filter({ hasText: 'Demo Event Guest' });
+      await eventCard.getByLabel('Final event start (MYT)').fill(`${bookingDate}T18:00`);
+      await eventCard.getByLabel('Final event end (MYT)').fill(`${bookingDate}T22:00`);
+      await eventCard.getByLabel('Total price (RM)').fill('1200');
+      await eventCard.getByLabel('Deposit (RM)').fill('0');
+      await eventCard.getByLabel('Agreed scope').fill('Four hours of event photography');
+      await eventCard.getByRole('button', { name: 'Accept & reserve slot', exact: true }).click();
+      await owner.getByRole('status').filter({ hasText: 'Booking accepted' }).waitFor();
+      await customer.getByRole('button', { name: 'Refresh status', exact: true }).click();
+      await customer.getByText('No deposit required', { exact: true }).waitFor();
+      await customer.getByRole('button', { name: 'View invoice', exact: true }).click();
+      await customer
+        .getByRole('dialog', { name: 'Invoice', exact: true })
+        .getByText('Four hours of event photography')
+        .waitFor();
+      checks += 4;
+    }
     await context.close();
   }
   assert.deepEqual(errors, []);

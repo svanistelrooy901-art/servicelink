@@ -1,4 +1,5 @@
 import { normalizeMalaysiaWhatsapp } from '../src/lib/whatsappNumber.ts';
+import { eventRequestError } from '../src/lib/bookingRules.ts';
 import type { BookingInput } from '../src/lib/bookingTypes.ts';
 export class ApiError extends Error {
   status: number;
@@ -29,7 +30,7 @@ export function bookingInput(value: unknown): BookingInput {
     'requestId',
   ];
   if (
-    Object.keys(v).some((k) => !fields.includes(k)) ||
+    Object.keys(v).some((k) => !fields.includes(k) && k !== 'event') ||
     fields.some((k) => !(k in v)) ||
     fields.filter((k) => k !== 'consent').some((k) => typeof v[k] !== 'string')
   )
@@ -41,7 +42,7 @@ export function bookingInput(value: unknown): BookingInput {
     p.slug.length > 60 ||
     !p.serviceId ||
     p.serviceId.length > 80 ||
-    !['appointment', 'date-range'].includes(p.mode) ||
+    !['appointment', 'date-range', 'event'].includes(p.mode) ||
     !uuid.test(p.requestId) ||
     p.consent !== true ||
     !p.customerName.trim() ||
@@ -63,6 +64,17 @@ export function bookingInput(value: unknown): BookingInput {
     end - start > 90 * 86400000
   )
     throw new ApiError(400, 'Choose a valid booking period.');
+  const event = p.event;
+  if (p.mode === 'event') {
+    if (
+      !event ||
+      typeof event !== 'object' ||
+      Array.isArray(event) ||
+      Object.keys(event).some((k) => !['venue', 'preferredTime'].includes(k)) ||
+      eventRequestError(p.start, p.end, event, 0, 0)
+    )
+      throw new ApiError(400, 'Enter a venue and a valid preferred time, if known.');
+  } else if ('event' in v) throw new ApiError(400, 'Invalid booking fields.');
   return {
     slug: p.slug,
     serviceId: p.serviceId,
@@ -77,6 +89,7 @@ export function bookingInput(value: unknown): BookingInput {
     note: p.note.trim(),
     consent: true,
     requestId: p.requestId,
+    ...(event ? { event: { venue: event.venue.trim(), preferredTime: event.preferredTime } } : {}),
   };
 }
 const hex = (bytes: ArrayBuffer) =>

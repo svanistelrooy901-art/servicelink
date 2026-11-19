@@ -1,12 +1,19 @@
 import { t } from '../i18n';
+import { InvoiceSettings } from '../components/InvoiceSettings';
 import { MediaImage } from '../components/MediaImage';
 import { useEffect, useState, type FormEvent } from 'react';
 import { CalendarDays, Plus, Trash2 } from 'lucide-react';
 import { useBookings } from '../hooks/useBookings';
 import { useAppStore } from '../hooks/useAppStore';
 import { bookingRepository } from '../lib/bookingRepository';
-import type { BookingSettings } from '../lib/bookingTypes';
-import { DAY_NAMES, myDate, addDays, malaysiaInstant } from '../lib/bookingRules';
+import type { BookingMode, BookingSettings } from '../lib/bookingTypes';
+import {
+  DAY_NAMES,
+  myDate,
+  addDays,
+  malaysiaInstant,
+  defaultBookingMode,
+} from '../lib/bookingRules';
 import { formatMY } from '../i18n/format';
 import { compressPaymentQR } from '../lib/media';
 import { bookingsEnabled, mediaEnabled } from '../lib/config';
@@ -115,7 +122,7 @@ export function AvailabilityPage() {
               <section className="panel">
                 <h2>{t('Your weekly hours')}</h2>
                 <p className="hint">
-                  {t('For appointments. Date-range enquiries are reviewed separately.')}
+                  {t('For appointments. Event and date-range requests are reviewed separately.')}
                 </p>
                 <div className="weekly-hours">
                   {draft.weekly.map((day, i) => (
@@ -171,21 +178,19 @@ export function AvailabilityPage() {
                   <label key={s.id}>
                     {s.name}
                     <select
-                      value={
-                        draft.modes[s.id] ??
-                        (profile.category === 'confinement' ? 'date-range' : 'appointment')
-                      }
+                      value={draft.modes[s.id] ?? defaultBookingMode(profile.category)}
                       onChange={(e) =>
                         patch({
                           modes: {
                             ...draft.modes,
-                            [s.id]: e.target.value as 'appointment' | 'date-range',
+                            [s.id]: e.target.value as BookingMode,
                           },
                         })
                       }
                     >
                       <option value="appointment">{t('Appointment · date and time')}</option>
                       <option value="date-range">{t('Date-range enquiry')}</option>
+                      <option value="event">{t('Event or job request')}</option>
                     </select>
                   </label>
                 ))}
@@ -292,6 +297,11 @@ export function AvailabilityPage() {
               <button className="btn-primary" disabled={busy || mediaBusy}>
                 {t('Save availability & payment details')}
               </button>
+              <InvoiceSettings
+                value={draft.invoice ?? undefined}
+                onChange={(invoice) => patch({ invoice })}
+                onProcessingChange={setMediaBusy}
+              />
             </fieldset>
           </form>
           <aside className="booking-blocks">
