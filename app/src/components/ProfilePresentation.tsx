@@ -5,7 +5,7 @@ import { MapPin, Globe, Briefcase, MessageCircle, ArrowUpRight, Star } from 'luc
 import { CategoryIcon } from './CategoryIcon';
 import { ProfileCover } from './ProfileCover';
 import { SocialLinks } from './SocialLinks';
-import { ProfileGallery } from './ProfileGallery';
+import { ProfilePortfolio } from './ProfilePortfolio';
 import { Link } from 'react-router-dom';
 import { coverageLabels } from '../i18n/format';
 import { categories, type ProviderProfile } from '../lib/types';
@@ -151,7 +151,7 @@ export function ProfilePresentation({
             )}
           </div>
         </section>
-        <ProfileGallery pictures={p.gallery} name={p.name} />
+        <ProfilePortfolio profile={p} preview={preview} />
         <section className="public-section">
           <h2>{t('Service coverage')}</h2>
           <div className="coverage-tags">

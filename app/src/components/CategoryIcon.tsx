@@ -1,4 +1,4 @@
-import { Baby, HeartHandshake, BookOpen, Paintbrush, Sparkles } from 'lucide-react';
+import { Baby, HeartHandshake, BookOpen, Paintbrush, Sparkles, Camera } from 'lucide-react';
 import type { Category } from '../lib/types';
 
 // One visual language for services across provider profiles and marketplace cards.
@@ -8,6 +8,7 @@ const icons = {
   tutor: BookOpen,
   makeup: Paintbrush,
   cleaning: Sparkles,
+  photography: Camera,
 };
 export function CategoryIcon({
   category,

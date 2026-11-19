@@ -7,7 +7,7 @@ import { useAppStore } from '../hooks/useAppStore';
 import { ProfilePresentation } from '../components/ProfilePresentation';
 import { CoverageSelector } from '../components/CoverageSelector';
 import { BannerEditor } from '../components/BannerEditor';
-import { GalleryEditor } from '../components/GalleryEditor';
+import { PortfolioEditor } from '../components/PortfolioEditor';
 import { SocialLinksEditor } from '../components/SocialLinksEditor';
 import { categories, type Service } from '../lib/types';
 import { normalizeSlug } from '../lib/profile';
@@ -31,6 +31,21 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
       t('Choose the places you serve. Customers will find you by service coverage.'),
     ],
   };
+  const addService = (name = '') =>
+    update({
+      services: [
+        ...p.services,
+        {
+          id: crypto.randomUUID(),
+          name,
+          description: '',
+          price: null,
+          priceBasis: 'quote',
+          durationMinutes: null,
+          delivery: 'in-person',
+        },
+      ],
+    });
   const changeService = (id: string, patch: Partial<Service>) =>
     update({ services: p.services.map((s) => (s.id === id ? { ...s, ...patch } : s)) });
   return (
@@ -229,9 +244,9 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
               </section>
               <SocialLinksEditor value={p.social} onChange={(social) => update({ social })} />
               <BannerEditor profile={p} onChange={update} onProcessingChange={setMediaBusy} />
-              <GalleryEditor
-                pictures={p.gallery}
-                onChange={(gallery) => update({ gallery })}
+              <PortfolioEditor
+                profile={p}
+                onChange={(portfolio) => update({ portfolio, gallery: [] })}
                 onProcessingChange={setMediaBusy}
               />
               <section className="panel">
@@ -268,6 +283,30 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                   <span className="count-badge">{p.services.length}/20</span>
                 </div>
               </section>
+              {p.category === 'photography' && (
+                <section className="panel">
+                  <h2>{t('Photography service templates')}</h2>
+                  <div className="portfolio-actions">
+                    {[
+                      'Weddings & Nikah',
+                      'Graduation',
+                      'Portraits',
+                      'Event photography',
+                      'Product photography',
+                    ].map((name) => (
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        key={name}
+                        disabled={p.services.length >= 20}
+                        onClick={() => addService(t(name))}
+                      >
+                        {t(name)}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              )}
               {p.services.map((s, i) => (
                 <section className="panel service-editor" key={s.id}>
                   <div className="section-label">
@@ -277,7 +316,20 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                     <button
                       className="icon-btn"
                       aria-label={t('Delete service {number}', { number: i + 1 })}
-                      onClick={() => update({ services: p.services.filter((x) => x.id !== s.id) })}
+                      onClick={() =>
+                        update({
+                          services: p.services.filter((x) => x.id !== s.id),
+                          ...(p.portfolio
+                            ? {
+                                portfolio: p.portfolio.map((project) =>
+                                  project.serviceId === s.id
+                                    ? { ...project, serviceId: '' }
+                                    : project,
+                                ),
+                              }
+                            : {}),
+                        })
+                      }
                     >
                       <Trash2 size={17} />
                     </button>
@@ -320,23 +372,21 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
                         ))}
                       </select>
                     </label>
-                    {s.priceBasis !== 'quote' && (
-                      <label>
-                        {t('Price (RM)')}
-                        <input
-                          type="number"
-                          min={0}
-                          max={100000}
-                          step="0.01"
-                          value={s.price ?? ''}
-                          onChange={(e) =>
-                            changeService(s.id, {
-                              price: e.target.value === '' ? null : Number(e.target.value),
-                            })
-                          }
-                        />
-                      </label>
-                    )}
+                    <label>
+                      {t(s.priceBasis === 'quote' ? 'Starting price (RM, optional)' : 'Price (RM)')}
+                      <input
+                        type="number"
+                        min={0}
+                        max={100000}
+                        step="0.01"
+                        value={s.price ?? ''}
+                        onChange={(e) =>
+                          changeService(s.id, {
+                            price: e.target.value === '' ? null : Number(e.target.value),
+                          })
+                        }
+                      />
+                    </label>
                   </div>
                   <div className="form-grid">
                     <label>
@@ -374,22 +424,7 @@ export function EditorPage({ section }: { section: 'profile' | 'services' | 'cov
               <button
                 className="add-service"
                 disabled={p.services.length >= 20}
-                onClick={() =>
-                  update({
-                    services: [
-                      ...p.services,
-                      {
-                        id: crypto.randomUUID(),
-                        name: '',
-                        description: '',
-                        price: null,
-                        priceBasis: 'quote',
-                        durationMinutes: null,
-                        delivery: 'in-person',
-                      },
-                    ],
-                  })
-                }
+                onClick={() => addService()}
               >
                 <Plus size={19} />
                 {t('Add a service')}

@@ -1125,40 +1125,6 @@ td {
   height: 40px;
   padding: 7px;
 }
-.gallery-teasers {
-  max-width: 520px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 16px;
-}
-.gallery-teasers img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: 13px;
-  background: #f6f1e8;
-  cursor: default;
-}
-.gallery-more {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 7px 0 7px 10px;
-  color: var(--accent);
-  background: transparent;
-  border: 0;
-  font-size: 12px;
-  font-weight: 600;
-}
-.gallery-more span {
-  background: var(--tint);
-  border-radius: 7px;
-  padding: 3px 6px;
-  font-size: 10px;
-}
 .gallery-dialog {
   width: min(940px, calc(100% - 28px));
   max-height: min(85dvh, 900px);
@@ -1187,12 +1153,6 @@ td {
 .gallery-dialog-header h2 {
   margin-top: 5px;
   font-size: 22px;
-}
-.gallery-dialog-header h2 small {
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--sl-muted);
-  margin-left: 8px;
 }
 .gallery-dialog-header .icon-btn {
   width: 44px;
@@ -1274,5 +1234,174 @@ td {
   }
   .workspace-header {
     flex-wrap: wrap;
+  }
+}
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: 12px;
+}
+.portfolio-card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  align-content: start;
+  padding: 0;
+  text-align: left;
+  background: var(--paper, white);
+  color: inherit;
+  border: 1px solid #dbe2e8;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.portfolio-card img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+}
+.portfolio-card strong {
+  padding: 13px;
+  overflow-wrap: anywhere;
+}
+.portfolio-project-detail {
+  padding: 0 20px 16px;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.portfolio-project-editor {
+  border-top: 1px solid #dbe2e8;
+  margin-top: 12px;
+  padding-top: 12px;
+  min-width: 0;
+}
+.portfolio-project-editor .gallery-editor {
+  padding: 12px;
+  margin: 10px 0 0;
+}
+.portfolio-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.portfolio-project-editor .section-label > .text-btn {
+  text-align: left;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.invoice-dialog {
+  width: min(720px, calc(100% - 24px));
+  max-height: calc(100% - 24px);
+  border: 1px solid #dbe2e8;
+  border-radius: 14px;
+  padding: 0;
+  background: white;
+  color: #14243a;
+}
+.invoice-dialog::backdrop {
+  background: rgb(15 23 42 / 0.65);
+}
+.invoice-controls {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 20px;
+  background: white;
+  border-bottom: 1px solid #dbe2e8;
+}
+.invoice-document {
+  padding: clamp(16px, 5vw, 40px);
+  overflow-wrap: anywhere;
+}
+.invoice-document p {
+  margin: 5px 0;
+  white-space: pre-line;
+}
+.invoice-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 2px solid #172a42;
+  padding-bottom: 16px;
+}
+.invoice-header h1 {
+  font-size: 1.8rem;
+  margin: 0 0 4px;
+}
+.invoice-header h2 {
+  font-size: 1.25rem;
+  margin: 4px 0;
+}
+.invoice-header img,
+.invoice-logo-preview {
+  display: block;
+  width: 110px;
+  height: 66px;
+  object-fit: contain;
+  object-position: left;
+}
+.invoice-customer,
+.invoice-service,
+.invoice-note {
+  margin-top: 16px;
+}
+.invoice-document h3 {
+  font-size: 0.85rem;
+  color: #40536a;
+  margin: 0 0 5px;
+}
+.invoice-totals {
+  margin-top: 18px;
+  padding: 12px 0;
+  border-block: 1px solid #dbe2e8;
+}
+.invoice-totals div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 5px 0;
+}
+.invoice-totals dd {
+  font-weight: 600;
+  margin: 0;
+  text-align: right;
+}
+@page invoice {
+  margin: 0;
+}
+@media print {
+  body:has(.invoice-dialog[open]) > :not(.invoice-dialog) {
+    display: none !important;
+  }
+  body:has(.invoice-dialog[open]) {
+    background: white;
+  }
+  .invoice-dialog[open] {
+    page: invoice;
+    display: block;
+    position: static;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    overflow: visible;
+    margin: 0;
+    border: 0;
+  }
+  .invoice-dialog::backdrop,
+  .invoice-controls {
+    display: none;
+  }
+  .invoice-document {
+    padding: 12mm;
+  }
+  .invoice-header,
+  .invoice-totals,
+  .invoice-customer,
+  .invoice-service {
+    break-inside: avoid;
   }
 }

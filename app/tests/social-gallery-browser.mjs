@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
 const appRoot = fileURLToPath(new URL('..', import.meta.url));
-const qaRoot = fileURLToPath(new URL('../../docs/qa/social-gallery/', import.meta.url));
+const qaRoot = fileURLToPath(new URL('../qa-output/portfolio/', import.meta.url));
 await mkdir(qaRoot, { recursive: true });
 const port = 5199,
   origin = `http://127.0.0.1:${port}`;
@@ -68,13 +68,19 @@ try {
         await route.abort();
       } else await continueLocal(route);
     });
-    await context.addInitScript(() => { localStorage.setItem('sl.language', 'en'); });
+    await context.addInitScript(() => {
+      localStorage.setItem('sl.language', 'en');
+    });
     const page = await context.newPage();
     page.on('pageerror', (e) => errors.push(e.message));
     await page.goto(`${origin}/login`);
     await page.getByRole('button', { name: 'Explore the demo' }).click();
     await page.getByRole('link', { name: 'My profile', exact: true }).click();
-    await page.getByRole('heading', { name: 'Your work, in pictures' }).waitFor();
+    await page.getByRole('button', { name: 'Add project', exact: true }).click();
+    await page.getByLabel('Project title', { exact: true }).fill('Demo work project');
+    await page.getByLabel('Project description', { exact: true }).fill('Eight work samples.');
+    await page.getByLabel('Linked service (optional)', { exact: true }).selectOption({ index: 1 });
+    await page.getByRole('heading', { name: 'Project pictures' }).waitFor();
     const editor = page.locator('.gallery-editor');
     check(await editor.locator('.gallery-edit-card').count(), 0, 'Empty gallery starts blank');
     const links = {
@@ -133,9 +139,13 @@ try {
       buffer: Buffer.from(data, 'base64'),
     }));
     const input = page.getByLabel('Gallery picture files');
-    await input.setInputFiles(fixtures);
-    await editor.getByRole('alert').filter({ hasText: 'Maximum 8' }).waitFor();
-    check(await editor.locator('.gallery-edit-card').count(), 0, 'Nine-file batch rejected');
+    await input.setInputFiles(Array.from({ length: 25 }, (_, i) => fixtures[i % fixtures.length]));
+    await editor.getByRole('alert').filter({ hasText: '24 more pictures' }).waitFor();
+    check(
+      await editor.locator('.gallery-edit-card').count(),
+      0,
+      'Batch above portfolio maximum rejected',
+    );
     await input.setInputFiles({
       name: 'bad.svg',
       mimeType: 'image/svg+xml',
@@ -167,20 +177,13 @@ try {
       true,
       'Cannot save unfinished batch',
     );
-    await page.getByRole('button', { name: 'Gallery full · 8 pictures', exact: true }).waitFor();
+    await editor.locator('.gallery-edit-card').nth(7).waitFor();
     await page.waitForFunction(
       () =>
         ![...document.querySelectorAll('button')].find((b) => b.textContent.includes('Save draft'))
           ?.disabled,
     );
     check(await editor.locator('.gallery-edit-card').count(), 8, 'Eight pictures added');
-    check(
-      await page
-        .getByRole('button', { name: 'Gallery full · 8 pictures', exact: true })
-        .isDisabled(),
-      true,
-      'Ninth upload disabled',
-    );
     const media = await editor.locator('.gallery-edit-image img').evaluateAll((imgs) =>
       imgs.map((img) => ({
         webp: img.src.startsWith('data:image/webp;base64,'),
@@ -206,7 +209,7 @@ try {
     await page.getByRole('button', { name: 'Save draft', exact: true }).click();
     await page.getByRole('status').filter({ hasText: 'Draft saved' }).waitFor();
     await page.reload();
-    await page.getByRole('button', { name: 'Gallery full · 8 pictures', exact: true }).waitFor();
+    await editor.locator('.gallery-edit-card').nth(7).waitFor();
     check(await editor.locator('.gallery-edit-card').count(), 8, 'Gallery survives reload');
     check(
       await page.getByLabel('Caption for picture 2', { exact: true }).inputValue(),
@@ -217,9 +220,9 @@ try {
       check(await page.getByLabel(`${name} link`).inputValue(), url, 'Social link persists');
     const preview = page.getByTestId('profile-presentation');
     check(
-      await preview.getByTestId('gallery-teasers').locator('img').count(),
-      2,
-      'Preview shows two thumbnails',
+      await preview.locator('.portfolio-card img').count(),
+      1,
+      'Preview shows the project cover',
     );
     check(
       await preview.locator('.profile-social button:disabled').count(),
@@ -246,13 +249,9 @@ try {
     pub.on('pageerror', (e) => errors.push(e.message));
     await pub.goto(`${origin}/p/aina-demo`);
     await pub.getByRole('heading', { name: 'Aina · Demo Provider', exact: true }).waitFor();
-    const teasers = pub.getByTestId('gallery-teasers');
-    check(await teasers.locator('img').count(), 2, 'Public profile shows only two pictures');
-    check(
-      await teasers.locator('img').nth(1).getAttribute('alt'),
-      'Fictional work 3',
-      'Published order matches preview',
-    );
+    const teasers = pub.locator('.portfolio-grid');
+    const more = pub.getByRole('button', { name: 'Demo work project', exact: true });
+    check(await teasers.locator('img').count(), 1, 'Public profile shows the project cover');
     for (const [name, url] of Object.entries(links)) {
       const link = pub.getByRole('link', { name: `${name} profile`, exact: true });
       check(await link.getAttribute('href'), url, 'Published social target matches');
@@ -263,12 +262,8 @@ try {
         'External link isolates opener',
       );
     }
-    await teasers.locator('img').first().click();
-    check(await pub.getByRole('dialog').count(), 0, 'Thumbnail does not open a picture');
-    check(context.pages().length, 2, 'Thumbnail creates no individual tab');
-    const more = pub.getByRole('button', { name: 'More gallery pictures', exact: true });
     await more.click();
-    const modal = pub.getByRole('dialog', { name: /Gallery/ });
+    const modal = pub.getByRole('dialog', { name: 'Demo work project', exact: true });
     await modal.waitFor();
     check(await modal.locator('img').count(), 8, 'More opens all eight pictures');
     check(
@@ -276,7 +271,12 @@ try {
       'Fictional work 3',
       'Modal order matches',
     );
-    check(await modal.locator('a').count(), 0, 'No individual image links');
+    const bookingLink = modal.getByRole('link', { name: 'Book this service', exact: true });
+    check(
+      (await bookingLink.getAttribute('href')).startsWith('/p/aina-demo/book?service='),
+      true,
+      'CTA preselects the linked service',
+    );
     check(await modal.locator('button').count(), 1, 'Only modal close is interactive');
     check(
       await pub.evaluate(() => document.body.style.overflow),
@@ -312,7 +312,7 @@ try {
     );
     await more.click();
     await modal.waitFor();
-    await modal.getByRole('button', { name: 'Close gallery' }).click();
+    await modal.getByRole('button', { name: 'Close project' }).click();
     await modal.waitFor({ state: 'hidden' });
     checks++;
     await more.click();
@@ -323,7 +323,7 @@ try {
     if (width === 390 || width === 1440)
       await pub.screenshot({ path: `${qaRoot}public-${width}.png`, fullPage: true });
     await page.getByRole('link', { name: 'My profile', exact: true }).click();
-    await page.getByRole('button', { name: 'Gallery full · 8 pictures', exact: true }).waitFor();
+    await editor.locator('.gallery-edit-card').nth(7).waitFor();
     for (let i = 0; i < 6; i++)
       await page.getByRole('button', { name: 'Remove picture 3', exact: true }).click();
     await page.getByRole('button', { name: 'Save draft', exact: true }).click();
@@ -339,18 +339,23 @@ try {
     await page.getByRole('status').filter({ hasText: 'Profile published' }).waitFor();
     await pub.reload();
     await pub.getByRole('heading', { name: 'Aina · Demo Provider', exact: true }).waitFor();
-    check(await teasers.locator('img').count(), 2, 'Two-picture gallery renders correctly');
-    check(await more.count(), 0, 'No More button when all pictures fit');
+    await more.click();
+    await modal.waitFor();
+    check(
+      await modal.locator('img').count(),
+      2,
+      'Published update shows only two remaining pictures',
+    );
+    await pub.keyboard.press('Escape');
     await page.getByRole('link', { name: 'My profile', exact: true }).click();
-    await page.getByRole('button', { name: 'Remove picture 2', exact: true }).click();
-    await page.getByRole('button', { name: 'Remove picture 1', exact: true }).click();
+    await page.getByRole('button', { name: 'Remove project', exact: true }).click();
     for (const name of Object.keys(links)) await page.getByLabel(`${name} link`).fill('');
     await page.getByRole('link', { name: 'Preview & publish', exact: true }).click();
     await page.getByRole('button', { name: 'Publish updates', exact: true }).click();
     await page.getByRole('status').filter({ hasText: 'Profile published' }).waitFor();
     await pub.reload();
     await pub.getByRole('heading', { name: 'Aina · Demo Provider', exact: true }).waitFor();
-    check(await pub.locator('.profile-gallery').count(), 0, 'Empty gallery hidden');
+    check(await pub.locator('.profile-portfolio').count(), 0, 'Empty gallery hidden');
     check(
       await pub.getByRole('navigation', { name: 'Social media' }).count(),
       0,

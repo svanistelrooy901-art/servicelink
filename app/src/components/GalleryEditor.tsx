@@ -1,9 +1,9 @@
 import { t } from '../i18n';
 import { MediaImage } from './MediaImage';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Images, Upload, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { compressGalleryPicture } from '../lib/media';
-import { MAX_GALLERY_PICTURES, moveGalleryPicture } from '../lib/gallery';
+import { moveGalleryPicture } from '../lib/gallery';
 import { mediaEnabled } from '../lib/config';
 import type { GalleryPicture } from '../lib/types';
 
@@ -11,10 +11,12 @@ export function GalleryEditor({
   pictures = [],
   onChange,
   onProcessingChange,
+  projectLimit,
 }: {
   pictures: GalleryPicture[];
   onChange: (pictures: GalleryPicture[]) => void;
   onProcessingChange: (busy: boolean) => void;
+  projectLimit: number;
 }) {
   const input = useRef<HTMLInputElement>(null),
     mounted = useRef(false),
@@ -31,17 +33,18 @@ export function GalleryEditor({
     onProcessingChange(preparing);
     return () => onProcessingChange(false);
   }, [preparing, onProcessingChange]);
-  const remaining = MAX_GALLERY_PICTURES - pictures.length;
+  const guide = useId();
+  const remaining = projectLimit - pictures.length;
   return (
     <section className="panel gallery-editor">
       <div className="section-label">
-        <h2>{t('Your work, in pictures')}</h2>
-        <span className="count-badge">{pictures.length}/8</span>
+        <h3>{t('Project pictures')}</h3>
+        <span className="count-badge">
+          {pictures.length}/{projectLimit}
+        </span>
       </div>
       <p className="hint">
-        {t(
-          'The first 2 pictures appear on your profile. More opens the full gallery. Use the arrows to choose the order.',
-        )}
+        {t('The first picture is your project cover. Use the arrows to reorder.')}
       </p>
       {pictures.length ? (
         <div className="gallery-edit-grid">
@@ -52,7 +55,7 @@ export function GalleryEditor({
                   src={p.src}
                   alt={p.caption || t('Work picture {number}', { number: i + 1 })}
                 />
-                {i < 2 && <span>{t('On profile')}</span>}
+                {i === 0 && <span>{t('Cover')}</span>}
               </div>
               <div className="gallery-edit-fields">
                 <label htmlFor={`gallery-caption-${p.id}`}>
@@ -124,7 +127,7 @@ export function GalleryEditor({
         {preparing
           ? t('Preparing pictures…')
           : remaining === 0
-            ? t('Gallery full · 8 pictures')
+            ? t('Portfolio picture limit reached')
             : t('Add work pictures')}
       </button>
       <input
@@ -133,7 +136,7 @@ export function GalleryEditor({
         multiple
         accept="image/jpeg,image/png,image/webp"
         aria-label={t('Gallery picture files')}
-        aria-describedby="gallery-upload-guide"
+        aria-describedby={guide}
         tabIndex={-1}
         disabled={!mediaEnabled || preparing || remaining === 0}
         onChange={async (e) => {
@@ -143,12 +146,7 @@ export function GalleryEditor({
           setError('');
           if (files.length > remaining) {
             setError(
-              t(
-                remaining === 1
-                  ? 'You can add {count} more picture. Maximum 8 in total.'
-                  : 'You can add {count} more pictures. Maximum 8 in total.',
-                { count: remaining },
-              ),
+              t('You can add {count} more pictures to your portfolio.', { count: remaining }),
             );
             return;
           }
@@ -172,10 +170,8 @@ export function GalleryEditor({
           }
         }}
       />
-      <p className="tiny" id="gallery-upload-guide">
-        {t(
-          'Up to 8 pictures. JPG, PNG or WebP, max 8 MB each. Resized and compressed automatically.',
-        )}
+      <p className="tiny" id={guide}>
+        {t('JPG, PNG or WebP up to 8 MB each. Pictures are resized and compressed.')}
       </p>
       {error && (
         <p role="alert" className="error-text">

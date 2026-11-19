@@ -301,3 +301,50 @@ test('different service IDs still reserve the same solo provider calendar', asyn
   await accept(r, first.id);
   await assert.rejects(r.request(input({ serviceId: 'second-service' })), /reserved/);
 });
+
+test('local event approvals preserve the requested venue, exact slot, deposit and invoice snapshot', async () => {
+  const { p, r } = await fixture();
+  const workspace = await p.load();
+  await p.publish({ ...workspace.draft, category: 'photography' }, workspace.revision);
+  let w = await r.load();
+  const originalSettings = {
+    ...w.settings,
+    invoice: { ...w.settings.invoice!, businessName: 'Example Studio' },
+  };
+  await r.saveSettings(originalSettings, w.revision);
+  const request = await r.request(
+    input({
+      mode: 'event',
+      start: malaysiaInstant('2026-11-02', '00:00'),
+      end: malaysiaInstant('2026-11-03', '00:00'),
+      event: { venue: 'Studio 1', preferredTime: '' },
+    }),
+  );
+  assert.equal((await r.availability('aina-demo')).busy.length, 0);
+  assert.equal(request.amountDueCents, null);
+  const terms = {
+    totalPriceCents: 135000,
+    amountDueCents: 0,
+    paymentDeadline: null,
+    agreedScope: 'Studio session',
+    start: malaysiaInstant('2026-11-02', '18:00'),
+    end: malaysiaInstant('2026-11-02', '19:00'),
+  };
+  w = await r.load();
+  w = await r.ownerAction(request.id, 'accept', w.revision, terms);
+  await r.saveSettings(
+    {
+      ...originalSettings,
+      invoice: { ...originalSettings.invoice, businessName: 'Edited Studio' },
+    },
+    w.revision,
+  );
+  const accepted = await r.customerRead(request.id, request.accessToken);
+  assert.equal(accepted?.status, 'confirmed');
+  assert.equal(accepted?.paymentDetails, null);
+  assert.equal(accepted?.amountDueCents, 0);
+  assert.equal(accepted?.totalPriceCents, 135000);
+  assert.equal(accepted?.invoice?.businessName, 'Example Studio');
+  assert.equal(accepted?.event?.venue, 'Studio 1');
+  assert.equal((await r.availability('aina-demo')).busy[0].start, terms.start);
+});

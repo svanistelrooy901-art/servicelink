@@ -16,18 +16,22 @@ import {
   overlaps,
   estimateCents,
   money,
+  defaultBookingMode,
 } from '../lib/bookingRules';
+import { priceLabel } from '../i18n/format';
 import { stateById } from '../lib/geography';
 export function BookingForm({
   profile,
   initialServiceId,
   onSubmit,
   submitting = false,
+  manual = false,
   submitLabel = t('Send booking request'),
 }: {
   profile: ProviderProfile;
   initialServiceId?: string;
-  onSubmit: (input: BookingInput) => Promise<void>;
+  onSubmit: (input: BookingInput, schedule?: { start: string; end: string }) => Promise<void>;
+  manual?: boolean;
   submitting?: boolean;
   submitLabel?: string;
 }) {
@@ -42,6 +46,9 @@ export function BookingForm({
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [note, setNote] = useState('');
+  const [venue, setVenue] = useState('');
+  const [eventTime, setEventTime] = useState('');
+  const [eventDuration, setEventDuration] = useState(120);
   const [consent, setConsent] = useState(false);
   const [state, setState] = useState(profile.coverage[0]?.stateId ?? '');
   const [district, setDistrict] = useState('');
@@ -58,10 +65,9 @@ export function BookingForm({
   }, [profile.slug]);
   const service = profile.services.find((s) => s.id === serviceId);
   const mode: BookingMode =
-    availability?.settings.modes[serviceId] ??
-    (profile.category === 'confinement' ? 'date-range' : 'appointment');
+    availability?.settings.modes[serviceId] ?? defaultBookingMode(profile.category);
   const times = useMemo(() => {
-    if (!availability || !service || mode === 'date-range') return [];
+    if (!availability || !service || mode !== 'appointment' || !date) return [];
     const hours = availability.settings.weekly.find(
       (d) => d.day === new Date(`${date}T12:00:00+08:00`).getUTCDay(),
     );
@@ -122,7 +128,7 @@ export function BookingForm({
     }) ?? [];
   let estimate: number | null = null;
   try {
-    if (service) {
+    if (service && mode !== 'event') {
       const start = malaysiaInstant(date, mode === 'date-range' ? '00:00' : time),
         end =
           mode === 'date-range'
@@ -140,28 +146,40 @@ export function BookingForm({
     if (submitting || !service) return;
     setError('');
     try {
-      const start = malaysiaInstant(date, mode === 'date-range' ? '00:00' : time);
+      const start = malaysiaInstant(date, mode === 'appointment' ? time : '00:00');
       const end =
-        mode === 'date-range'
-          ? malaysiaInstant(endDate, '00:00')
-          : new Date(
-              Date.parse(start) + (service.durationMinutes ?? minutes) * 60000,
-            ).toISOString();
-      await onSubmit({
-        slug: profile.slug,
-        serviceId,
-        mode,
-        start,
-        end,
-        stateId: state,
-        subdivisionId: district,
-        customerName,
-        customerPhone: phone,
-        customerEmail: email,
-        note,
-        consent,
-        requestId,
-      });
+        mode === 'event'
+          ? malaysiaInstant(addDays(date, 1), '00:00')
+          : mode === 'date-range'
+            ? malaysiaInstant(endDate, '00:00')
+            : new Date(
+                Date.parse(start) + (service.durationMinutes ?? minutes) * 60000,
+              ).toISOString();
+      const fixedEventStart = manual && mode === 'event' ? malaysiaInstant(date, eventTime) : null;
+      await onSubmit(
+        {
+          slug: profile.slug,
+          serviceId,
+          mode,
+          start,
+          end,
+          stateId: state,
+          subdivisionId: district,
+          customerName,
+          customerPhone: phone,
+          customerEmail: email,
+          note,
+          consent,
+          requestId,
+          ...(mode === 'event' ? { event: { venue, preferredTime: eventTime } } : {}),
+        },
+        fixedEventStart
+          ? {
+              start: fixedEventStart,
+              end: new Date(Date.parse(fixedEventStart) + eventDuration * 60000).toISOString(),
+            }
+          : undefined,
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : t('Unable to send this request.'));
     }
@@ -218,6 +236,16 @@ export function BookingForm({
                 onChange={(e) => setEndDate(e.target.value)}
               />
             </label>
+          ) : mode === 'event' ? (
+            <label>
+              {t(manual ? 'Event start time (MYT)' : 'Preferred time (optional)')}
+              <input
+                type="time"
+                required={manual}
+                value={eventTime}
+                onChange={(e) => setEventTime(e.target.value)}
+              />
+            </label>
           ) : (
             <label>
               {t('Preferred start time')}
@@ -238,6 +266,32 @@ export function BookingForm({
             </label>
           )}
         </div>
+        {mode === 'event' && (
+          <div className="form-grid">
+            <label>
+              {t('Venue or area')}
+              <input
+                required
+                maxLength={200}
+                value={venue}
+                onChange={(e) => setVenue(e.target.value)}
+              />
+            </label>
+            {manual && (
+              <label>
+                {t('Event duration (minutes)')}
+                <input
+                  required
+                  type="number"
+                  min={1}
+                  max={1440}
+                  value={eventDuration}
+                  onChange={(e) => setEventDuration(Number(e.target.value))}
+                />
+              </label>
+            )}
+          </div>
+        )}
         {mode === 'appointment' && !service?.durationMinutes && (
           <label>
             {t('Requested duration (minutes)')}
@@ -335,7 +389,8 @@ export function BookingForm({
           />
         </label>
         <p className="booking-estimate">
-          {t('Estimated service price')} <strong>{t(money(estimate))}</strong>
+          {t('Estimated service price')}{' '}
+          <strong>{t(mode === 'event' && service ? priceLabel(service) : money(estimate))}</strong>
           <small>{t('Provider confirms the final amount and any extras before you pay.')}</small>
         </p>
         <label className="check-row">

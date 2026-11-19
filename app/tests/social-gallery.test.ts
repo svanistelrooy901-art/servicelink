@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { demoProfile } from '../src/data/demo.ts';
 import { validSocialLink, emptySocialLinks } from '../src/lib/social.ts';
-import { galleryErrors, moveGalleryPicture } from '../src/lib/gallery.ts';
+import { galleryErrors, moveGalleryPicture, profileProjects } from '../src/lib/gallery.ts';
 import { publicSnapshot, validateForPublish } from '../src/lib/profile.ts';
 import { createLocalRepository, LOCAL_WORKSPACE_KEY } from '../src/lib/localRepository.ts';
 const picture = (id: string) => ({
@@ -131,4 +131,39 @@ test('gallery/social edits, ordering and removals stay drafts until publication;
   assert.equal((await r.listPublic())[0].profile.social.instagram, '');
   await r.unpublish(w.revision);
   assert.equal(await r.getPublic(p.slug), null);
+});
+
+test('legacy galleries become editable projects and publication validates all portfolio limits', () => {
+  const legacy = { ...demoProfile(), gallery: [picture('1'), picture('2')] };
+  const [oldProject] = profileProjects(legacy);
+  assert.equal(oldProject.title, 'Past work');
+  assert.deepEqual(oldProject.pictures, legacy.gallery);
+  const project = { ...oldProject, serviceId: legacy.services[0].id, privateNote: 'Owner only' };
+  const profile = {
+    ...legacy,
+    category: 'photography' as const,
+    gallery: [],
+    portfolio: [project],
+  };
+  assert.deepEqual(validateForPublish(profile), []);
+  assert.equal('privateNote' in publicSnapshot(profile).portfolio![0], false);
+  const noPhotos = {
+    id: 'guide',
+    title: 'Lesson guide',
+    description: 'Text only',
+    serviceId: '',
+    pictures: [],
+  };
+  assert.deepEqual(validateForPublish({ ...profile, portfolio: [noPhotos] }), []);
+  assert.ok(
+    validateForPublish({ ...profile, portfolio: [{ ...project, serviceId: 'removed' }] }).length,
+  );
+  assert.ok(
+    validateForPublish({
+      ...profile,
+      portfolio: [
+        { ...project, pictures: Array.from({ length: 25 }, (_, i) => picture(String(i))) },
+      ],
+    }).length,
+  );
 });

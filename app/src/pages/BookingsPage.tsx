@@ -6,6 +6,12 @@ import { useBookings } from '../hooks/useBookings';
 import { useAppStore } from '../hooks/useAppStore';
 import { bookingRepository } from '../lib/bookingRepository';
 import { BookingForm, bookingAccessPath } from '../components/BookingForm';
+import {
+  BookingTermsFields,
+  bookingTerms,
+  type BookingTermsDraft,
+} from '../components/BookingTermsFields';
+import { BookingInvoice } from '../components/BookingInvoice';
 import type { BookingRecord, AcceptBooking, BookingWorkspace } from '../lib/bookingTypes';
 import {
   myDate,
@@ -25,8 +31,12 @@ export function BookingsPage() {
   const [filter, setFilter] = useState('requested');
   const [date, setDate] = useState(myDate());
   const [manualOpen, setManualOpen] = useState(false);
-  const [manualAmount, setManualAmount] = useState('');
-  const [manualDeadline, setManualDeadline] = useState(`${addDays(myDate(), 1)}T08:00`);
+  const [manualTerms, setManualTerms] = useState<BookingTermsDraft>({
+    total: '',
+    deposit: '',
+    scope: '',
+    deadline: `${addDays(myDate(), 1)}T08:00`,
+  });
   if (!bookingsEnabled)
     return (
       <section className="panel">
@@ -154,47 +164,28 @@ export function BookingsPage() {
             <p>{t('Publish your profile first to choose a service.')}</p>
           ) : (
             <>
-              <div className="form-grid">
-                <label>
-                  {t('Agreed amount due (RM)')}
-                  <input
-                    type="number"
-                    min={0}
-                    max={100000}
-                    step="0.01"
-                    value={manualAmount}
-                    onChange={(e) => setManualAmount(e.target.value)}
-                  />
-                </label>
-                <label>
-                  {t('Manual booking payment deadline')}
-                  <input
-                    type="datetime-local"
-                    required
-                    value={manualDeadline}
-                    onChange={(e) => setManualDeadline(e.target.value)}
-                  />
-                </label>
-              </div>
+              <BookingTermsFields draft={manualTerms} onChange={setManualTerms} />
               <BookingForm
                 profile={workspace.published}
+                manual
                 submitLabel="Add accepted manual booking"
                 submitting={busy}
-                onSubmit={async (input) => {
+                onSubmit={async (input, schedule) => {
                   if (!data) return;
-                  if (manualAmount === '') throw new Error(t('Enter the agreed amount due.'));
-                  const amount = Math.round(Number(manualAmount) * 100);
-                  const [day, time] = manualDeadline.split('T');
+                  const terms = bookingTerms(manualTerms);
                   const result = await run(
-                    () =>
-                      bookingRepository.manual(
-                        input,
-                        { amountDueCents: amount, paymentDeadline: malaysiaInstant(day, time) },
-                        data.revision,
-                      ),
+                    () => bookingRepository.manual(input, { ...terms, ...schedule }, data.revision),
                     t('Manual booking added; slot reserved.'),
                   );
-                  if (result) setManualOpen(false);
+                  if (result) {
+                    setManualOpen(false);
+                    setManualTerms((previous) => ({
+                      ...previous,
+                      total: '',
+                      deposit: '',
+                      scope: '',
+                    }));
+                  }
                 }}
               />
             </>
@@ -257,28 +248,39 @@ function OwnerBookingCard({
     a?: AcceptBooking,
   ) => Promise<BookingWorkspace | undefined>;
 }) {
-  const [amount, setAmount] = useState(
-    b.amountDueCents === null ? '' : String(b.amountDueCents / 100),
-  );
-  const [deadline, setDeadline] = useState(
-    localInput(
-      new Date(Math.min(Date.now() + 24 * 3600000, Date.parse(b.start) - 60000)).toISOString(),
+  const requestedStart = b.requestedDate
+    ? malaysiaInstant(b.requestedDate, b.event?.preferredTime || '09:00')
+    : b.start;
+  const [terms, setTerms] = useState<BookingTermsDraft>({
+    total: b.amountDueCents == null ? '' : String(b.amountDueCents / 100),
+    deposit: '',
+    scope: '',
+    deadline: localInput(
+      new Date(
+        Math.min(Date.now() + 24 * 3600000, Date.parse(requestedStart) - 60000),
+      ).toISOString(),
     ),
+  });
+  const [start, setStart] = useState(
+    `${b.requestedDate ?? ''}T${b.event?.preferredTime || '09:00'}`,
   );
+  const [end, setEnd] = useState(`${b.requestedDate ?? ''}T17:00`);
   const [checked, setChecked] = useState(false);
   const [error, setError] = useState('');
   const status = effectiveStatus(b);
   async function accept() {
     setError('');
     try {
-      if (amount === '') throw new Error(t('Enter a final amount before accepting.'));
-      const [day, time] = deadline.split('T');
-      await onAction('accept', {
-        amountDueCents: Math.round(Number(amount) * 100),
-        paymentDeadline: malaysiaInstant(day, time),
-      });
+      const acceptance = bookingTerms(terms);
+      if (b.mode === 'event') {
+        const [startDate, startTime] = start.split('T');
+        const [endDate, endTime] = end.split('T');
+        acceptance.start = malaysiaInstant(startDate, startTime);
+        acceptance.end = malaysiaInstant(endDate, endTime);
+      }
+      await onAction('accept', acceptance);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('Unable to accept booking.'));
+      setError(e instanceof Error ? t(e.message) : t('Unable to accept booking.'));
     }
   }
   return (
@@ -297,13 +299,33 @@ function OwnerBookingCard({
           <h3>{b.customerName}</h3>
           <p>{b.customerPhone}</p>
           {b.customerEmail && <p>{b.customerEmail}</p>}
-          <p className="booking-time">
-            {formatMY(b.start)}
-            <br />
-            {t('to')} {formatMY(b.end)}
-          </p>
+          {b.mode === 'event' && b.event && (
+            <p className="tiny">
+              {t('Venue or area')}
+              {' · '}
+              {b.event.venue}
+            </p>
+          )}
+          {b.mode === 'event' && !b.invoice ? (
+            <p className="booking-time">
+              {b.requestedDate}
+              {b.event?.preferredTime && ` · ${b.event.preferredTime}`}
+            </p>
+          ) : (
+            <p className="booking-time">
+              {formatMY(b.start)}
+              <br />
+              {t('to')} {formatMY(b.end)}
+            </p>
+          )}
           <p className="tiny">
-            {b.mode === 'date-range' ? t('Full date-range request') : t('Appointment request')}
+            {t(
+              b.mode === 'event'
+                ? 'Event or job request'
+                : b.mode === 'date-range'
+                  ? 'Full date-range request'
+                  : 'Appointment request',
+            )}
           </p>
           {b.note && <p className="customer-note">{b.note}</p>}
           {b.accessToken && (
@@ -315,7 +337,23 @@ function OwnerBookingCard({
         </section>
         <section>
           <p className="payment-state">{t(paymentLabel(b.paymentStatus))}</p>
-          <strong className="booking-amount">{t(money(b.amountDueCents))}</strong>
+          {b.totalPriceCents == null ? (
+            <strong className="booking-amount">{t(money(b.amountDueCents))}</strong>
+          ) : (
+            <>
+              <p>
+                {t('Total price')} · {money(b.totalPriceCents)}
+              </p>
+              <p>
+                {t('Deposit')} · {money(b.amountDueCents)}
+              </p>
+              <p>
+                {t('Balance after deposit')} · {money(b.totalPriceCents - (b.amountDueCents ?? 0))}
+              </p>
+              {b.agreedScope && <p className="customer-note">{b.agreedScope}</p>}
+            </>
+          )}
+          <BookingInvoice booking={b} />
           {b.paymentDeadline && (
             <p className="tiny">
               {t('Deadline:')} {formatMY(b.paymentDeadline)}
@@ -328,31 +366,27 @@ function OwnerBookingCard({
           )}
           {status === 'requested' && (
             <fieldset disabled={busy} className="accept-booking">
-              <label>
-                {t('Final amount due (RM)')}
-                <input
-                  type="number"
-                  min={0}
-                  max={100000}
-                  step="0.01"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                />
-              </label>
-              <label>
-                {t('Payment deadline (MYT)')}
-                <input
-                  type="datetime-local"
-                  required
-                  value={deadline}
-                  onChange={(e) => setDeadline(e.target.value)}
-                />
-              </label>
-              <p className="tiny">
-                {t(
-                  'Choose a deadline before the service starts. The slot is released when an unpaid window expires.',
-                )}
-              </p>
+              {b.mode === 'event' && (
+                <div className="form-grid">
+                  <label>
+                    {t('Final event start (MYT)')}
+                    <input
+                      type="datetime-local"
+                      value={start}
+                      onChange={(e) => setStart(e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    {t('Final event end (MYT)')}
+                    <input
+                      type="datetime-local"
+                      value={end}
+                      onChange={(e) => setEnd(e.target.value)}
+                    />
+                  </label>
+                </div>
+              )}
+              <BookingTermsFields draft={terms} onChange={setTerms} />
               <div className="booking-action-row">
                 <button className="btn-primary" onClick={accept}>
                   {t('Accept & reserve slot')}

@@ -1,5 +1,5 @@
 import type { Service } from './types';
-export type BookingMode = 'appointment' | 'date-range';
+export type BookingMode = 'appointment' | 'date-range' | 'event';
 export type BookingStatus =
   | 'requested'
   | 'accepted'
@@ -28,6 +28,18 @@ export interface ManualPaymentDetails {
   instructions: string;
   qrPhoto: string;
 }
+export interface InvoiceTemplate {
+  businessName: string;
+  registration: string;
+  contact: string;
+  address: string;
+  logo: string;
+  note: string;
+}
+export interface EventRequest {
+  venue: string;
+  preferredTime: string;
+}
 export interface BookingSettings {
   enabled: boolean;
   weekly: DayHours[];
@@ -35,6 +47,7 @@ export interface BookingSettings {
   bufferMinutes: number;
   modes: Record<string, BookingMode>;
   payment: ManualPaymentDetails;
+  invoice?: InvoiceTemplate | null;
 }
 export interface BookingInput {
   slug: string;
@@ -48,6 +61,7 @@ export interface BookingInput {
   customerPhone: string;
   customerEmail: string;
   note: string;
+  event?: EventRequest | null;
   consent: boolean;
   requestId: string;
 }
@@ -64,6 +78,10 @@ export interface BookingRecord extends Omit<BookingInput, 'consent' | 'requestId
   paymentStatus: PaymentStatus;
   bufferMinutes: number;
   amountDueCents: number | null;
+  totalPriceCents?: number | null;
+  agreedScope?: string;
+  requestedDate?: string | null;
+  invoice?: (InvoiceTemplate & { issuedAt: string }) | null;
   paymentDeadline: string | null;
   paymentDetails: ManualPaymentDetails | null;
   createdAt: string;
@@ -87,7 +105,11 @@ export interface BookingAvailability {
 }
 export interface AcceptBooking {
   amountDueCents: number;
-  paymentDeadline: string;
+  paymentDeadline: string | null;
+  totalPriceCents?: number;
+  agreedScope?: string;
+  start?: string;
+  end?: string;
 }
 export interface BookingRepository {
   load(): Promise<BookingWorkspace>;

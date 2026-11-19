@@ -4,6 +4,7 @@ export const categories = {
   tutor: 'Private tutor',
   makeup: 'Makeup artist',
   cleaning: 'Cleaning service',
+  photography: 'Photography',
 } as const;
 export type Category = keyof typeof categories;
 export interface SocialLinks {
@@ -15,6 +16,13 @@ export interface GalleryPicture {
   id: string;
   src: string;
   caption: string;
+}
+export interface PortfolioProject {
+  id: string;
+  title: string;
+  description: string;
+  serviceId: string;
+  pictures: GalleryPicture[];
 }
 export interface Coverage {
   stateId: string;
@@ -46,6 +54,7 @@ export interface ProviderProfile {
   bannerPosition: number;
   social: SocialLinks;
   gallery: GalleryPicture[];
+  portfolio?: PortfolioProject[];
   accent: 'forest' | 'plum' | 'ocean';
   coverage: Coverage[];
   services: Service[];

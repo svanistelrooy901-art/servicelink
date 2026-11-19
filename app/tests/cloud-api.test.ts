@@ -362,6 +362,160 @@ test('staging HTTP APIs: two isolated clients, booking ownership/tokens, retries
       (await db.query('select sl_api_limit($1,1,60) as allowed', ['c'.repeat(64)])).rows[0].allowed,
       false,
     );
+    // Photographers use the existing publication, media and provider-wide capacity flow.
+    await db.exec('reset role');
+    const workImage = crypto.randomUUID(),
+      invoiceLogo = crypto.randomUUID();
+    for (const [id, kind] of [
+      [workImage, 'gallery'],
+      [invoiceLogo, 'portrait'],
+    ]) {
+      await db.query('select sl_media_reserve($1,$2,$3,$4)', [id, owner, kind, 100]);
+      await db.query('select sl_media_finish($1,$2,$3)', [id, owner, 'ready']);
+    }
+    const photoProfile = {
+      ...profile,
+      category: 'photography',
+      portfolio: [
+        {
+          id: 'sample-work',
+          title: 'Fictional event',
+          description: 'Fictional sample only',
+          serviceId: input.serviceId,
+          pictures: [{ id: 'picture', src: `/api/media/${workImage}.webp`, caption: 'Sample' }],
+        },
+      ],
+    };
+    await db.query('insert into sl_public_profiles(user_id,slug,profile) values($1,$2,$3)', [
+      owner,
+      profile.slug,
+      JSON.stringify(photoProfile),
+    ]);
+    assert.equal(
+      (await db.query('select sl_media_access($1) as key', [workImage])).rows[0].key,
+      `${owner}/${workImage}.webp`,
+    );
+    const eventInput = {
+      ...input,
+      mode: 'event' as const,
+      start: malaysiaInstant(date, '00:00'),
+      end: malaysiaInstant(addDays(date, 1), '00:00'),
+      event: { venue: 'Fictional hall', preferredTime: '' },
+      requestId: crypto.randomUUID(),
+    };
+    w = await provider.load();
+    settings.invoice = {
+      ...settings.invoice!,
+      businessName: 'Demo Studio',
+      logo: `/api/media/${invoiceLogo}.webp`,
+      note: 'Balance after service.',
+    };
+    await assert.rejects(
+      provider.saveSettings(
+        {
+          ...settings,
+          invoice: { ...settings.invoice, logo: `/api/media/${foreign}.webp` },
+        },
+        w.revision,
+      ),
+      /settings/,
+    );
+    w = await provider.saveSettings(settings, w.revision);
+    const event = await customer.request(eventInput);
+    assert.equal(event.requestedDate, date);
+    assert.deepEqual(event.event, eventInput.event);
+    assert.equal(event.invoice, null);
+    assert.equal(event.amountDueCents, null);
+    const quote = {
+      amountDueCents: 27352,
+      totalPriceCents: 120000,
+      agreedScope: 'Four hours, edited photos included',
+      start: malaysiaInstant(date, '13:00'),
+      end: malaysiaInstant(date, '17:00'),
+      paymentDeadline: new Date(Date.now() + 3600000).toISOString(),
+    };
+    w = await provider.load();
+    await assert.rejects(
+      provider.ownerAction(event.id, 'accept', w.revision, { ...quote, amountDueCents: 120001 }),
+      /deposit/,
+    );
+    await assert.rejects(
+      provider.ownerAction(event.id, 'accept', w.revision, { ...quote, start: input.start }),
+      /reserved/,
+    );
+    assert.equal((await customer.customerRead(event.id, event.accessToken))?.status, 'requested');
+    w = await provider.ownerAction(event.id, 'accept', w.revision, quote);
+    const acceptedEvent = (await customer.customerRead(event.id, event.accessToken))!;
+    assert.equal(acceptedEvent.totalPriceCents, 120000);
+    assert.equal(acceptedEvent.amountDueCents, 27352);
+    assert.equal(Date.parse(acceptedEvent.start), Date.parse(quote.start));
+    assert.equal(acceptedEvent.invoice?.businessName, 'Demo Studio');
+    assert.equal(acceptedEvent.invoice?.note, 'Balance after service.');
+    assert.equal(acceptedEvent.agreedScope, quote.agreedScope);
+    assert.equal(await customer.customerRead(event.id, booking.accessToken), null);
+    w = await provider.saveSettings(
+      { ...settings, invoice: { ...settings.invoice, businessName: 'Updated Studio', logo: '' } },
+      w.revision,
+    );
+    assert.equal(
+      (await customer.customerRead(event.id, event.accessToken))?.invoice?.businessName,
+      'Demo Studio',
+    );
+    await db.exec('reset role');
+    assert.equal(
+      (await db.query('select sl_media_access($1) as key', [invoiceLogo])).rows[0].key,
+      null,
+    );
+    assert.equal(
+      (
+        await db.query('select sl_media_access($1,null,$2,$3) as key', [
+          invoiceLogo,
+          event.id,
+          await hash(booking.accessToken),
+        ])
+      ).rows[0].key,
+      null,
+    );
+    assert.equal(
+      (
+        await db.query('select sl_media_access($1,null,$2,$3) as key', [
+          invoiceLogo,
+          event.id,
+          await hash(event.accessToken),
+        ])
+      ).rows[0].key,
+      `${owner}/${invoiceLogo}.webp`,
+    );
+    await db.query(
+      "update sl_private.media_assets set created_at=now()-interval '8 days' where id=$1",
+      [invoiceLogo],
+    );
+    const invoiceGc = await db.query('select sl_media_gc($1) as removed', [owner]);
+    assert.equal(
+      (invoiceGc.rows[0].removed as { id: string }[]).some((asset) => asset.id === invoiceLogo),
+      false,
+    );
+
+    w = await provider.manual(
+      {
+        ...eventInput,
+        requestId: crypto.randomUUID(),
+      },
+      {
+        ...quote,
+        totalPriceCents: 50000,
+        amountDueCents: 0,
+        paymentDeadline: null,
+        start: malaysiaInstant(date, '18:00'),
+        end: malaysiaInstant(date, '22:00'),
+      },
+      w.revision,
+    );
+    const manualEvent = w.bookings.find((record) => record.source === 'provider');
+    assert.equal(manualEvent?.status, 'confirmed');
+    assert.equal(manualEvent?.paymentDetails, null);
+    assert.equal(manualEvent?.paymentDeadline, null);
+    assert.equal(manualEvent?.invoice?.businessName, 'Updated Studio');
     assert.ok(upstream.every((u) => !u.includes(booking.accessToken)));
   } finally {
     await db.close();
